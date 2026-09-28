@@ -5,6 +5,8 @@
 #
 # SKIP_RENAME=ON is the positive control: the checks must fail on the unrenamed sample.
 
+cmake_minimum_required(VERSION 3.25)
+
 foreach(var IN ITEMS PYTHON SCRIPTS SAMPLE WORK)
   if(NOT DEFINED ${var})
     message(FATAL_ERROR "${var} is not set")

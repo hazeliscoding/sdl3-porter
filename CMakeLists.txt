@@ -56,7 +56,10 @@ add_test(NAME bundled-sdl-files-tampered
   COMMAND ${CMAKE_COMMAND} -DBUNDLE_DIR=${tampered_bundle} -DSDL_SOURCE_DIR=${sdl3_SOURCE_DIR}
           -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-bundled-sdl.cmake
 )
-set_tests_properties(bundled-sdl-files-tampered PROPERTIES WILL_FAIL TRUE)
+# Pass only on the specific failure, so an unrelated error can't satisfy the control.
+set_tests_properties(bundled-sdl-files-tampered PROPERTIES
+  PASS_REGULAR_EXPRESSION "differs from the SDL release: build-scripts/rename_symbols.py"
+)
 
 # The bundled rename scripts run from the skill's layout and leave the traps alone.
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
@@ -71,7 +74,9 @@ foreach(control IN ITEMS OFF ON)
             -DSKIP_RENAME=${control} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/rename-smoke.cmake
   )
 endforeach()
-set_tests_properties(rename-smoke-unrenamed PROPERTIES WILL_FAIL TRUE)
+set_tests_properties(rename-smoke-unrenamed PROPERTIES
+  PASS_REGULAR_EXPRESSION "main.c: expected SDL3 include"
+)
 
 file(GLOB fixture_dirs LIST_DIRECTORIES true CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/fixtures/*")
 foreach(dir IN LISTS fixture_dirs)

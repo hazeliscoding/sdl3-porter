@@ -3,6 +3,8 @@
 #
 #   cmake -DBUNDLE_DIR=<dir> -DSDL_SOURCE_DIR=<dir> -P check-bundled-sdl.cmake
 
+cmake_minimum_required(VERSION 3.25)
+
 foreach(var IN ITEMS BUNDLE_DIR SDL_SOURCE_DIR)
   if(NOT DEFINED ${var})
     message(FATAL_ERROR "${var} is not set")
