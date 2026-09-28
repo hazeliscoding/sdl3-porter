@@ -12,6 +12,7 @@ Files:
 build-scripts/rename_headers.py
 build-scripts/rename_macros.py
 build-scripts/rename_symbols.py
+docs/README-migration.md
 include/SDL3/SDL_oldnames.h
 LICENSE.txt
 
