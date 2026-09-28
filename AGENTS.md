@@ -43,6 +43,7 @@ The skill is only worth trusting if these hold.
 ## Evals
 
 - Evals use `claude plugin eval`. Don't build a separate eval framework.
+- Installed as a plugin, the skill is `sdl3-porter:sdl3-porter`. Match it in `tool_used` graders with `(?:[\w-]+:)?sdl3-porter`.
 - Prefer regex graders over files. Use `llm` graders only for short output with a concrete pass/fail rubric.
 - Never commit eval results, and never lower a threshold to make a case pass.
 

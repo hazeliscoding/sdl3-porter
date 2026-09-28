@@ -23,15 +23,23 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **License:** zlib, matching SDL and the bundled scripts.
 - **The logo is option A, "Chevron tile":** `›3` in a rounded orange tile, beside the `sdl3-porter` wordmark, both in JetBrains Mono ExtraBold. The accent is `#c2410c` on light backgrounds and `#fb923c` on dark ones.
 
+### Added during M0 (2026-09-27)
+
+- **Fixtures default to the dummy video and audio drivers.** A trap that needs rendering or OpenGL sets the offscreen driver on its own test.
+- **The plugin has no version until 0.1.0.** Installs follow the latest commit until then. `claude plugin validate` warns about it, which is expected.
+- **Installed as a plugin, the skill's name is `sdl3-porter:sdl3-porter`.** Eval graders match it with `(?:[\w-]+:)?sdl3-porter`.
+- **No CI cache for now.** SDL builds in about 90 seconds per platform. Add a cache only if CI gets slow.
+- **Linux CI installs SDL's X11 and Mesa packages.** SDL refuses to configure with X11 but without Xcursor and its other X11 dependencies.
+
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (zlib), `.gitignore` and `.gitattributes`.
 - [x] Write `README.md`, `ROADMAP.md`, `AGENTS.md` and `CLAUDE.md`.
 - [x] Brand: pick a logo option from a claude.ai design project, export `mark.svg` and `lockup.svg` with `-dark` variants to `docs/brand/`, and add the `<picture>` header to the README. Convert the text to paths.
-- [ ] Plugin skeleton: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` and a placeholder `skills/sdl3-porter/SKILL.md`.
-- [ ] Fixture harness: a top-level `CMakeLists.txt` that fetches SDL 3.4.16 and registers each `fixtures/<id>/naive` and `fixtures/<id>/fixed` program as a CTest test. Naive tests are marked `WILL_FAIL`, so a naive fixture that passes breaks the build.
-- [ ] First trap, `bool-returns`: an `SDL_Init(...) != 0` check that exits on success.
-- [ ] CI: configure, build and `ctest` on Linux, Windows and macOS, with the offscreen video and dummy audio drivers.
+- [x] Plugin skeleton: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` and a placeholder `skills/sdl3-porter/SKILL.md`.
+- [x] Fixture harness: a top-level `CMakeLists.txt` that fetches SDL 3.4.16 and registers each `fixtures/<id>/naive` and `fixtures/<id>/fixed` program as a CTest test. Naive tests are marked `WILL_FAIL`, so a naive fixture that passes breaks the build.
+- [x] First trap, `bool-returns`: an `SDL_Init(...) != 0` check that exits on success.
+- [x] CI: configure, build and `ctest` on Linux, Windows and macOS, with the dummy video and audio drivers, plus `claude plugin validate`.
 
 **Done when:** CI is green on all three platforms, with `bool-returns` naive failing and fixed passing, and the plugin installs from its local marketplace and `/sdl3-porter` loads in Claude Code.
 
