@@ -51,7 +51,7 @@ The skill is only worth trusting if these hold.
 
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `chore:`, `test:`, `ci:`, `build:`, `refactor:`). Keep each commit atomic, and use a scope when it adds clarity (`feat(skill): …`, `test(fixtures): …`).
 - **No AI attribution** in commits or PRs. That means no `Co-Authored-By` trailers, no "Generated with" lines and no session links.
-- **`AGENTS.md` and `CLAUDE.md` are committed.** `.gitignore` un-ignores them, overriding the global gitignore. Keep them free of secrets and private paths.
+- **`AGENTS.md`, `CLAUDE.md` and `.claude-plugin/` are committed.** `.gitignore` un-ignores them, overriding the global gitignore. Keep them free of secrets and private paths.
 - **Checks:** automate acceptance checks instead of handing manual steps to the owner. Give every check that tests for an absence a positive control, meaning a case that proves the check can fail.
 - **Validation:** evidence comes from the evals, the dogfooding log and public async signals (issues, PRs, installs). Don't plan interviews, recruiting or outreach.
 - **Docs:** short and concise. Prefer editing `ROADMAP.md` over creating new planning documents. Repo files never reference the owner's private notes.

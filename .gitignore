@@ -22,6 +22,7 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
-# Agent guidelines are committed; this overrides the global gitignore
+# Agent guidelines and the plugin manifest are committed; this overrides the global gitignore
 !AGENTS.md
 !CLAUDE.md
+!.claude-plugin/

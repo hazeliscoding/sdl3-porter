@@ -1,0 +1,12 @@
+{
+  "name": "sdl3-porter",
+  "description": "Port C and C++ code from SDL2 to SDL3, and catch the changes that compile cleanly but break at runtime.",
+  "author": {
+    "name": "Hazel Granados",
+    "url": "https://github.com/hazeliscoding"
+  },
+  "homepage": "https://github.com/hazeliscoding/sdl3-porter",
+  "repository": "https://github.com/hazeliscoding/sdl3-porter",
+  "license": "Zlib",
+  "keywords": ["sdl", "sdl3", "sdl2", "porting", "migration", "gamedev", "c", "cpp"]
+}

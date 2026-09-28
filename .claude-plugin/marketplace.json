@@ -1,0 +1,15 @@
+{
+  "name": "sdl3-porter",
+  "description": "The sdl3-porter agent skill: port SDL2 code to SDL3 without the bugs that still compile.",
+  "owner": {
+    "name": "Hazel Granados",
+    "url": "https://github.com/hazeliscoding"
+  },
+  "plugins": [
+    {
+      "name": "sdl3-porter",
+      "source": "./",
+      "description": "Port C and C++ code from SDL2 to SDL3, and catch the changes that compile cleanly but break at runtime."
+    }
+  ]
+}
