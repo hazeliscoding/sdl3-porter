@@ -1,16 +1,120 @@
 ---
 name: sdl3-porter
-description: Ports C and C++ code from SDL2 to SDL3 and checks the port for changes that compile cleanly but break at runtime. Use when migrating, upgrading or porting a project from SDL2 to SDL3, when SDL3 code behaves differently from the SDL2 version it replaced, or when SDL2-era patterns (SDL_Init(...) != 0 checks, SDL_RenderCopy, audio callbacks, SDL_GameController) show up in SDL3 code.
+description: Ports C and C++ projects from SDL2 to SDL3, including build files, includes and renamed APIs, then checks the port for changes that compile cleanly but break at runtime. Use when migrating or upgrading code from SDL2 to SDL3, or when ported SDL3 code misbehaves.
 license: Zlib
 ---
 
 # sdl3-porter
 
-**Status: placeholder.** The porting workflow and the trap checks are not written yet. They arrive in the project's M1 and M2 milestones.
+Port SDL2 code to SDL3, then sweep the port for traps: code that compiles cleanly against SDL3 but now means something else.
 
-Until then:
+Work from SDL's documentation, never from memory. Most SDL code you have seen is SDL2, and SDL3 changed return values, ownership and defaults without changing how the code looks.
 
-1. Tell the user that sdl3-porter is a placeholder and can't yet check a port for runtime traps.
-2. Work from SDL's own migration guide, `docs/README-migration.md` in the SDL3 source tree or https://wiki.libsdl.org/SDL3/README-migration, not from memory.
-3. Remember the most common silent change: SDL3 functions return `bool`, true on success. An SDL2-style `if (SDL_Init(...) != 0)` check now fails on every successful launch, and `< 0` never catches a failure.
-4. Don't tell the user a port is finished until it builds and runs.
+- SDL's migration guide, pinned to SDL 3.4.16: `${CLAUDE_SKILL_DIR}/scripts/sdl/docs/README-migration.md`. It has one `## SDL_<header>.h` section per header. Search it for a symbol before changing code that uses it.
+- Exact SDL3 signatures: the `include/SDL3/*.h` headers of the SDL3 the project builds against.
+
+**Scope:** core SDL3, meaning init, events, video and OpenGL, the renderer, input, audio, timers and the filesystem. SDL_image, SDL_ttf, SDL_mixer and SDL_net are out of scope. Port their includes and nothing else, and list them in the report.
+
+## Workflow
+
+Copy this checklist into your response and tick each item as you finish it:
+
+```
+SDL3 port:
+- [ ] 1. Survey the project
+- [ ] 2. Port, or recommend sdl2-compat
+- [ ] 3. Port the build
+- [ ] 4. Run SDL's rename scripts
+- [ ] 5. Build and fix until it compiles
+- [ ] 6. Sweep for traps
+- [ ] 7. Build and run
+- [ ] 8. Report
+```
+
+### 1. Survey the project
+
+- How does the build get SDL2? Look for `find_package(SDL2`, `SDL2::`, `sdl2-config`, `pkg-config` with `sdl2`, a vendored copy (for example `external/SDL2/`), FetchContent, Makefiles, Visual Studio projects or meson files.
+- Which paths hold the project's own source? Which hold vendored SDL, other third-party code or build output? The rename scripts must never touch the second group.
+- Which SDL subsystems does the code use? Check the `SDL_Init` flags and the API prefixes. This decides which trap files to read in step 6.
+- Are SDL_image, SDL_ttf, SDL_mixer or SDL_net used? They are out of scope.
+- Run `git status`. The port must be reviewable as a diff. If there are uncommitted changes, ask the user before going on. If the project isn't a git repository, say so and suggest a backup first.
+
+### 2. Port, or recommend sdl2-compat
+
+If the user asked to port the code, or wants SDL3's APIs, port it.
+
+If they only want an existing SDL2 program to run on SDL3, recommend sdl2-compat instead and ask before porting. See [build.md: sdl2-compat](references/build.md#sdl2-compat-running-without-porting).
+
+### 3. Port the build
+
+Follow [references/build.md](references/build.md). The essentials:
+
+- Keep the project's way of getting SDL. A system package stays a package, and a vendored copy stays vendored.
+- `SDL2::SDL2` becomes `SDL3::SDL3`, and `find_package(SDL2 ...)` becomes `find_package(SDL3 REQUIRED CONFIG COMPONENTS SDL3)`.
+- Remove `SDL2main` from the build. Add `#include <SDL3/SDL_main.h>` to the one file that defines `main`.
+
+### 4. Run SDL's rename scripts
+
+SDL's own scripts do the mechanical renames: headers, then symbols, then macros. They edit files in place. Pass only the project's own source paths, never the repository root, `.git`, build output or a vendored SDL:
+
+```sh
+python3 "${CLAUDE_SKILL_DIR}/scripts/sdl/build-scripts/rename_headers.py" src include
+python3 "${CLAUDE_SKILL_DIR}/scripts/sdl/build-scripts/rename_symbols.py" --all-symbols src include
+python3 "${CLAUDE_SKILL_DIR}/scripts/sdl/build-scripts/rename_macros.py" src include
+```
+
+- Replace `src include` with the project's source paths.
+- Use whichever of `python3`, `python` or `py -3` runs Python 3.
+- Without Python, rename by hand from the "renamed" lists in the migration guide.
+- Then read `git diff`. Resolve every `FIXME` comment that `rename_macros.py` added.
+
+The scripts only rename. They don't fix changed return values, ownership or defaults. That's step 6.
+
+### 5. Build and fix until it compiles
+
+Build with the project's own build system. For each error:
+
+1. Search the migration guide for the symbol, under its header's section.
+2. Check the SDL3 header for the exact signature.
+3. Fix the code, then rebuild.
+
+Repeat until it builds with no warnings that the SDL2 build didn't have.
+
+Never add a cast just to make a type error go away. A cast that hides a changed type is itself a trap. For example, don't cast an `SDL_Rect *` to `SDL_FRect *`. Convert the rectangle instead.
+
+### 6. Sweep for traps
+
+Code that compiles can still be wrong. For each subsystem the project uses, read its trap file and check every trap in it against all ported files:
+
+| Subsystem | Trap file |
+|---|---|
+| Init and error handling (always read) | [references/init.md](references/init.md) |
+
+For each trap:
+
+1. Run its "How to find it" search.
+2. Read every hit in context.
+3. Fix the ones that match, and note `file:line` and the trap id.
+
+### 7. Build and run
+
+Rebuild. Run the project's tests if it has any. If the program can run without a display (SDL's dummy drivers: `SDL_VIDEO_DRIVER=dummy SDL_AUDIO_DRIVER=dummy`, or a test mode or frame limit the program offers), run it and check it exits cleanly.
+
+Don't call the port finished until it builds and, where possible, runs. If you couldn't build or run it, say so plainly.
+
+### 8. Report
+
+Use this format, one line per trap, with no emoji:
+
+```
+2 traps found, 2 fixed
+
+src/main.c:14     bool-returns   SDL_Init returns true on success, so `< 0` never caught a failure.
+src/net.c:88      bool-returns   SDL_SetHint returns bool, so `!= 0` treated success as failure.
+
+Build: find_package(SDL3), SDL2main removed, SDL_main.h added to src/main.c.
+Not checked: couldn't build here (SDL3 isn't installed).
+Needs a human: audio by ear, a real gamepad, SDL_mixer (out of scope).
+```
+
+If no traps were found, say `0 traps found` and list the trap files you checked.
