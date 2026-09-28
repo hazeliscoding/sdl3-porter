@@ -19,10 +19,15 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # SDL refuses to configure on Linux without a windowing backend.
+      # SDL's X11 backend and its hard dependencies (docs/README-linux.md), plus
+      # Mesa for the OpenGL traps. Fixtures use the dummy audio driver, so no audio libs.
       - name: Install SDL build dependencies
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libx11-dev libxext-dev
+        run: >-
+          sudo apt-get update && sudo apt-get install -y
+          libx11-dev libxext-dev libxrandr-dev libxcursor-dev libxfixes-dev
+          libxi-dev libxss-dev libxtst-dev libxkbcommon-dev
+          libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev
 
       - name: Configure
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
