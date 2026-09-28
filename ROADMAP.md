@@ -15,6 +15,8 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **Port only when it's needed.** When the goal is only to run on SDL3, the skill recommends sdl2-compat and asks before porting.
 - **Supported versions:** SDL 3.2.0 and later. Fixtures are pinned to SDL 3.4.16, and SDL2 originals to the latest SDL 2.32 release.
 - **Fixtures are small C programs,** one behavior each. The skill ports C and C++.
+- **Fixtures compile with warnings as errors** (`-Wall -Wextra -Werror`, `/W4 /WX`). This enforces "compiles cleanly". If any compiler warns about a naive port, the compiler already catches it, so it becomes reference guidance instead of a trap.
+- **SDL builds from a hash-checked source archive as a static library,** so the build is the same locally and in CI, and Windows needs no DLL copying.
 - **Headless CI:** the offscreen video driver, dummy or disk audio, the virtual joystick API and the software renderer with `SDL_RenderReadPixels`. OpenGL traps run on Linux with Mesa. Every other trap runs on Windows, Linux and macOS.
 - **Claude Code first.** The repo is a Claude Code plugin with its own marketplace file. The SKILL.md also works as a plain Agent Skill, and the README calls that untested until an eval covers another harness.
 - **Name:** `sdl3-porter`, for the repo, the plugin and the skill (`/sdl3-porter`).

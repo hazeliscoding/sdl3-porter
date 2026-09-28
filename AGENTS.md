@@ -11,14 +11,21 @@ These are the working rules for agents in this repo. sdl3-porter is an agent ski
 
 ## Commands
 
-The M0 harness adds the configure, build and test commands here. Keep them cross-platform (`cmake`, `ctest`), because the owner develops on Windows. Avoid bash-only scripts.
+```sh
+cmake -S . -B build                                   # fetches and builds SDL 3.4.16 the first time
+cmake --build build --config Debug
+ctest --test-dir build -C Debug --output-on-failure   # naive fixtures must fail, fixed must pass
+claude plugin validate .                              # plugin and marketplace manifests
+```
+
+Keep commands cross-platform (`cmake`, `ctest`), because the owner develops on Windows. On Windows, the CMake bundled with Visual Studio works. Avoid bash-only scripts.
 
 ## Every trap is proven (hard rules)
 
 The skill is only worth trusting if these hold.
 
 - **No trap without fixtures.** A trap card needs `fixtures/<id>/sdl2/`, `naive/` and `fixed/`. The naive fixture is the positive control: it must fail in CI, and its test is marked `WILL_FAIL`. A trap without a failing naive fixture isn't done.
-- **Compiles, then breaks.** A trap's naive fixture must compile against SDL3. If it doesn't compile, it's a compile error, and it goes in a reference file, not a trap card.
+- **Compiles cleanly, then breaks.** A trap's naive fixture must compile against SDL3 with warnings as errors (`-Wall -Wextra -Werror`, `/W4 /WX`). If it doesn't compile, or any compiler warns about it, the compiler already catches it, so it goes in a reference file, not a trap card. Never silence a warning in a naive fixture to make it qualify.
 - **Cite the source.** Every trap card links the README-migration section or SDL wiki page it rests on. If you can't find one, don't add the trap.
 - **Don't edit bundled SDL files.** Everything under `skills/sdl3-porter/scripts/sdl/` is byte-identical to the SDL tag named in its `SOURCE` file. To update, copy fresh files from a new tag, update `SOURCE` and record a decision.
 - **Headless and offline.** Fixtures run without a display, audio hardware, gamepads or network: the offscreen video driver, dummy or disk audio, the virtual joystick API and the software renderer. A fixture that needs real hardware isn't a fixture.
