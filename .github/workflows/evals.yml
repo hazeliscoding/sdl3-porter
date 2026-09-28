@@ -1,0 +1,87 @@
+name: Evals
+
+# Runs the skill's claude plugin eval cases on demand. Evals cost model usage,
+# so this never runs on push. Windows can't sandbox the Bash tool the skill needs,
+# so evals run here, on Linux.
+
+on:
+  workflow_dispatch:
+    inputs:
+      case:
+        description: Case name glob (empty runs every case)
+        required: false
+        default: ""
+      runs:
+        description: Runs per case
+        required: false
+        default: "3"
+      ablation:
+        description: "none, or with-without to add a no-skill baseline"
+        required: false
+        default: none
+        type: choice
+        options: [none, with-without]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: evals
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+
+      - name: Check for a token
+        env:
+          HAS_OAUTH: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN != '' }}
+          HAS_API_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+        run: |
+          if [ "$HAS_OAUTH" != "true" ] && [ "$HAS_API_KEY" != "true" ]; then
+            echo "::error::Add a CLAUDE_CODE_OAUTH_TOKEN (from 'claude setup-token') or ANTHROPIC_API_KEY repository secret."
+            exit 1
+          fi
+
+      - name: Install Claude Code and the sandbox backend
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          sudo apt-get update && sudo apt-get install -y bubblewrap socat
+          # Ubuntu 24.04 blocks the unprivileged user namespaces bubblewrap needs.
+          if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
+            sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+          fi
+
+      - name: Run evals
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CASE: ${{ inputs.case }}
+          RUNS: ${{ inputs.runs }}
+          ABLATION: ${{ inputs.ablation }}
+        run: |
+          # Keep only the token that was provided.
+          [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ] || unset CLAUDE_CODE_OAUTH_TOKEN
+          [ -n "$ANTHROPIC_API_KEY" ] || unset ANTHROPIC_API_KEY
+          claude plugin eval . \
+            --trust-plugin --scaffold --allow-tools Bash Write Edit \
+            --model claude-sonnet-5 --runs "$RUNS" --ablation "$ABLATION" \
+            ${CASE:+--case "$CASE"} \
+            --no-publish --max-cost-usd 20 \
+            --json results.json --report report.html
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: eval-results
+          path: |
+            results.json
+            report.html
+          if-no-files-found: ignore
