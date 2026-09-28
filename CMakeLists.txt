@@ -40,6 +40,39 @@ function(add_fixture id variant)
   )
 endfunction()
 
+# The SDL files bundled with the skill must match this release byte for byte.
+set(sdl_bundle "${CMAKE_CURRENT_SOURCE_DIR}/skills/sdl3-porter/scripts/sdl")
+add_test(NAME bundled-sdl-files
+  COMMAND ${CMAKE_COMMAND} -DBUNDLE_DIR=${sdl_bundle} -DSDL_SOURCE_DIR=${sdl3_SOURCE_DIR}
+          -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-bundled-sdl.cmake
+)
+
+# Positive control: the same check must fail on a tampered copy.
+set(tampered_bundle "${CMAKE_CURRENT_BINARY_DIR}/tampered-sdl-bundle")
+file(REMOVE_RECURSE "${tampered_bundle}")
+file(COPY "${sdl_bundle}/" DESTINATION "${tampered_bundle}")
+file(APPEND "${tampered_bundle}/build-scripts/rename_symbols.py" "# tampered\n")
+add_test(NAME bundled-sdl-files-tampered
+  COMMAND ${CMAKE_COMMAND} -DBUNDLE_DIR=${tampered_bundle} -DSDL_SOURCE_DIR=${sdl3_SOURCE_DIR}
+          -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-bundled-sdl.cmake
+)
+set_tests_properties(bundled-sdl-files-tampered PROPERTIES WILL_FAIL TRUE)
+
+# The bundled rename scripts run from the skill's layout and leave the traps alone.
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+foreach(control IN ITEMS OFF ON)
+  set(name rename-smoke)
+  if(control)
+    set(name rename-smoke-unrenamed)
+  endif()
+  add_test(NAME ${name}
+    COMMAND ${CMAKE_COMMAND} -DPYTHON=${Python3_EXECUTABLE} -DSCRIPTS=${sdl_bundle}/build-scripts
+            -DSAMPLE=${CMAKE_CURRENT_SOURCE_DIR}/samples/bounce -DWORK=${CMAKE_CURRENT_BINARY_DIR}/${name}
+            -DSKIP_RENAME=${control} -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/rename-smoke.cmake
+  )
+endforeach()
+set_tests_properties(rename-smoke-unrenamed PROPERTIES WILL_FAIL TRUE)
+
 file(GLOB fixture_dirs LIST_DIRECTORIES true CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/fixtures/*")
 foreach(dir IN LISTS fixture_dirs)
   if(NOT IS_DIRECTORY "${dir}")
