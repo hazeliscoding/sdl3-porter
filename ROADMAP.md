@@ -41,6 +41,8 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **Evals run in GitHub Actions on Ubuntu, by hand.** Claude Code can't sandbox a shell tool on Windows, so it refuses evals that grant Bash there. The `Evals` workflow runs only on `workflow_dispatch`, with Sonnet 5, a $20 cost ceiling and a token from a repository secret.
 - **`port-sample` doesn't build the port.** SDL3 isn't installed in the eval sandbox, so the prompt says so and the graders check files. M3 revisits building inside evals.
 - **Eval file graders take one file each.** Globs in `{source: file, path}` aren't supported.
+- **`port-sample` passed 3 of 3 runs** on 2026-09-27, with Sonnet 5 and Claude Code 2.1.283: all 8 graders in every run, 50–53 of the 60 allowed turns, about 6 minutes and $1.20–1.50 per run, $3.95 in total. Raise `max_turns` if a later run hits the limit.
+- **Transcripts are opt-in.** The `Evals` workflow uploads each run's `trace.jsonl` only when started with `traces=true`, because artifacts on a public repo are readable by anyone signed in. They expire after 7 days.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -63,7 +65,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - [x] A sample SDL2 program that uses video, the renderer, input and audio, for the whole-port eval.
 - [x] Eval `port-sample`: the skill fires, no SDL2 include remains, `SDL3/SDL.h` and `SDL3/SDL_main.h` are included, and the CMake file finds SDL3.
 - [x] `Evals` workflow: a manual GitHub Actions job on Ubuntu that runs `claude plugin eval`.
-- [ ] Add a `CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY` repository secret (owner), then run `port-sample` 3 times.
+- [x] Add a `CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY` repository secret (owner), then run `port-sample` 3 times.
 
 **Done when:** the byte-identity check passes and fails on a tampered copy, and `port-sample` passes 3 of 3 runs.
 
