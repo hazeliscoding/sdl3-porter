@@ -31,6 +31,17 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **No CI cache for now.** SDL builds in about 90 seconds per platform. Add a cache only if CI gets slow.
 - **Linux CI installs SDL's X11 and Mesa packages.** SDL refuses to configure with X11 but without Xcursor and its other X11 dependencies.
 
+### Added during M1 (2026-09-27)
+
+- **SDL's migration guide ships with the skill.** `docs/README-migration.md` from `release-3.4.16` sits beside the rename scripts, so the agent works from pinned docs, not memory. The byte-identity check covers it.
+- **The `bool-returns` trap card is written in M1** (`references/init.md`), because the trap sweep needs at least one card. M2 adds the rest.
+- **A smoke test pins what the rename scripts do.** It runs them from the skill's layout on the bounce sample, and checks that they rename the APIs and leave the `bool-returns` and `mix-volume-float` traps in place.
+- **Controls pass only on their expected failure.** The tampered-bundle and unrenamed-sample controls match their specific failure message, not any failure. Naive fixtures stay `WILL_FAIL` until M2 adds a runner that also handles crashes.
+- **Configuring the harness requires Python 3**, for the rename smoke test.
+- **Evals run in GitHub Actions on Ubuntu, by hand.** Claude Code can't sandbox a shell tool on Windows, so it refuses evals that grant Bash there. The `Evals` workflow runs only on `workflow_dispatch`, with Sonnet 5, a $20 cost ceiling and a token from a repository secret.
+- **`port-sample` doesn't build the port.** SDL3 isn't installed in the eval sandbox, so the prompt says so and the graders check files. M3 revisits building inside evals.
+- **Eval file graders take one file each.** Globs in `{source: file, path}` aren't supported.
+
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (zlib), `.gitignore` and `.gitattributes`.
@@ -45,12 +56,14 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 
 ## M1: Porting workflow
 
-- [ ] `SKILL.md` workflow, under 500 lines: survey, port or sdl2-compat, build system, renames, compile loop, trap sweep, report. Details go in `references/`.
-- [ ] `references/build.md`: `find_package(SDL3)`, FetchContent, pkg-config, include paths, `SDL_main.h`, and copying the SDL3 DLL on Windows.
-- [ ] Bundle `scripts/sdl/build-scripts/` (the three rename scripts) and `scripts/sdl/include/SDL3/SDL_oldnames.h` from `release-3.4.16`, with SDL's license text and a `SOURCE` file naming the tag.
-- [ ] CI check: the bundled files are byte-identical to the tag.
-- [ ] A sample SDL2 program that uses video, the renderer, input and audio, for the whole-port eval.
-- [ ] Eval `port-sample`: the skill fires, no `SDL2/` include remains, and `SDL3/SDL.h` is included.
+- [x] `SKILL.md` workflow, under 500 lines: survey, port or sdl2-compat, build system, renames, compile loop, trap sweep, report. Details go in `references/`.
+- [x] `references/build.md`: `find_package(SDL3)`, FetchContent, pkg-config, include paths, `SDL_main.h`, and copying the SDL3 DLL on Windows.
+- [x] Bundle `scripts/sdl/build-scripts/` (the three rename scripts), `scripts/sdl/include/SDL3/SDL_oldnames.h` and `scripts/sdl/docs/README-migration.md` from `release-3.4.16`, with SDL's license text and a `SOURCE` file naming the tag.
+- [x] CI check: the bundled files are byte-identical to the tag.
+- [x] A sample SDL2 program that uses video, the renderer, input and audio, for the whole-port eval.
+- [x] Eval `port-sample`: the skill fires, no SDL2 include remains, `SDL3/SDL.h` and `SDL3/SDL_main.h` are included, and the CMake file finds SDL3.
+- [x] `Evals` workflow: a manual GitHub Actions job on Ubuntu that runs `claude plugin eval`.
+- [ ] Add a `CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY` repository secret (owner), then run `port-sample` 3 times.
 
 **Done when:** the byte-identity check passes and fails on a tampered copy, and `port-sample` passes 3 of 3 runs.
 

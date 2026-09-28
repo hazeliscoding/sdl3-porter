@@ -16,7 +16,10 @@ cmake -S . -B build                                   # fetches and builds SDL 3
 cmake --build build --config Debug
 ctest --test-dir build -C Debug --output-on-failure   # naive fixtures must fail, fixed must pass
 claude plugin validate .                              # plugin and marketplace manifests
+gh workflow run evals.yml -f case=port-sample -f runs=3   # evals run in GitHub Actions, never locally on Windows
 ```
+
+Configuring needs Python 3, for the rename smoke test.
 
 Keep commands cross-platform (`cmake`, `ctest`), because the owner develops on Windows. On Windows, the CMake bundled with Visual Studio works. Avoid bash-only scripts.
 
@@ -44,7 +47,9 @@ The skill is only worth trusting if these hold.
 
 - Evals use `claude plugin eval`. Don't build a separate eval framework.
 - Installed as a plugin, the skill is `sdl3-porter:sdl3-porter`. Match it in `tool_used` graders with `(?:[\w-]+:)?sdl3-porter`.
-- Prefer regex graders over files. Use `llm` graders only for short output with a concrete pass/fail rubric.
+- Evals run in the manual `Evals` GitHub Actions workflow. Claude Code refuses evals that grant Bash on Windows, because it can't sandbox the shell there.
+- Prefer regex graders over files, one file per grader (`{source: file, path}` takes no globs). Use `llm` graders only for short output with a concrete pass/fail rubric.
+- Case scaffolds are bash scripts that copy from `samples/` or `fixtures/` relative to their own location, then commit the copy, so the skill starts from a clean git tree.
 - Never commit eval results, and never lower a threshold to make a case pass.
 
 ## Brand
