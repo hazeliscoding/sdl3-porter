@@ -1,0 +1,19 @@
+Copied unmodified from SDL, tag release-3.4.16:
+https://github.com/libsdl-org/SDL/tree/release-3.4.16
+
+The files keep SDL's layout, because rename_symbols.py reads
+include/SDL3/SDL_oldnames.h relative to its own location. They are
+zlib-licensed; see LICENSE.txt.
+
+CI checks that each file listed below is byte-identical to the same path
+in the SDL release archive, and that nothing else is in this folder.
+
+Files:
+build-scripts/rename_headers.py
+build-scripts/rename_macros.py
+build-scripts/rename_symbols.py
+include/SDL3/SDL_oldnames.h
+LICENSE.txt
+
+To update: copy the same paths from a newer SDL release, change the tag
+here and in CMakeLists.txt, and record the decision in ROADMAP.md.
