@@ -1,4 +1,9 @@
-# sdl3-porter
+<h1>
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/brand/lockup-dark.svg">
+    <img alt="sdl3-porter" src="docs/brand/lockup.svg" height="40">
+  </picture>
+</h1>
 
 **Port SDL2 code to SDL3 without the bugs that still compile.** sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3, then checks the port for the changes that build cleanly but break at runtime.
 

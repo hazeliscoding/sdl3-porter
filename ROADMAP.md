@@ -19,12 +19,13 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **Claude Code first.** The repo is a Claude Code plugin with its own marketplace file. The SKILL.md also works as a plain Agent Skill, and the README calls that untested until an eval covers another harness.
 - **Name:** `sdl3-porter`, for the repo, the plugin and the skill (`/sdl3-porter`).
 - **License:** zlib, matching SDL and the bundled scripts.
+- **The logo is option A, "Chevron tile":** `›3` in a rounded orange tile, beside the `sdl3-porter` wordmark, both in JetBrains Mono ExtraBold. The accent is `#c2410c` on light backgrounds and `#fb923c` on dark ones.
 
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (zlib), `.gitignore` and `.gitattributes`.
 - [x] Write `README.md`, `ROADMAP.md`, `AGENTS.md` and `CLAUDE.md`.
-- [ ] Brand: pick a logo option from a claude.ai design project, export `mark.svg` and `lockup.svg` with `-dark` variants to `docs/brand/`, and add the `<picture>` header to the README. Convert the text to paths.
+- [x] Brand: pick a logo option from a claude.ai design project, export `mark.svg` and `lockup.svg` with `-dark` variants to `docs/brand/`, and add the `<picture>` header to the README. Convert the text to paths.
 - [ ] Plugin skeleton: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` and a placeholder `skills/sdl3-porter/SKILL.md`.
 - [ ] Fixture harness: a top-level `CMakeLists.txt` that fetches SDL 3.4.16 and registers each `fixtures/<id>/naive` and `fixtures/<id>/fixed` program as a CTest test. Naive tests are marked `WILL_FAIL`, so a naive fixture that passes breaks the build.
 - [ ] First trap, `bool-returns`: an `SDL_Init(...) != 0` check that exits on success.

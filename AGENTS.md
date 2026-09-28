@@ -39,6 +39,14 @@ The skill is only worth trusting if these hold.
 - Prefer regex graders over files. Use `llm` graders only for short output with a concrete pass/fail rubric.
 - Never commit eval results, and never lower a threshold to make a case pass.
 
+## Brand
+
+- The logo is option A, "Chevron tile": `›3` in a rounded tile, beside the `sdl3-porter` wordmark. Keep it that simple. Don't add effects, gradients or a second accent.
+- The assets are in `docs/brand/`: `mark.svg` and `lockup.svg` for light backgrounds, and `-dark` files for dark backgrounds. Use the SVGs, and don't re-typeset the wordmark with a web font.
+- The type is JetBrains Mono ExtraBold, converted to vector paths, with -0.03em letter spacing on the wordmark and -0.04em on the tile.
+- The accent is `#c2410c` on light and `#fb923c` on dark. The tile's glyphs are `#ffffff` on light and `#0d1117` on dark. Ink is `#1f2328` on light and `#e6edf3` on dark, matching GitHub's text colors.
+- Write the name in lowercase, `sdl3-porter`, everywhere.
+
 ## Working style
 
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `chore:`, `test:`, `ci:`, `build:`, `refactor:`). Keep each commit atomic, and use a scope when it adds clarity (`feat(skill): …`, `test(fixtures): …`).
