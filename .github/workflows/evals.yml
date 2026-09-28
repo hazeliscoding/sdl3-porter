@@ -21,6 +21,11 @@ on:
         default: none
         type: choice
         options: [none, with-without]
+      traces:
+        description: Upload each run's transcript (public artifact, kept 7 days)
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -65,6 +70,7 @@ jobs:
           CASE: ${{ inputs.case }}
           RUNS: ${{ inputs.runs }}
           ABLATION: ${{ inputs.ablation }}
+          KEEP_TEMP: ${{ inputs.traces && '1' || '' }}
         run: |
           # Keep only the token that was provided.
           [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ] || unset CLAUDE_CODE_OAUTH_TOKEN
@@ -72,7 +78,7 @@ jobs:
           claude plugin eval . \
             --trust-plugin --scaffold --allow-tools Bash Write Edit \
             --model claude-sonnet-5 --runs "$RUNS" --ablation "$ABLATION" \
-            ${CASE:+--case "$CASE"} \
+            ${CASE:+--case "$CASE"} ${KEEP_TEMP:+--keep-temp} \
             --no-publish --max-cost-usd 20 \
             --json results.json --report report.html
 
@@ -85,3 +91,13 @@ jobs:
             results.json
             report.html
           if-no-files-found: ignore
+
+      # Only the out/ folder of a kept run is written by the harness, not the agent.
+      - name: Upload transcripts
+        if: always() && inputs.traces
+        uses: actions/upload-artifact@v7
+        with:
+          name: eval-transcripts
+          path: /tmp/claude-eval-*/out/trace.jsonl
+          retention-days: 7
+          if-no-files-found: warn
