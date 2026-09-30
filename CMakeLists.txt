@@ -138,3 +138,37 @@ add_executable(crash cmake/crash.c)
 add_runner_control(run-naive-passed bool-returns-fixed bool-returns "the bool-returns trap didn't reproduce")
 add_runner_control(run-naive-other-failure bool-returns-naive other-trap "without a line starting with \"other-trap: \"")
 add_runner_control(run-naive-crashed crash crash "The naive port crashed, which counts as its trap")
+
+# Every trap card has fixtures, and every fixture folder has a trap card.
+set(references "${CMAKE_CURRENT_SOURCE_DIR}/skills/sdl3-porter/references")
+set(fixtures "${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
+add_test(NAME trap-cards
+  COMMAND ${CMAKE_COMMAND} -DREFERENCES=${references} -DFIXTURES=${fixtures}
+          -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-cards.cmake
+)
+
+# Positive controls: the check must fail on a card without fixtures, and on
+# fixtures without a card.
+set(orphans "${CMAKE_CURRENT_BINARY_DIR}/trap-cards-orphans")
+file(REMOVE_RECURSE "${orphans}")
+file(COPY "${references}/" DESTINATION "${orphans}/references")
+file(APPEND "${orphans}/references/init.md" "\n## orphan-card\n\n**What compiles:** nothing yet.\n")
+foreach(dir IN LISTS fixture_dirs)
+  get_filename_component(id "${dir}" NAME)
+  file(MAKE_DIRECTORY "${orphans}/fixtures/${id}")
+endforeach()
+file(MAKE_DIRECTORY "${orphans}/fixtures/orphan-fixture")
+add_test(NAME trap-cards-orphan-card
+  COMMAND ${CMAKE_COMMAND} -DREFERENCES=${orphans}/references -DFIXTURES=${fixtures}
+          -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-cards.cmake
+)
+add_test(NAME trap-cards-orphan-fixture
+  COMMAND ${CMAKE_COMMAND} -DREFERENCES=${references} -DFIXTURES=${orphans}/fixtures
+          -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-cards.cmake
+)
+set_tests_properties(trap-cards-orphan-card PROPERTIES
+  PASS_REGULAR_EXPRESSION "trap card without a fixture folder: orphan-card"
+)
+set_tests_properties(trap-cards-orphan-fixture PROPERTIES
+  PASS_REGULAR_EXPRESSION "fixture folder without a trap card: orphan-fixture"
+)
