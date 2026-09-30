@@ -82,6 +82,13 @@ Repeat until it builds with no warnings that the SDL2 build didn't have.
 
 Never add a cast just to make a type error go away. A cast that hides a changed type is itself a trap. For example, don't cast an `SDL_Rect *` to `SDL_FRect *`. Convert the rectangle instead.
 
+Some strings that SDL2 handed over for you to free are now `const` in SDL3, because SDL owns them. When `SDL_free` or a `char *` rejects one, delete the `SDL_free` and keep the pointer `const`. Casting `const` away compiles, then frees memory SDL still owns. Two examples:
+
+- `event.drop.data`, which was `event.drop.file` in SDL2. SDL manages event memory (migration guide, `SDL_events.h`).
+- `SDL_GetBasePath()`. SDL caches the result (`SDL_filesystem.h`).
+
+`SDL_GetPrefPath()` still returns a `char *` that you free.
+
 ### 6. Sweep for traps
 
 Code that compiles can still be wrong. For each subsystem the project uses, read its trap file and check every trap in it against all ported files:
