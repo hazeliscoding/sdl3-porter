@@ -49,6 +49,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **SDL2 originals build against SDL 2.32.10 and must pass.** It's the latest 2.32 release, fetched from a hash-checked archive into the same build as SDL3. The two share option names, so both build static with the C library. Each original runs headless with SDL2's `SDL_VIDEODRIVER` and `SDL_AUDIODRIVER` variables. A passing original proves the fixture's check holds on SDL2, so the naive failure comes from the port.
 - **Naive fixtures run through `cmake/run-naive.cmake` instead of `WILL_FAIL`.** CTest can't count a crash as an expected failure. The test passes only when the naive port exits non-zero after printing a line that starts with `<id>: `, or crashes. A port that passes, hangs or fails without that line fails the test. Controls cover a passing program, a failure without the line and a crash.
 - **A trap card is a `## <id>` section of `references/*.md` with a `**What compiles:**` part.** The `trap-cards` check matches those ids against the `fixtures/` folders, with controls for a card without fixtures and for fixtures without a card.
+- **`drop-data-freed` and `base-path-freed` are guidance, not traps (2026-09-30).** SDL3 makes `SDL_DropEvent.data` and `SDL_GetBasePath()` `const char *`, so no naive port that frees them compiles cleanly. In C, GCC, Clang and MSVC warn about the dropped `const` even without warning flags, and in C++ it's an error. Only a cast gets it through, and a naive fixture may not silence a warning. `SKILL.md` step 5 now says to drop the `SDL_free` instead of casting.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -84,9 +85,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 | Area | Trap | What breaks |
 |---|---|---|
 | Init | `bool-returns` | A leftover `SDL_Init(...) != 0` treats success as failure and exits on every launch |
-| Memory | `drop-data-freed` | `SDL_free` on drop-event data is a double free, because SDL owns event memory |
 | Memory | `text-event-pointer-kept` | Keeping `event.text.text` after the event leaves a dangling pointer |
-| Memory | `base-path-freed` | `SDL_GetBasePath()` now returns memory SDL owns, so freeing it corrupts the heap |
 | Input | `text-input-off` | Text input is no longer on by default, so no text events arrive |
 | Input | `gamepad-index-vs-id` | `which` is now an instance ID, not an index, so the wrong pad or none opens |
 | Render | `vsync-flag-dropped` | Dropping the removed `SDL_RENDERER_PRESENTVSYNC` flag leaves the loop unthrottled |
