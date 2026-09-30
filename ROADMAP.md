@@ -44,6 +44,12 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **`port-sample` passed 3 of 3 runs** on 2026-09-27, with Sonnet 5 and Claude Code 2.1.283: all 8 graders in every run, 50–53 of the 60 allowed turns, about 6 minutes and $1.20–1.50 per run, $3.95 in total. Raise `max_turns` if a later run hits the limit.
 - **Transcripts are opt-in.** The `Evals` workflow uploads each run's `trace.jsonl` only when started with `traces=true`, because artifacts on a public repo are readable by anyone signed in. They expire after 7 days.
 
+### Added during M2 (2026-09-29)
+
+- **SDL2 originals build against SDL 2.32.10 and must pass.** It's the latest 2.32 release, fetched from a hash-checked archive into the same build as SDL3. The two share option names, so both build static with the C library. Each original runs headless with SDL2's `SDL_VIDEODRIVER` and `SDL_AUDIODRIVER` variables. A passing original proves the fixture's check holds on SDL2, so the naive failure comes from the port.
+- **Naive fixtures run through `cmake/run-naive.cmake` instead of `WILL_FAIL`.** CTest can't count a crash as an expected failure. The test passes only when the naive port exits non-zero after printing a line that starts with `<id>: `, or crashes. A port that passes, hangs or fails without that line fails the test. Controls cover a passing program, a failure without the line and a crash.
+- **A trap card is a `## <id>` section of `references/*.md` with a `**What compiles:**` part.** The `trap-cards` check matches those ids against the `fixtures/` folders, with controls for a card without fixtures and for fixtures without a card.
+
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (zlib), `.gitignore` and `.gitattributes`.
@@ -91,7 +97,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 | Audio | `mix-volume-float` | `SDL_MIX_MAXVOLUME` (128) passed as a 0–1 float gives 128× gain and clipping |
 | Hints | `hint-string-ignored` | Hints written as renamed or removed string literals are silently ignored |
 
-- [ ] Consistency check: every trap card has a fixture folder, and every fixture folder has a trap card.
+- [x] Consistency check: every trap card has a fixture folder, and every fixture folder has a trap card.
 
 **Done when:** every naive fixture fails and every fixed fixture passes, the consistency check passes and fails on a card without fixtures, and any trap that couldn't be reproduced headless has moved to guidance with a decision recorded here.
 
