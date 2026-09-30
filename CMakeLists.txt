@@ -34,6 +34,8 @@ FetchContent_MakeAvailable(SDL2)
 
 enable_testing()
 
+set(run_naive "${CMAKE_CURRENT_SOURCE_DIR}/cmake/run-naive.cmake")
+
 # One test per program. The warning flags enforce "compiles cleanly": a naive
 # port the compiler warns about is guidance, not a trap.
 function(add_fixture id variant)
@@ -52,7 +54,14 @@ function(add_fixture id variant)
   else()
     target_compile_options(${target} PRIVATE -Wall -Wextra -Werror)
   endif()
-  add_test(NAME ${target} COMMAND ${target})
+  if(variant STREQUAL "naive")
+    # The positive control: passes only if the naive port fails with its trap.
+    add_test(NAME ${target}
+      COMMAND ${CMAKE_COMMAND} -DEXE=$<TARGET_FILE:${target}> -DID=${id} -P ${run_naive}
+    )
+  else()
+    add_test(NAME ${target} COMMAND ${target})
+  endif()
   set_tests_properties(${target} PROPERTIES
     ENVIRONMENT "${drivers}"
     TIMEOUT 30
@@ -111,6 +120,21 @@ foreach(dir IN LISTS fixture_dirs)
   foreach(variant IN ITEMS sdl2 naive fixed)
     add_fixture(${id} ${variant})
   endforeach()
-  # The positive control: a naive port that passes breaks the build.
-  set_tests_properties(${id}-naive PROPERTIES WILL_FAIL TRUE)
 endforeach()
+
+# Positive controls for the naive runner: it must fail on a port that passes and
+# on a failure without the trap's line, and it must count a crash as the trap.
+function(add_runner_control name target id expected)
+  add_test(NAME ${name}
+    COMMAND ${CMAKE_COMMAND} -DEXE=$<TARGET_FILE:${target}> -DID=${id} -P ${run_naive}
+  )
+  set_tests_properties(${name} PROPERTIES
+    ENVIRONMENT "SDL_VIDEO_DRIVER=dummy;SDL_AUDIO_DRIVER=dummy"
+    PASS_REGULAR_EXPRESSION "${expected}"
+    TIMEOUT 30
+  )
+endfunction()
+add_executable(crash cmake/crash.c)
+add_runner_control(run-naive-passed bool-returns-fixed bool-returns "the bool-returns trap didn't reproduce")
+add_runner_control(run-naive-other-failure bool-returns-naive other-trap "without a line starting with \"other-trap: \"")
+add_runner_control(run-naive-crashed crash crash "The naive port crashed, which counts as its trap")
