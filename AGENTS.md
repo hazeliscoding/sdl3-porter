@@ -12,9 +12,9 @@ These are the working rules for agents in this repo. sdl3-porter is an agent ski
 ## Commands
 
 ```sh
-cmake -S . -B build                                   # fetches and builds SDL 3.4.16 the first time
+cmake -S . -B build                                   # fetches and builds SDL 3.4.16 and 2.32.10 the first time
 cmake --build build --config Debug
-ctest --test-dir build -C Debug --output-on-failure   # naive fixtures must fail, fixed must pass
+ctest --test-dir build -C Debug --output-on-failure   # originals and fixed ports pass, naive ports fail
 claude plugin validate .                              # plugin and marketplace manifests
 gh workflow run evals.yml -f case=port-sample -f runs=3   # evals run in GitHub Actions, never locally on Windows
 ```
@@ -27,7 +27,7 @@ Keep commands cross-platform (`cmake`, `ctest`), because the owner develops on W
 
 The skill is only worth trusting if these hold.
 
-- **No trap without fixtures.** A trap card needs `fixtures/<id>/sdl2/`, `naive/` and `fixed/`. The naive fixture is the positive control: it must fail in CI, and its test is marked `WILL_FAIL`. A trap without a failing naive fixture isn't done.
+- **No trap without fixtures.** A trap card needs `fixtures/<id>/sdl2/`, `naive/` and `fixed/`. The naive fixture is the positive control: it must fail in CI, and its test is marked `WILL_FAIL`. The SDL2 original must pass against SDL 2.32. A trap without a failing naive fixture isn't done.
 - **Compiles cleanly, then breaks.** A trap's naive fixture must compile against SDL3 with warnings as errors (`-Wall -Wextra -Werror`, `/W4 /WX`). If it doesn't compile, or any compiler warns about it, the compiler already catches it, so it goes in a reference file, not a trap card. Never silence a warning in a naive fixture to make it qualify.
 - **Cite the source.** Every trap card links the README-migration section or SDL wiki page it rests on. If you can't find one, don't add the trap.
 - **Don't edit bundled SDL files.** Everything under `skills/sdl3-porter/scripts/sdl/` is byte-identical to the SDL tag named in its `SOURCE` file. To update, copy fresh files from a new tag, update `SOURCE` and record a decision.
@@ -40,7 +40,7 @@ The skill is only worth trusting if these hold.
 - A trap card has **What compiles**, **What breaks**, **How to find it**, **Fix** and **Source** sections.
 - Trap ids are kebab-case and stable. Renaming one is a breaking change that needs a decision in `ROADMAP.md`.
 - Fixtures are small C programs that test one behavior each. A failing fixture exits non-zero and prints one line that says what went wrong.
-- Pin versions: SDL 3.4.16 for ports, the latest SDL 2.32 release for originals. Bump them only through a decision in `ROADMAP.md`.
+- Pin versions: SDL 3.4.16 for ports, SDL 2.32.10 (the latest 2.32 release) for originals. Bump them only through a decision in `ROADMAP.md`.
 - The skill's own output is plain: one line per trap with `file:line`, the trap id and what changed, then what still needs a human. No emoji.
 
 ## Evals

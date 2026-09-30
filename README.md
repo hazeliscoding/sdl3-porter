@@ -49,7 +49,7 @@ v0.1 covers core SDL3: init, events, video and OpenGL, the renderer, input, audi
 
 ## Every trap is proven
 
-- **Three programs per trap.** The SDL2 original, the naive port that compiles and fails, and the correct port. CI builds both ports against SDL 3.4.16 and runs them headless on Windows, Linux and macOS (OpenGL traps on Linux). The naive port must fail and the correct one must pass, or the trap doesn't ship.
+- **Three programs per trap.** The SDL2 original, the naive port that compiles and fails, and the correct port. CI builds the original against SDL 2.32 and both ports against SDL 3.4.16, and runs all three headless on Windows, Linux and macOS (OpenGL traps on Linux). The original and the correct port must pass and the naive port must fail, or the trap doesn't ship.
 - **Measured against no skill.** Evals run Claude Code on each original with and without sdl3-porter, and the README will publish both scores.
 - **Sourced.** Each trap links the section of SDL's [migration guide](https://wiki.libsdl.org/SDL3/README-migration) it rests on.
 

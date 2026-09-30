@@ -20,14 +20,33 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SDL3)
 
+# The SDL2 originals, to prove each fixture's check passes on SDL2 behavior.
+# SDL2 reads SDL3's cached options, so it also builds static and with the C
+# library. SDL_TEST is SDL2's name for SDL_TEST_LIBRARY.
+set(SDL_TEST OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(
+  SDL2
+  URL https://github.com/libsdl-org/SDL/releases/download/release-2.32.10/SDL2-2.32.10.tar.gz
+  URL_HASH SHA256=5f5993c530f084535c65a6879e9b26ad441169b3e25d789d83287040a9ca5165
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+FetchContent_MakeAvailable(SDL2)
+
 enable_testing()
 
-# One test per port. The warning flags enforce "compiles cleanly": a naive
+# One test per program. The warning flags enforce "compiles cleanly": a naive
 # port the compiler warns about is guidance, not a trap.
 function(add_fixture id variant)
   set(target "${id}-${variant}")
   add_executable(${target} "fixtures/${id}/${variant}/main.c")
-  target_link_libraries(${target} PRIVATE SDL3::SDL3)
+  if(variant STREQUAL "sdl2")
+    target_link_libraries(${target} PRIVATE SDL2::SDL2main SDL2::SDL2)
+    # SDL2 spells the driver variables without the second underscore.
+    set(drivers "SDL_VIDEODRIVER=dummy;SDL_AUDIODRIVER=dummy")
+  else()
+    target_link_libraries(${target} PRIVATE SDL3::SDL3)
+    set(drivers "SDL_VIDEO_DRIVER=dummy;SDL_AUDIO_DRIVER=dummy")
+  endif()
   if(MSVC)
     target_compile_options(${target} PRIVATE /W4 /WX)
   else()
@@ -35,7 +54,7 @@ function(add_fixture id variant)
   endif()
   add_test(NAME ${target} COMMAND ${target})
   set_tests_properties(${target} PROPERTIES
-    ENVIRONMENT "SDL_VIDEO_DRIVER=dummy;SDL_AUDIO_DRIVER=dummy"
+    ENVIRONMENT "${drivers}"
     TIMEOUT 30
   )
 endfunction()
@@ -89,8 +108,9 @@ foreach(dir IN LISTS fixture_dirs)
       message(FATAL_ERROR "Trap ${id} has no ${variant}/main.c. Every trap needs sdl2/, naive/ and fixed/.")
     endif()
   endforeach()
-  add_fixture(${id} naive)
-  add_fixture(${id} fixed)
+  foreach(variant IN ITEMS sdl2 naive fixed)
+    add_fixture(${id} ${variant})
+  endforeach()
   # The positive control: a naive port that passes breaks the build.
   set_tests_properties(${id}-naive PROPERTIES WILL_FAIL TRUE)
 endforeach()
