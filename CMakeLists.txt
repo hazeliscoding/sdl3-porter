@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.25)
 project(sdl3_porter_fixtures LANGUAGES C)
 
+# SDL3 enables Objective-C only in its own directory, which leaves SDL2's .m
+# sources without an Objective-C compile rule. Enabling it here covers both.
+if(APPLE)
+  enable_language(OBJC)
+endif()
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
