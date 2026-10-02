@@ -22,8 +22,8 @@ if (SDL_Init(SDL_INIT_VIDEO) != 0) {    /* or < 0, or == -1 */
 **How to find it:** search the ported sources for SDL calls compared with a number, and for SDL results stored in an `int`:
 
 ```
-SDL_\w+\([^;]*\)\s*(==|!=|<|<=|>|>=)\s*-?\d
-int\s+\w+\s*=\s*SDL_\w+\(
+SDL_\w+\s*\([^;]*\)\s*(==|!=|<|<=|>|>=)\s*-?[0-9]
+int\s+\w+\s*=\s*SDL_\w+\s*\(
 ```
 
 For each hit, look up the function in the SDL3 headers. Fix it if the function now returns `bool`. Functions that return a pointer, an ID or a count keep their old checks. For example, `SDL_OpenAudioDevice` still returns `0` on failure.

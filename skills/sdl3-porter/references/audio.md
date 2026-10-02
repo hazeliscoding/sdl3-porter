@@ -18,8 +18,8 @@ The SDL2 code this replaces called `SDL_PauseAudioDevice(dev, 0)` to start playb
 **How to find it:** search the ported sources for streams opened this way, and for the calls that resume or pause them:
 
 ```
-SDL_OpenAudioDeviceStream\(
-SDL_Resume(AudioStreamDevice|AudioDevice)\(|SDL_PauseAudio(StreamDevice|Device)\(
+SDL_OpenAudioDeviceStream
+SDL_Resume(AudioStreamDevice|AudioDevice)|SDL_PauseAudio(StreamDevice|Device)
 ```
 
 Every stream from `SDL_OpenAudioDeviceStream` needs its device resumed, with `SDL_ResumeAudioStreamDevice(stream)` or `SDL_ResumeAudioDevice(SDL_GetAudioStreamDevice(stream))`, before the app expects sound. `SDL_PauseAudioDevice` takes one argument in SDL3 and always pauses, so a `SDL_PauseAudioDevice(dev, 0)` trimmed to `SDL_PauseAudioDevice(dev)` pauses instead of resuming. Streams bound with `SDL_BindAudioStream` to a device from `SDL_OpenAudioDevice` need no resume.
