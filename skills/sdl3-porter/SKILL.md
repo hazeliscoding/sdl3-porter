@@ -96,6 +96,7 @@ Code that compiles can still be wrong. For each subsystem the project uses, read
 | Subsystem | Trap file |
 |---|---|
 | Init and error handling (always read) | [references/init.md](references/init.md) |
+| Audio | [references/audio.md](references/audio.md) |
 
 For each trap:
 

@@ -97,6 +97,8 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 | Audio | `mix-volume-float` | `SDL_MIX_MAXVOLUME` (128) passed as a 0–1 float gives 128× gain and clipping |
 | Hints | `hint-string-ignored` | Hints written as renamed or removed string literals are silently ignored |
 
+Done: `bool-returns`, `audio-stream-paused`.
+
 - [x] Consistency check: every trap card has a fixture folder, and every fixture folder has a trap card.
 
 **Done when:** every naive fixture fails and every fixed fixture passes, the consistency check passes and fails on a card without fixtures, and any trap that couldn't be reproduced headless has moved to guidance with a decision recorded here.
