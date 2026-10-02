@@ -51,6 +51,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **A trap card is a `## <id>` section of `references/*.md` with a `**What compiles:**` part.** The `trap-cards` check matches those ids against the `fixtures/` folders, with controls for a card without fixtures and for fixtures without a card.
 - **`drop-data-freed` and `base-path-freed` are guidance, not traps (2026-09-30).** SDL3 makes `SDL_DropEvent.data` and `SDL_GetBasePath()` `const char *`, so no naive port that frees them compiles cleanly. In C, GCC, Clang and MSVC warn about the dropped `const` even without warning flags, and in C++ it's an error. Only a cast gets it through, and a naive fixture may not silence a warning. `SKILL.md` step 5 now says to drop the `SDL_free` instead of casting.
 - **Fixture setup failures print `setup:`, not the trap id (2026-09-30).** Only the trap's own check starts its line with `<id>: `, so the naive runner can't mistake a failed `SDL_Init` or device open for the trap.
+- **`mix-volume-float` qualifies through integer literals, macros and 8- and 16-bit integer variables, not `int` variables (2026-10-01).** SDL3 removed `SDL_MIX_MAXVOLUME`, so code that still uses it doesn't compile, and MSVC `/W4` warns (C4244) when a non-constant `int` expression is passed as the float volume. Literals, macros, including a re-defined `SDL_MIX_MAXVOLUME`, and plain 8- and 16-bit integer variables compile cleanly on MSVC, GCC and Clang, as C and as C++. Several public SDL3 ports re-define the macro, and the bounce sample uses it, so the naive fixture does that. The card shows the literal form too, and its search still lists `int` variables, because GCC and Clang build them silently. SDL3 doesn't clamp the volume, so 16-bit samples wrap rather than clip.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -94,10 +95,10 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 | Render | `rect-cast-to-frect` | Casting `SDL_Rect*` to `SDL_FRect*` draws garbage geometry |
 | OpenGL | `gl-attributes-after-window` | GL attributes set after the window exists don't set its depth, stencil or MSAA |
 | Audio | `audio-stream-paused` | A device opened with `SDL_OpenAudioDeviceStream` starts paused, so nothing plays |
-| Audio | `mix-volume-float` | `SDL_MIX_MAXVOLUME` (128) passed as a 0–1 float gives 128× gain and clipping |
+| Audio | `mix-volume-float` | An SDL2 volume (0–128) passed as `SDL_MixAudio`'s 0–1 float turns 16-bit audio into wrapped-around noise |
 | Hints | `hint-string-ignored` | Hints written as renamed or removed string literals are silently ignored |
 
-Done: `bool-returns`, `audio-stream-paused`.
+Done: `bool-returns`, `audio-stream-paused`, `mix-volume-float`.
 
 - [x] Consistency check: every trap card has a fixture folder, and every fixture folder has a trap card.
 

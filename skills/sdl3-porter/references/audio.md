@@ -38,3 +38,38 @@ SDL_ResumeAudioStreamDevice(stream);
 **Source:** SDL `docs/README-migration.md`, `SDL_audio.h` section: "Audio devices, opened by SDL_OpenAudioDevice(), no longer start in a paused state", with the SDL2 migration examples that resume the stream's device. `SDL_OpenAudioDeviceStream` in `SDL_audio.h` ([wiki](https://wiki.libsdl.org/SDL3/SDL_OpenAudioDeviceStream)): "the audio device begins paused. [...] The audio device should be resumed with SDL_ResumeAudioStreamDevice()."
 
 **Fixture:** `fixtures/audio-stream-paused/`.
+
+## mix-volume-float
+
+**What compiles:**
+
+```c
+#define SDL_MIX_MAXVOLUME 128    /* re-added because SDL3 removed it */
+SDL_MixAudio(dst, src, SDL_AUDIO_S16, len, SDL_MIX_MAXVOLUME / 2);
+SDL_MixAudio(dst, src, SDL_AUDIO_S16, len, 128);
+```
+
+**What breaks:** SDL2's `SDL_MixAudioFormat` took an integer volume from 0 to `SDL_MIX_MAXVOLUME` (128). SDL3 renamed it `SDL_MixAudio`, and its volume is a float from 0.0 to 1.0. C converts the integer without a word, so SDL2's half volume, 64, becomes 64 times full volume. SDL3 doesn't clamp the volume. 8- and 16-bit samples wrap around into loud noise: a 16-bit sample of 8000 mixed at 64 comes out as -12288. 32-bit and float samples clip at full scale.
+
+The rename scripts rename the function and leave the volume alone. Code that still uses `SDL_MIX_MAXVOLUME` doesn't compile, because SDL3 removed the macro. Re-defining it as 128, or replacing it with a number, makes the call compile and keeps the wrong scale. SDL2's four-argument `SDL_MixAudio`, which mixed in the format of the device from `SDL_OpenAudio`, doesn't compile against SDL3's five-argument one either. When you add the format, convert the volume too.
+
+**How to find it:** search the ported sources for every mixing call, and for SDL2's volume scale:
+
+```
+SDL_MixAudio
+SDL_MIX_MAXVOLUME|MIX_?MAX_?VOLUME
+```
+
+Calls often span several lines, so read each whole call. Trace its last argument back to where it's set, and compare it with the SDL2 original in `git diff`. A volume that came from SDL2 is on the 0–128 scale, and only 0 means the same on both scales. Convert everything else: literals, including 1, which was 1/128 of full volume; anything computed on the 0–128 scale; and integer variables. Don't count on the compiler: MSVC `/W4` warns (C4244) about non-constant `int` expressions, but GCC and Clang don't with `-Wall -Wextra`, and no compiler warns about literals, macros or a plain 8- or 16-bit integer variable. A 0–128 constant is fine as the divisor of a float division, as in `volume / 128.0f`, but never as the volume itself. With integers on both sides, `volume / 128` is 0 for every volume below 128, and SDL3 mixes nothing.
+
+**Fix:** pass a float from 0.0 to 1.0:
+
+```c
+SDL_MixAudio(dst, src, SDL_AUDIO_S16, len, 0.5f);
+```
+
+`SDL_MIX_MAXVOLUME` becomes `1.0f`. A volume the project keeps on SDL2's 0–128 scale converts with `volume / 128.0f`. Storing it as a float from 0 to 1 is better.
+
+**Source:** SDL `docs/README-migration.md`, `SDL_audio.h` section: "SDL_MixAudioFormat() and SDL_MIX_MAXVOLUME have been removed in favour of SDL_MixAudio(), which now takes the audio format, and a float volume between 0.0 and 1.0." `SDL_MixAudio` in `SDL_audio.h` ([wiki](https://wiki.libsdl.org/SDL3/SDL_MixAudio)): "volume ranges from 0.0 - 1.0, and should be set to 1.0 for full audio volume." The wrap comes from SDL's `src/audio/SDL_mixer.c` at `release-3.4.16`, not from the docs: it rounds `volume * 128` to an `int` without clamping it, and scales 8- and 16-bit samples within their own type before the overflow clipping the header describes. 32-bit and float samples don't overflow when scaled, so they clip.
+
+**Fixture:** `fixtures/mix-volume-float/`.
