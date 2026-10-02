@@ -39,7 +39,7 @@ The skill is only worth trusting if these hold.
 - `SKILL.md` holds the workflow and stays under 500 lines. Detail goes in `references/`, one file per subsystem, so the agent loads only what the project uses.
 - A trap card has **What compiles**, **What breaks**, **How to find it**, **Fix** and **Source** sections.
 - Trap ids are kebab-case and stable. Renaming one is a breaking change that needs a decision in `ROADMAP.md`.
-- Fixtures are small C programs that test one behavior each. A failing fixture exits non-zero and prints one line that starts with its trap id and says what went wrong, for example `bool-returns: SDL_Init reported failure`. The naive runner requires that line. Only a crash may replace it.
+- Fixtures are small C programs that test one behavior each. A failing fixture exits non-zero and prints one line that says what went wrong. Only the trap's own check starts that line with the trap id, for example `bool-returns: SDL_Init reported failure`. Setup failures start with `setup:`, so the naive runner, which requires the trap's line, can tell them apart. Only a crash may replace the trap's line.
 - Pin versions: SDL 3.4.16 for ports, SDL 2.32.10 (the latest 2.32 release) for originals. Bump them only through a decision in `ROADMAP.md`.
 - The skill's own output is plain: one line per trap with `file:line`, the trap id and what changed, then what still needs a human. No emoji.
 

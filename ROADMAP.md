@@ -50,6 +50,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **Naive fixtures run through `cmake/run-naive.cmake` instead of `WILL_FAIL`.** CTest can't count a crash as an expected failure. The test passes only when the naive port exits non-zero after printing a line that starts with `<id>: `, or crashes. A port that passes, hangs or fails without that line fails the test. Controls cover a passing program, a failure without the line and a crash.
 - **A trap card is a `## <id>` section of `references/*.md` with a `**What compiles:**` part.** The `trap-cards` check matches those ids against the `fixtures/` folders, with controls for a card without fixtures and for fixtures without a card.
 - **`drop-data-freed` and `base-path-freed` are guidance, not traps (2026-09-30).** SDL3 makes `SDL_DropEvent.data` and `SDL_GetBasePath()` `const char *`, so no naive port that frees them compiles cleanly. In C, GCC, Clang and MSVC warn about the dropped `const` even without warning flags, and in C++ it's an error. Only a cast gets it through, and a naive fixture may not silence a warning. `SKILL.md` step 5 now says to drop the `SDL_free` instead of casting.
+- **Fixture setup failures print `setup:`, not the trap id (2026-09-30).** Only the trap's own check starts its line with `<id>: `, so the naive runner can't mistake a failed `SDL_Init` or device open for the trap.
 
 ## M0: Placeholder (as soon as possible)
 
