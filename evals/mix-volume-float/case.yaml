@@ -6,7 +6,7 @@ context:
   scaffold_script: scaffold.sh
 execution:
   max_turns: 50
-  timeout_seconds: 900
+  timeout_seconds: 1200
   allowed_tools: [Read, Glob, Grep, Edit, Write, Bash, Skill]
   prompt: |
     This is a small SDL2 program. Port it to SDL3.
