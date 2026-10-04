@@ -52,6 +52,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **`drop-data-freed` and `base-path-freed` are guidance, not traps (2026-09-30).** SDL3 makes `SDL_DropEvent.data` and `SDL_GetBasePath()` `const char *`, so no naive port that frees them compiles cleanly. In C, GCC, Clang and MSVC warn about the dropped `const` even without warning flags, and in C++ it's an error. Only a cast gets it through, and a naive fixture may not silence a warning. `SKILL.md` step 5 now says to drop the `SDL_free` instead of casting.
 - **Fixture setup failures print `setup:`, not the trap id (2026-09-30).** Only the trap's own check starts its line with `<id>: `, so the naive runner can't mistake a failed `SDL_Init` or device open for the trap.
 - **`mix-volume-float` qualifies through integer literals, macros and 8- and 16-bit integer variables, not `int` variables (2026-10-01).** SDL3 removed `SDL_MIX_MAXVOLUME`, so code that still uses it doesn't compile, and MSVC `/W4` warns (C4244) when a non-constant `int` expression is passed as the float volume. Literals, macros, including a re-defined `SDL_MIX_MAXVOLUME`, and plain 8- and 16-bit integer variables compile cleanly on MSVC, GCC and Clang, as C and as C++. Several public SDL3 ports re-define the macro, and the bounce sample uses it, so the naive fixture does that. The card shows the literal form too, and its search still lists `int` variables, because GCC and Clang build them silently. SDL3 doesn't clamp the volume, so 16-bit samples wrap rather than clip.
+- **`text-event-pointer-kept` is guidance, not a trap (2026-10-02).** SDL3 frees text-event memory at the next event pump, but only its platform keyboard backends create that memory, through the internal `SDL_SendKeyboardText`. An event pushed with `SDL_PushEvent` keeps the app's own pointer, which SDL never frees, and the dummy and offscreen drivers produce no keyboard input. So no headless fixture can make the naive port fail. `references/events.md` covers it, together with drop-event data, which has the same lifetime.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -87,7 +88,6 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 | Area | Trap | What breaks |
 |---|---|---|
 | Init | `bool-returns` | A leftover `SDL_Init(...) != 0` treats success as failure and exits on every launch |
-| Memory | `text-event-pointer-kept` | Keeping `event.text.text` after the event leaves a dangling pointer |
 | Input | `text-input-off` | Text input is no longer on by default, so no text events arrive |
 | Input | `gamepad-index-vs-id` | `which` is now an instance ID, not an index, so the wrong pad or none opens |
 | Render | `vsync-flag-dropped` | Dropping the removed `SDL_RENDERER_PRESENTVSYNC` flag leaves the loop unthrottled |
