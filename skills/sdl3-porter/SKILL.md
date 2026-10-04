@@ -91,11 +91,12 @@ Some strings that SDL2 handed over for you to free are now `const` in SDL3, beca
 
 ### 6. Sweep for traps
 
-Code that compiles can still be wrong. For each subsystem the project uses, read its trap file and check every trap in it against all ported files:
+Code that compiles can still be wrong. For each subsystem the project uses, read its file and check every trap and guidance section in it against all ported files:
 
-| Subsystem | Trap file |
+| Subsystem | File |
 |---|---|
 | Init and error handling (always read) | [references/init.md](references/init.md) |
+| Events | [references/events.md](references/events.md) |
 | Audio | [references/audio.md](references/audio.md) |
 
 For each trap:
