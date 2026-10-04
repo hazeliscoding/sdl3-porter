@@ -57,6 +57,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **`vsync-flag-dropped` checks the renderer's vsync setting, not timing (2026-10-04).** SDL2's software renderer reports vsync but doesn't wait on a window with a native framebuffer, like the dummy driver's, so a timed loop fails on the SDL2 original. The fixtures ask the renderer instead: `SDL_GetRendererInfo` in SDL2 and `SDL_GetRenderVSync` in SDL3. SDL3's software renderer does wait when vsync is on, so the fixed port's loop is paced either way.
 - **`text-input-off` checks whether text input is on (2026-10-04).** The dummy and offscreen drivers produce no keyboard input, and SDL3 only gates real keyboard text, not pushed events, so no headless fixture can type. SDL3's keyboard code drops text and editing events unless `SDL_TextInputActive` is true for the focused window, so the fixtures ask that instead: `SDL_IsTextInputActive` in SDL2 and `SDL_TextInputActive` in SDL3.
 - **`gl-attributes-after-window` is dropped (2026-10-04).** It isn't an SDL3 change. `SDL_GL_SetAttribute` is documented the same way in SDL 2.32 and 3.4 ("attributes should be set before creating an OpenGL window"), and the migration guide says nothing about when attributes apply, so an SDL2 original that sets them after the window would fail the same check. Without a source, it can't be a trap. M2 has no OpenGL trap.
+- **`rect-cast-to-frect` is guidance, not a trap (2026-10-04).** SDL3's render functions take `SDL_FRect`, and the unchanged SDL2 call that passes an `SDL_Rect *` doesn't compile cleanly. MSVC warns (C4133), GCC and Clang warn about incompatible pointer types, GCC 14 and later reject it, and so does C++. Only a cast gets it through, and a naive fixture may not silence a warning, as with `drop-data-freed`. `SKILL.md` step 5 already says to convert the rectangle instead of casting it.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -85,23 +86,20 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 
 ## M2: Traps
 
-- [ ] Trap cards in `references/<subsystem>.md`. Each has: what compiles, what breaks, how to find it, the fix and the source.
-- [ ] Fixtures for each trap: `sdl2/` (builds against SDL 2.32), `naive/` and `fixed/`.
-- [ ] The traps:
+- [x] Trap cards in `references/<subsystem>.md`. Each has: what compiles, what breaks, how to find it, the fix and the source.
+- [x] Fixtures for each trap: `sdl2/` (builds against SDL 2.32), `naive/` and `fixed/`.
+- [x] The traps:
 
 | Area | Trap | What breaks |
 |---|---|---|
 | Init | `bool-returns` | A leftover `SDL_Init(...) != 0` treats success as failure and exits on every launch |
 | Input | `text-input-off` | Text input is no longer on by default, so no text events arrive |
-| Input | `gamepad-index-vs-id` | `which` is now an instance ID, not an index, so the wrong pad or none opens |
+| Input | `gamepad-index-vs-id` | Functions that took a device index now take an instance ID, so an index loop opens the wrong pad or none |
 | Render | `vsync-flag-dropped` | Dropping the removed `SDL_RENDERER_PRESENTVSYNC` flag leaves the loop unthrottled |
 | Render | `linear-by-default` | The scale-quality hint is gone and textures default to linear, so pixel art blurs |
-| Render | `rect-cast-to-frect` | Casting `SDL_Rect*` to `SDL_FRect*` draws garbage geometry |
 | Audio | `audio-stream-paused` | A device opened with `SDL_OpenAudioDeviceStream` starts paused, so nothing plays |
 | Audio | `mix-volume-float` | An SDL2 volume (0–128) passed as `SDL_MixAudio`'s 0–1 float turns 16-bit audio into wrapped-around noise |
 | Hints | `hint-string-ignored` | Hints written as renamed or removed string literals are silently ignored |
-
-Done: `bool-returns`, `audio-stream-paused`, `mix-volume-float`, `linear-by-default`, `gamepad-index-vs-id`, `hint-string-ignored`, `vsync-flag-dropped`, `text-input-off`.
 
 - [x] Consistency check: every trap card has a fixture folder, and every fixture folder has a trap card.
 
