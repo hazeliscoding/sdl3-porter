@@ -99,7 +99,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 | Audio | `mix-volume-float` | An SDL2 volume (0–128) passed as `SDL_MixAudio`'s 0–1 float turns 16-bit audio into wrapped-around noise |
 | Hints | `hint-string-ignored` | Hints written as renamed or removed string literals are silently ignored |
 
-Done: `bool-returns`, `audio-stream-paused`, `mix-volume-float`, `linear-by-default`.
+Done: `bool-returns`, `audio-stream-paused`, `mix-volume-float`, `linear-by-default`, `gamepad-index-vs-id`.
 
 - [x] Consistency check: every trap card has a fixture folder, and every fixture folder has a trap card.
 
