@@ -55,6 +55,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **`text-event-pointer-kept` is guidance, not a trap (2026-10-02).** SDL3 frees text-event memory at the next event pump, but only its platform keyboard backends create that memory, through the internal `SDL_SendKeyboardText`. An event pushed with `SDL_PushEvent` keeps the app's own pointer, which SDL never frees, and the dummy and offscreen drivers produce no keyboard input. So no headless fixture can make the naive port fail. `references/events.md` covers it, together with drop-event data, which has the same lifetime.
 - **Software-rendering traps run on the dummy video driver (2026-10-04).** The dummy drivers of SDL2 and SDL3 both give windows a framebuffer, so the software renderer and `SDL_RenderReadPixels` work without the offscreen driver. Only OpenGL traps need offscreen.
 - **`vsync-flag-dropped` checks the renderer's vsync setting, not timing (2026-10-04).** SDL2's software renderer reports vsync but doesn't wait on a window with a native framebuffer, like the dummy driver's, so a timed loop fails on the SDL2 original. The fixtures ask the renderer instead: `SDL_GetRendererInfo` in SDL2 and `SDL_GetRenderVSync` in SDL3. SDL3's software renderer does wait when vsync is on, so the fixed port's loop is paced either way.
+- **`text-input-off` checks whether text input is on (2026-10-04).** The dummy and offscreen drivers produce no keyboard input, and SDL3 only gates real keyboard text, not pushed events, so no headless fixture can type. SDL3's keyboard code drops text and editing events unless `SDL_TextInputActive` is true for the focused window, so the fixtures ask that instead: `SDL_IsTextInputActive` in SDL2 and `SDL_TextInputActive` in SDL3.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -100,7 +101,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 | Audio | `mix-volume-float` | An SDL2 volume (0–128) passed as `SDL_MixAudio`'s 0–1 float turns 16-bit audio into wrapped-around noise |
 | Hints | `hint-string-ignored` | Hints written as renamed or removed string literals are silently ignored |
 
-Done: `bool-returns`, `audio-stream-paused`, `mix-volume-float`, `linear-by-default`, `gamepad-index-vs-id`, `hint-string-ignored`, `vsync-flag-dropped`.
+Done: `bool-returns`, `audio-stream-paused`, `mix-volume-float`, `linear-by-default`, `gamepad-index-vs-id`, `hint-string-ignored`, `vsync-flag-dropped`, `text-input-off`.
 
 - [x] Consistency check: every trap card has a fixture folder, and every fixture folder has a trap card.
 

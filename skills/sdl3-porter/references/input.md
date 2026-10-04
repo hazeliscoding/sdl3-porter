@@ -48,3 +48,40 @@ To map gamepads to player slots, store the ID in the slot and search the slots f
 **Source:** SDL `docs/README-migration.md`, `SDL_joystick.h` section: "SDL_JoystickID has changed from Sint32 to Uint32, with an invalid ID being 0", "Rather than iterating over joysticks using device index, there is a new function SDL_GetJoysticks()" and "SDL_AttachVirtualJoystick() now returns the joystick instance ID instead of a device index". `SDL_gamecontroller.h` section: "The SDL_EVENT_GAMEPAD_ADDED event now provides the joystick instance ID in the which member". The shared counter comes from SDL's source at `release-3.4.16`, not from the docs: joystick drivers take IDs from `SDL_GetNextObjectID()` in `src/SDL_utils.c`, which `src/video/SDL_video.c`, `src/timer/SDL_timer.c` and the sensor and haptic drivers use too.
 
 **Fixture:** `fixtures/gamepad-index-vs-id/`.
+
+## text-input-off
+
+**What compiles:**
+
+```c
+while (SDL_PollEvent(&event)) {
+    if (event.type == SDL_EVENT_TEXT_INPUT) {    /* never arrives */
+        SDL_strlcat(name, event.text.text, sizeof name);
+    }
+}
+```
+
+**What breaks:** SDL2 turned text input on when video started, on every platform except the 3DS and PSP, so many programs read text events without ever calling `SDL_StartTextInput`. SDL3 starts with text input off, and keeps it per window. Until the app calls `SDL_StartTextInput(window)`, typing still produces key events, but no `SDL_EVENT_TEXT_INPUT` or `SDL_EVENT_TEXT_EDITING` events. Name entry, chat boxes and consoles stay empty. Code that did call `SDL_StartTextInput()` in SDL2 doesn't compile until it passes a window, so it gets a second look anyway.
+
+**How to find it:** search the ported sources for text events, and for the calls that control text input:
+
+```
+SDL_EVENT_TEXT_(INPUT|EDITING)|\.text\.text|\.edit\.text
+SDL_(Start|Stop)TextInput|SDL_TextInputActive
+```
+
+If the project reads text events, check that it calls `SDL_StartTextInput` for each window that should receive them, before the user types. A project that never called `SDL_StartTextInput` in SDL2 relied on the default, and needs the call added.
+
+**Fix:** turn text input on for the window while the app wants text, and off again afterwards:
+
+```c
+SDL_StartTextInput(window);    /* when a text field gets focus */
+/* ... */
+SDL_StopTextInput(window);     /* when it loses focus */
+```
+
+The migration guide warns that starting text input may show an input method editor (IME) and skip key events, so prefer turning it on only around text fields. To keep SDL2's always-on behavior, call `SDL_StartTextInput(window)` once after creating the window.
+
+**Source:** SDL `docs/README-migration.md`, `SDL_keyboard.h` section: "Text input is no longer automatically enabled when initializing video, you should call SDL_StartTextInput() when you want to receive text input and call SDL_StopTextInput() when you are done. Starting text input may shown an input method editor (IME) and cause key up/down events to be skipped, so should only be enabled when the application wants text input." SDL's `src/events/SDL_keyboard.c` at `release-3.4.16` drops text and editing events unless `SDL_TextInputActive` is true for the focused window.
+
+**Fixture:** `fixtures/text-input-off/`.
