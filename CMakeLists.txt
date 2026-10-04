@@ -128,6 +128,24 @@ foreach(dir IN LISTS fixture_dirs)
   endforeach()
 endforeach()
 
+# The SDL2 programs the evals port must build against SDL2, so no case starts
+# from broken code. They're interactive, so they're built, not run.
+file(GLOB sample_dirs LIST_DIRECTORIES true CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/samples/*")
+foreach(dir IN LISTS sample_dirs)
+  if(NOT IS_DIRECTORY "${dir}")
+    continue()
+  endif()
+  get_filename_component(name "${dir}" NAME)
+  file(GLOB sources CONFIGURE_DEPENDS "${dir}/src/*.c")
+  add_executable(sample-${name} ${sources})
+  target_link_libraries(sample-${name} PRIVATE SDL2::SDL2main SDL2::SDL2)
+  if(MSVC)
+    target_compile_options(sample-${name} PRIVATE /W4 /WX)
+  else()
+    target_compile_options(sample-${name} PRIVATE -Wall -Wextra -Werror)
+  endif()
+endforeach()
+
 # Positive controls for the naive runner: it must fail on a port that passes and
 # on a failure without the trap's line, and it must count a crash as the trap.
 function(add_runner_control name target id expected)
