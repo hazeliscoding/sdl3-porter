@@ -100,6 +100,7 @@ Code that compiles can still be wrong. For each subsystem the project uses, read
 | Keyboard, text input, joysticks and gamepads | [references/input.md](references/input.md) |
 | 2D renderer | [references/render.md](references/render.md) |
 | Audio | [references/audio.md](references/audio.md) |
+| Hints, set in code, the environment or config files | [references/hints.md](references/hints.md) |
 
 For each trap:
 
