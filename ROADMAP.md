@@ -59,6 +59,13 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **`gl-attributes-after-window` is dropped (2026-10-04).** It isn't an SDL3 change. `SDL_GL_SetAttribute` is documented the same way in SDL 2.32 and 3.4 ("attributes should be set before creating an OpenGL window"), and the migration guide says nothing about when attributes apply, so an SDL2 original that sets them after the window would fail the same check. Without a source, it can't be a trap. M2 has no OpenGL trap.
 - **`rect-cast-to-frect` is guidance, not a trap (2026-10-04).** SDL3's render functions take `SDL_FRect`, and the unchanged SDL2 call that passes an `SDL_Rect *` doesn't compile cleanly. MSVC warns (C4133), GCC and Clang warn about incompatible pointer types, GCC 14 and later reject it, and so does C++. Only a cast gets it through, and a naive fixture may not silence a warning, as with `drop-data-freed`. `SKILL.md` step 5 already says to convert the rectangle instead of casting it.
 
+### Added during M3 (2026-10-04)
+
+- **Trap cases port realistic samples, not the fixture originals.** A fixture's SDL2 original exists to test its trap, and its checks and messages point straight at it, so porting one measures how well a model ports a test, with the skill or without it. Each trap's case scaffolds `samples/<id>/` instead: a small, plausible SDL2 program with the trap in it, a neutral name and no self-check. CI builds every sample against SDL 2.32 with warnings as errors, bounce included.
+- **`port-sample` is the whole-program case.** Bounce already holds seven of the eight traps, all but `gamepad-index-vs-id`, and three guidance items. Its event-driven gamepad code ports correctly. The new graders are named `trap-<id>` and `guidance-<item>`, and the include and CMake graders from M1 stay.
+- **Trap graders must be able to fail.** Every `trap-*` and `guidance-*` grader must fail on a port that only ran SDL's rename scripts, which still has every trap. The `eval-graders` test checks it, with a control for a grader that passes anyway.
+- **Case scores leave out `skill-fired`.** In a with-without run, `claude plugin eval` reports the `tool_used: Skill` grader separately instead of scoring it in either arm, so a case's score measures only the port.
+
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (zlib), `.gitignore` and `.gitattributes`.
@@ -107,8 +114,9 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 
 ## M3: Evals
 
-- [ ] One eval case per trap: scaffold its `sdl2/` program, ask for a port, and grade that the skill fired, the naive pattern is gone and the fix is present.
-- [ ] A whole-program case: the sample with several traps at once.
+- [x] One eval case per trap: scaffold its sample from `samples/<id>/`, ask for a port, and grade that the skill fired, the naive pattern is gone and the fix is present.
+- [x] A whole-program case: the sample with several traps at once.
+- [ ] Run every case 3 times with and without the skill in the `Evals` workflow.
 - [ ] A README table of with-skill and without-skill scores per trap, with the model and the date.
 
 **Done when:** every case scores at least 0.9 with the skill across 3 runs, and the README table is generated from `aggregate-result.json`.

@@ -50,6 +50,8 @@ The skill is only worth trusting if these hold.
 - Evals run in the manual `Evals` GitHub Actions workflow. Claude Code refuses evals that grant Bash on Windows, because it can't sandbox the shell there.
 - Prefer regex graders over files, one file per grader (`{source: file, path}` takes no globs). Use `llm` graders only for short output with a concrete pass/fail rubric.
 - Case scaffolds are bash scripts that copy from `samples/` or `fixtures/` relative to their own location, then commit the copy, so the skill starts from a clean git tree.
+- A trap's case ports `samples/<id>/`, a plausible SDL2 program with a neutral name and no self-check. Never port the fixture's SDL2 original: its checks point straight at the trap.
+- Name trap graders `trap-*` and guidance graders `guidance-*`. Each must fail on a port that only ran SDL's rename scripts, and the `eval-graders` test checks that. Write patterns that JavaScript and Python's `re` read the same way, because the check runs them in Python.
 - Never commit eval results, and never lower a threshold to make a case pass.
 
 ## Brand
