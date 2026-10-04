@@ -11,7 +11,7 @@ Port SDL2 code to SDL3, then sweep the port for traps: code that compiles cleanl
 Work from SDL's documentation, never from memory. Most SDL code you have seen is SDL2, and SDL3 changed return values, ownership and defaults without changing how the code looks.
 
 - SDL's migration guide, pinned to SDL 3.4.16: `${CLAUDE_SKILL_DIR}/scripts/sdl/docs/README-migration.md`. It has one `## SDL_<header>.h` section per header. Search it for a symbol before changing code that uses it.
-- Exact SDL3 signatures: the `include/SDL3/*.h` headers of the SDL3 the project builds against.
+- Exact SDL3 signatures: the `include/SDL3/*.h` headers of the SDL3 the project builds against. Find them through the build: a vendored copy, the CMake package or `pkg-config --cflags sdl3`. If SDL3 isn't installed, say so and work from the migration guide. Never search the whole filesystem for headers, which can take minutes.
 
 **Scope:** core SDL3, meaning init, events, video and OpenGL, the renderer, input, audio, timers and the filesystem. SDL_image, SDL_ttf, SDL_mixer and SDL_net are out of scope. Port their includes and nothing else, and list them in the report.
 
