@@ -65,6 +65,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **`port-sample` is the whole-program case.** Bounce already holds seven of the eight traps, all but `gamepad-index-vs-id`, and three guidance items. Its event-driven gamepad code ports correctly. The new graders are named `trap-<id>` and `guidance-<item>`, and the include and CMake graders from M1 stay.
 - **Trap graders must be able to fail.** Every `trap-*` and `guidance-*` grader must fail on a port that only ran SDL's rename scripts, which still has every trap. The `eval-graders` test checks it, with a control for a grader that passes anyway.
 - **Case scores leave out `skill-fired`.** In a with-without run, `claude plugin eval` reports the `tool_used: Skill` grader separately instead of scoring it in either arm, so a case's score measures only the port.
+- **The smoke run passed, and showed a slow header search (2026-10-04).** `text-input-off` scored 1.0 with the skill and 1.0 without it, for $0.69, with Sonnet 5 and Claude Code 2.1.289. The run with the skill took 13 minutes for 33 turns. A traced rerun took 3.5 minutes, 87 seconds of it in a `find /` for SDL3 headers that the sandbox doesn't have. `SKILL.md` now says to find headers through the build and to fall back on the migration guide. Trap cases now get `port-sample`'s 20 minutes, and the `Evals` job 3 hours.
 
 ## M0: Placeholder (as soon as possible)
 
