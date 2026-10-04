@@ -146,6 +146,30 @@ foreach(dir IN LISTS sample_dirs)
   endif()
 endforeach()
 
+# Every trap grader in the evals must fail on a port that only ran SDL's rename
+# scripts, so it can tell an unfixed trap from a fixed one.
+set(evals "${CMAKE_CURRENT_SOURCE_DIR}/evals")
+set(samples "${CMAKE_CURRENT_SOURCE_DIR}/samples")
+add_test(NAME eval-graders
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-eval-graders.py
+          ${evals} ${samples} ${sdl_bundle}/build-scripts ${CMAKE_CURRENT_BINARY_DIR}/eval-graders
+)
+
+# Positive control: the check must fail on a trap grader that passes anyway.
+set(loose_evals "${CMAKE_CURRENT_BINARY_DIR}/eval-graders-loose")
+file(REMOVE_RECURSE "${loose_evals}")
+file(COPY "${evals}/" DESTINATION "${loose_evals}" PATTERN "results" EXCLUDE)
+file(WRITE "${loose_evals}/text-input-off/graders/trap-always-passes.md"
+  "---\ntype: regex\ntarget: {source: file, path: \"src/main.c\"}\npattern: 'SDL'\nmatch: contains\n---\n"
+)
+add_test(NAME eval-graders-loose
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-eval-graders.py
+          ${loose_evals} ${samples} ${sdl_bundle}/build-scripts ${CMAKE_CURRENT_BINARY_DIR}/eval-graders-loose-work
+)
+set_tests_properties(eval-graders-loose PROPERTIES
+  PASS_REGULAR_EXPRESSION "text-input-off/trap-always-passes.md passes on a port that only ran the rename scripts"
+)
+
 # Positive controls for the naive runner: it must fail on a port that passes and
 # on a failure without the trap's line, and it must count a crash as the trap.
 function(add_runner_control name target id expected)
