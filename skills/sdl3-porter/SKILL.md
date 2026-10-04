@@ -97,6 +97,7 @@ Code that compiles can still be wrong. For each subsystem the project uses, read
 |---|---|
 | Init and error handling (always read) | [references/init.md](references/init.md) |
 | Events | [references/events.md](references/events.md) |
+| 2D renderer | [references/render.md](references/render.md) |
 | Audio | [references/audio.md](references/audio.md) |
 
 For each trap:
