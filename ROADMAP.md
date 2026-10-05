@@ -151,9 +151,9 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - [x] Run every eval case 3 times with and without the skill, and regenerate the README table.
 - [ ] README quick start: install with `/plugin marketplace add hazeliscoding/sdl3-porter`, checked on a clean machine.
 - [x] Document what's supported: SDL 3.2 and later, C and C++, Claude Code. Other harnesses are untested.
-- [ ] `CONTRIBUTING.md`: how to add a trap as a card, three fixtures and an eval case.
-- [ ] `SECURITY.md`: the skill edits your code and runs the bundled Python scripts and your build. It downloads nothing at runtime.
-- [ ] A "missed trap" issue template that asks for the SDL version, a minimal SDL2 snippet and what went wrong.
+- [x] `CONTRIBUTING.md`: how to add a trap as a card, three fixtures and an eval case.
+- [x] `SECURITY.md`: the skill edits your code and runs the bundled Python scripts and your build. It downloads nothing at runtime.
+- [x] A "missed trap" issue template that asks for the SDL version, a minimal SDL2 snippet and what went wrong.
 - [ ] Set `plugin.json` to 0.1.0, tag it and publish a GitHub release.
 
 **Done when:** on a clean machine, someone can install from the README, port the sample and build and run it, CI is green, and there are no known critical bugs.
