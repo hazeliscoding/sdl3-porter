@@ -65,7 +65,7 @@ Python 3 on your `PATH` lets the skill run SDL's rename scripts. Without it, the
 - **Fixes the build** one subsystem at a time: CMake, includes, `SDL_main.h`, then each compile error.
 - **Sweeps for traps** in each subsystem you use, cites `file:line` for every one it finds, fixes it and tells you what still needs a human.
 
-v0.1 covers core SDL3: init, events, video and OpenGL, the renderer, input, audio, timers and the filesystem. SDL_image, SDL_ttf and SDL_mixer come later.
+It covers core SDL3: init, events, video and OpenGL, the renderer, surfaces, input, audio, timers, the filesystem and file I/O (`SDL_IOStream`). SDL_image, SDL_ttf and SDL_mixer come later.
 
 ## Every trap is proven
 
