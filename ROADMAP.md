@@ -87,6 +87,14 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **The clean-machine check passed.** On the same fresh WSL Ubuntu 24.04, a Linux-native Claude Code 2.1.289, logged in for the first time, installed the plugin with the README's two commands, at `55d487a`. A fresh session on the owner's default model, Opus 5.5, ported the bounce sample in 16 turns for $0.69, and its report listed all 7 of the sample's traps by id. Another ported AKrikler/chip8 in 25 turns for $1.13 and listed all 4 of its traps. Both ports built against SDL 3.4.16 without warnings and ran on WSLg. The bounce port drew 300 frames in 5,097 ms, against 4,835 ms for the SDL2 original, so vsync still paces it. The owner saw a crisp sprite and their typing in the title, heard clean beeps, and played chip8's Pong with sharp pixels.
 - **Versioning starts at 0.1.0.** Claude Code compares a plugin's `version` to decide whether an install has an update, so from now on users only get changes when `plugin.json`'s version goes up. Every release bumps it, tags `vX.Y.Z` and publishes a GitHub release, and changes between releases wait on `main` until the next one.
 
+### Road to 1.0 (2026-10-05)
+
+- **1.0 means porting, done well.** It's a complete, stable SDL2-to-SDL3 porter with evidence behind it. Writing new SDL3 correctly (main callbacks, properties, the GPU API) is the 2.x track: it needs evals that judge new code rather than catch known traps, and it can reuse every trap card as a list of things not to do.
+- **What 1.0 promises.** The plugin and skill names, the trap ids, the report format and the oldest supported SDL3 stay fixed across 1.x. The coverage claim lists its known gaps. The supported SDL range is tested in CI. The evidence covers more than one model and ports larger than 1,000 lines.
+- **A sweep of the migration guide found the rest of the core traps.** It turned up 7 strong candidates that compile cleanly, can be proven headless and look common, 6 provable but niche ones, and about 9 that can only be guidance. It also found that the guide's YUV default (`SDL_COLORSPACE_JPEG`) contradicts the 3.4.16 header (`SDL_COLORSPACE_BT601_LIMITED`, which matches SDL2), so nothing changes in practice.
+- **Surfaces and `SDL_IOStream` join the core scope.** Two of the strong candidates live there, and both are core SDL3.
+- **Each milestone on the way ends in a minor release** (0.2.0 after M6, and so on), so users get new traps without waiting for 1.0.
+
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (zlib), `.gitignore` and `.gitattributes`.
@@ -163,18 +171,63 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 
 **Done when:** on a clean machine, someone can install from the README, port the sample and build and run it, CI is green, and there are no known critical bugs.
 
+## M6: Coverage
+
+- [ ] Widen the scope to surfaces and `SDL_IOStream` in the README, `SKILL.md` and this file.
+- [ ] Add the 7 strong traps, each with a card, fixtures, a sample and an eval case:
+
+| Area | Trap | What breaks |
+|---|---|---|
+| Input | `mouse-logical-coords` | Mouse events are no longer converted to the logical size, so clicks land in the wrong place |
+| Video | `display-index-vs-id` | Display functions take an ID, not an index, so display 0 is invalid |
+| I/O | `rwread-count-vs-bytes` | `SDL_ReadIO` returns bytes, not a count of items, so a `!= 1` check fails every read |
+| Surfaces | `indexed-surface-no-palette` | Indexed surfaces no longer get a palette, so palette calls and blits fail |
+| Audio | `audio-init-implicit` | Opening audio no longer initializes the audio subsystem, so the device doesn't open |
+| Render | `vertex-color-float` | `SDL_Vertex` colors are floats from 0 to 1, so 0–255 values draw white |
+| Video | `window-mode-null` | `SDL_GetWindowFullscreenMode` returns NULL for a windowed window, which crashes on use |
+
+- [ ] Write guidance for the changes no fixture can prove: Nintendo face buttons, exclusive fullscreen, batching with direct OpenGL, mouse wheel values, high DPI, asynchronous window operations, Apple bundle paths, gamepad rumble and `SDL_RegisterEvents`.
+- [ ] Keep the 6 niche candidates as candidates: `event-timestamp-ns`, `target-state-persists`, `blit-dstrect-unchanged`, `render-output-size-logical`, `logical-scale-separate` and `resized-on-set-size`. Each becomes a trap only when a port or an issue shows it in real code.
+- [ ] Release 0.2.0.
+
+**Done when:** every strong candidate is either a trap whose fixtures pass in CI or guidance with a decision recorded here, and 0.2.0 is released.
+
+## M7: Support and stability
+
+- [ ] Run the fixtures in CI against SDL 3.2.0 as well as the pinned 3.4 release, because the README promises 3.2 and later. A trap that behaves differently on 3.2 says so on its card.
+- [ ] Pin the CI and `Evals` runners before GitHub moves `ubuntu-latest` to Ubuntu 26 on 2026-10-19, or check that their packages still install there.
+- [ ] Write the stability promise in the README: what stays fixed across 1.x and what only a major version may change.
+- [ ] Write down how the pinned SDL moves: to the latest 3.x release before each minor release, with the fixtures and evals run again.
+- [ ] Release 0.3.0.
+
+**Done when:** CI is green against both SDL versions, the stability promise is in the README, and 0.3.0 is released.
+
+## M8: Evidence
+
+- [ ] Run every eval case 5 times with and without the skill, on Sonnet 5 and on Haiku 4.5, and show both models in the README table.
+- [ ] Port two public SDL2 projects of 10,000 lines or more in local clones, against their maintainers' own SDL3 ports where they exist, and log them in `docs/dogfooding.md`.
+- [ ] Turn every miss into a trap, a reference fix or a Later item, as in M4.
+- [ ] Release 0.4.0.
+
+**Done when:** every case scores at least 0.9 with the skill on both models, the log has the two larger ports with every miss resolved, and 0.4.0 is released.
+
+## M9: v1.0.0
+
+- [ ] List the plugin in plugin directories.
+- [ ] Publish the write-up: how the skill was built and tested, the eval results with and without it, the header search that hung the evals, and how its ports compare with maintainers' own SDL3 migrations.
+- [ ] Set `plugin.json` to 1.0.0, tag it and publish a GitHub release.
+
+**Done when:** 1.0.0 is released, CI is green, and every open "missed trap" issue has a decision.
+
 ## Later
 
 - A deterministic trap checker built from the trap cards' patterns, runnable in CI without a model, and a hook that runs it on every file the agent edits.
 - SDL_image 3, SDL_ttf 3 and SDL_mixer 3.
-- Writing new SDL3: main callbacks, properties and the GPU API.
-- High-DPI guidance, with a visual check.
+- Writing new SDL3: main callbacks, properties and the GPU API. This is the 2.x track.
+- A visual high-DPI check, beyond M6's guidance.
 - Evals for Codex and other harnesses.
 - A catalog marketplace repo that lists this and future skills.
-- Listings in plugin directories.
 - Build the port inside evals: install SDL3 on the eval runner so the agent can build its port and run it headless.
-- Before GitHub moves `ubuntu-latest` to Ubuntu 26 (from 2026-10-19), pin the CI and `Evals` runners to `ubuntu-24.04`, or check that their apt packages still install on 26.
-- A write-up of how the skill was built and tested: the eval results with and without it, the header search that hung the evals, and how its ports compare with maintainers' own SDL3 migrations.
 
 ## Not planned
 
