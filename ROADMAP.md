@@ -95,6 +95,10 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **Surfaces and `SDL_IOStream` join the core scope.** Two of the strong candidates live there, and both are core SDL3.
 - **Each milestone on the way ends in a minor release** (0.2.0 after M6, and so on), so users get new traps without waiting for 1.0.
 
+### Added during M7 (2026-10-05)
+
+- **CI and evals run on `ubuntu-24.04`, not `ubuntu-latest`.** GitHub moves `ubuntu-latest` to Ubuntu 26 from 2026-10-19. The pin keeps the image that the apt packages and the eval sandbox setup, including the AppArmor change bubblewrap needs, were written for. Moving to Ubuntu 26 is a separate change, with its own check that the packages still install.
+
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (zlib), `.gitignore` and `.gitattributes`.
@@ -195,7 +199,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 ## M7: Support and stability
 
 - [ ] Run the fixtures in CI against SDL 3.2.0 as well as the pinned 3.4 release, because the README promises 3.2 and later. A trap that behaves differently on 3.2 says so on its card.
-- [ ] Pin the CI and `Evals` runners before GitHub moves `ubuntu-latest` to Ubuntu 26 on 2026-10-19, or check that their packages still install there.
+- [x] Pin the CI and `Evals` runners before GitHub moves `ubuntu-latest` to Ubuntu 26 on 2026-10-19, or check that their packages still install there.
 - [ ] Write the stability promise in the README: what stays fixed across 1.x and what only a major version may change.
 - [ ] Write down how the pinned SDL moves: to the latest 3.x release before each minor release, with the fixtures and evals run again.
 - [ ] Release 0.3.0.
