@@ -71,3 +71,37 @@ Or set `SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER` to 1 for `SDL_CreateRende
 **Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "SDL_CreateRenderer()'s flags parameter has been removed" and "SDL_RENDERER_PRESENTVSYNC - replaced with SDL_PROP_RENDERER_CREATE_PRESENT_VSYNC_NUMBER during renderer creation and SDL_PROP_RENDERER_VSYNC_NUMBER after renderer creation". `SDL_SetRenderVSync` in `SDL_render.h` ([wiki](https://wiki.libsdl.org/SDL3/SDL_SetRenderVSync)): "When a renderer is created, vsync defaults to SDL_RENDERER_VSYNC_DISABLED."
 
 **Fixture:** `fixtures/vsync-flag-dropped/`.
+
+## blend-by-default
+
+**What compiles:**
+
+```c
+SDL_Texture *screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 160, 144);
+pixels[i] = (r << 16) | (g << 8) | b;    /* alpha byte left at 0 */
+SDL_RenderTexture(renderer, screen, NULL, NULL);    /* draws nothing */
+```
+
+**What breaks:** SDL2 created textures with `SDL_BLENDMODE_NONE`, so the alpha byte of their pixels didn't matter. SDL3 creates every texture whose format has an alpha channel with `SDL_BLENDMODE_BLEND`. Pixels written with an alpha of 0 now draw fully transparent, and the screen shows only what was under the texture, often plain black. Emulators and software renderers are the usual victims: they build `0x00RRGGBB` values for an ARGB format and never set the alpha byte. Pixels with a partial alpha draw partly transparent.
+
+**How to find it:** search the ported sources for textures they create, and for blend-mode settings:
+
+```
+SDL_CreateTexture\w*
+SDL_SetTextureBlendMode|SDL_BLENDMODE_
+```
+
+For each texture with an alpha format, meaning one with an `A` in its name such as `ARGB8888`, `RGBA8888`, `ABGR8888`, `BGRA8888` or `RGBA32`, check whether the code sets its blend mode. If it doesn't, check what it writes into the alpha channel: 0, nothing at all, or values that SDL2 ignored. Formats with an `X` instead, such as `XRGB8888`, have no alpha channel.
+
+**Fix:** turn blending off to keep SDL2's behavior:
+
+```c
+SDL_Texture *screen = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, 160, 144);
+SDL_SetTextureBlendMode(screen, SDL_BLENDMODE_NONE);
+```
+
+Writing an opaque alpha (`0xFF000000 | ...`) or creating the texture with an `X` format such as `SDL_PIXELFORMAT_XRGB8888` also works. Textures that are meant to be blended keep the default.
+
+**Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "Textures are created with SDL_SCALEMODE_LINEAR by default, and use SDL_BLENDMODE_BLEND by default if they are created with a format that has an alpha channel." SDL2's default comes from its source at `release-2.32.10`, not its docs: `SDL_CreateTexture` in `src/render/SDL_render.c` zero-fills the new texture, which leaves its blend mode at `SDL_BLENDMODE_NONE`.
+
+**Fixture:** `fixtures/blend-by-default/`.
