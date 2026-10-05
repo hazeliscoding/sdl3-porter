@@ -11,7 +11,7 @@ Port SDL2 code to SDL3, then sweep the port for traps: code that compiles cleanl
 Work from SDL's documentation, never from memory. Most SDL code you have seen is SDL2, and SDL3 changed return values, ownership and defaults without changing how the code looks.
 
 - SDL's migration guide, pinned to SDL 3.4.16: `${CLAUDE_SKILL_DIR}/scripts/sdl/docs/README-migration.md`. It has one `## SDL_<header>.h` section per header. Search it for a symbol before changing code that uses it.
-- Exact SDL3 signatures: SDL 3.4.16's public headers, pinned beside the guide in `${CLAUDE_SKILL_DIR}/scripts/sdl/include/SDL3/`. Each function's comment says which version added it (`\since`), so check that against the oldest SDL3 the project supports. Don't search the filesystem for other SDL headers: a whole-disk search can take minutes.
+- Exact SDL3 signatures: SDL 3.4.16's public headers, pinned beside the guide in `${CLAUDE_SKILL_DIR}/scripts/sdl/include/SDL3/`. Each function's comment says which version added it (`\since`), so check that against the oldest SDL3 the project supports. Never look for SDL outside the project with `find` or `locate`, whether for headers, libraries or CMake and pkg-config files. Those searches take minutes.
 
 **Scope:** core SDL3, meaning init, events, video and OpenGL, the renderer, input, audio, timers and the filesystem. SDL_image, SDL_ttf, SDL_mixer and SDL_net are out of scope. Port their includes and nothing else, and list them in the report.
 
@@ -80,7 +80,7 @@ Build with the project's own build system. For each error:
 
 Repeat until it builds with no warnings that the SDL2 build didn't have.
 
-If SDL3 isn't installed, compile without linking instead. Compile each changed source file against the bundled headers, with the project's own include paths and defines: `cc -fsyntax-only -I"${CLAUDE_SKILL_DIR}/scripts/sdl/include"`, `c++` for C++, or `cl /Zs` with MSVC. The bundle leaves out `SDL_opengl.h` and SDL's other Khronos headers, so skip any file that includes them. Fix every error as above, and say in the report that the port was only syntax-checked.
+To find out whether SDL3 is installed, ask the build: configure the project, or run `pkg-config --exists sdl3`. If SDL3 isn't installed, compile without linking instead. Compile each changed source file against the bundled headers, with the project's own include paths and defines: `cc -fsyntax-only -I"${CLAUDE_SKILL_DIR}/scripts/sdl/include"`, `c++` for C++, or `cl /Zs` with MSVC. The bundle leaves out `SDL_opengl.h` and SDL's other Khronos headers, so skip any file that includes them. Fix every error as above, and say in the report that the port was only syntax-checked.
 
 Never add a cast just to make a type error go away. A cast that hides a changed type is itself a trap. For example, don't cast an `SDL_Rect *` to `SDL_FRect *`. Convert the rectangle instead.
 
