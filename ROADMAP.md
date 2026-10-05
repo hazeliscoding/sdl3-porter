@@ -75,6 +75,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **The public programs are gbemu and AKrikler/chip8, in local clones.** Each started from the commit before its maintainer's own SDL3 port, which served as the answer key. pengupop was dropped, because its original is SDL 1.2. Only MSVC was available, so chip8 was built and run, and gbemu, whose build needs GCC or Clang, was compiled without linking. Nothing was forked or pushed.
 - **`blend-by-default` joins the traps.** The skill's gbemu port missed it, and the maintainer's own port fixed it: SDL3 blends textures with an alpha format by default, so a frame buffer of `0x00RRGGBB` pixels draws transparent. Its fixtures prove it like the other traps. Its eval case waits for the full eval run before the next release, which also measures the `SKILL.md` changes made in M4.
 - **Every dogfood report counted changes without a trap id as traps.** jage's, gbemu's and chip8's reports all did, the last two after a first rule against it. `SKILL.md` step 8 now requires a trap id on every trap line.
+- **Evals still don't build the port.** This answers M1's note that M3 would revisit it. A trap compiles cleanly by definition, so a build wouldn't change any trap score, and graders can't see whether a build succeeded. `SKILL.md` step 5's syntax check against the bundled headers already catches compile errors when SDL3 isn't installed. Installing SDL3 on the eval runner moves to Later.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -161,6 +162,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - Evals for Codex and other harnesses.
 - A catalog marketplace repo that lists this and future skills.
 - Listings in plugin directories.
+- Build the port inside evals: install SDL3 on the eval runner so the agent can build its port and run it headless.
 - A write-up of how the skill was built and tested: the eval results with and without it, the header search that hung the evals, and how its ports compare with maintainers' own SDL3 migrations.
 
 ## Not planned
