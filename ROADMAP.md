@@ -80,6 +80,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 ### Added during M5 (2026-10-05)
 
 - **The pre-release eval run passed.** All 10 cases scored 1.00 with the skill over 3 runs, and the skill fired in all 30 runs, with Sonnet 5 and Claude Code 2.1.289, for $26.58. `blend-by-default` scored 0.00 without the skill. The median run with the skill took 202 seconds, but three took 746, 808 and 1130 seconds with ordinary turn counts, so something in them waited, close to the 1200-second timeout. Those runs kept no transcripts, so the cause is still open.
+- **The quick start works from an empty Claude Code config.** With `CLAUDE_CONFIG_DIR` pointing at a new folder, the README's two commands added the marketplace and installed and enabled the plugin at the latest commit. That checks the commands, not a clean machine, so the quick start item stays open for one.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -149,7 +150,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 
 - [x] Run every eval case 3 times with and without the skill, and regenerate the README table.
 - [ ] README quick start: install with `/plugin marketplace add hazeliscoding/sdl3-porter`, checked on a clean machine.
-- [ ] Document what's supported: SDL 3.2 and later, C and C++, Claude Code. Other harnesses are untested.
+- [x] Document what's supported: SDL 3.2 and later, C and C++, Claude Code. Other harnesses are untested.
 - [ ] `CONTRIBUTING.md`: how to add a trap as a card, three fixtures and an eval case.
 - [ ] `SECURITY.md`: the skill edits your code and runs the bundled Python scripts and your build. It downloads nothing at runtime.
 - [ ] A "missed trap" issue template that asks for the SDL version, a minimal SDL2 snippet and what went wrong.
