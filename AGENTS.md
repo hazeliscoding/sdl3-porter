@@ -64,6 +64,7 @@ The skill is only worth trusting if these hold.
 
 ## Working style
 
+- **Releases:** installed plugins only update when `version` in `.claude-plugin/plugin.json` changes. A release bumps it, tags `vX.Y.Z` and publishes a GitHub release. Don't bump it outside a release.
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `chore:`, `test:`, `ci:`, `build:`, `refactor:`). Keep each commit atomic, and use a scope when it adds clarity (`feat(skill): …`, `test(fixtures): …`).
 - **No AI attribution** in commits or PRs. That means no `Co-Authored-By` trailers, no "Generated with" lines and no session links.
 - **`AGENTS.md`, `CLAUDE.md` and `.claude-plugin/` are committed.** `.gitignore` un-ignores them, overriding the global gitignore. Keep them free of secrets and private paths.
