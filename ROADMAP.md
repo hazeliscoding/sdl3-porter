@@ -190,7 +190,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 | Render | `vertex-color-float` | `SDL_Vertex` colors are floats from 0 to 1, so 0–255 values draw white |
 | Video | `window-mode-null` | `SDL_GetWindowFullscreenMode` returns NULL for a windowed window, which crashes on use |
 
-Done: `mouse-logical-coords`, `display-index-vs-id`, `indexed-surface-no-palette`, `rwread-count-vs-bytes`, `audio-init-implicit`.
+Done: `mouse-logical-coords`, `display-index-vs-id`, `indexed-surface-no-palette`, `rwread-count-vs-bytes`, `audio-init-implicit`, `vertex-color-float`.
 
 - [ ] Write guidance for the changes no fixture can prove: Nintendo face buttons, exclusive fullscreen, batching with direct OpenGL, mouse wheel values, high DPI, asynchronous window operations, Apple bundle paths, gamepad rumble and `SDL_RegisterEvents`.
 - [ ] Keep the 6 niche candidates as candidates: `event-timestamp-ns`, `target-state-persists`, `blit-dstrect-unchanged`, `render-output-size-logical`, `logical-scale-separate` and `resized-on-set-size`. Each becomes a trap only when a port or an issue shows it in real code.

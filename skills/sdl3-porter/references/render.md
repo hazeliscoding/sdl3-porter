@@ -105,3 +105,34 @@ Writing an opaque alpha (`0xFF000000 | ...`) or creating the texture with an `X`
 **Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "Textures are created with SDL_SCALEMODE_LINEAR by default, and use SDL_BLENDMODE_BLEND by default if they are created with a format that has an alpha channel." SDL2's default comes from its source at `release-2.32.10`, not its docs: `SDL_CreateTexture` in `src/render/SDL_render.c` zero-fills the new texture, which leaves its blend mode at `SDL_BLENDMODE_NONE`.
 
 **Fixture:** `fixtures/blend-by-default/`.
+
+## vertex-color-float
+
+**What compiles:**
+
+```c
+SDL_Vertex v = { { 10, 10 }, { 255, 128, 0, 255 }, { 0, 0 } };    /* 128 now clamps to full */
+v.color.a = sprite_color.a;                                       /* a 0-255 byte in a 0-1 float */
+```
+
+**What breaks:** SDL2's `SDL_Vertex` held an `SDL_Color`, four bytes from 0 to 255. SDL3's holds an `SDL_FColor`, four floats from 0 to 1 for ordinary content. Integer values still compile, whether constants or copies of `Uint8` fields, and anything above 1 clamps to full. Only 0 and 255 survive, so mid-tones go to full strength: orange (255, 128, 0) draws yellow, a half-transparent alpha of 128 draws opaque, and dimmed vertex colors draw at full brightness. Assigning a whole `SDL_Color` to the field doesn't compile, so the trap hides in initializers and channel-by-channel copies.
+
+**How to find it:** search the ported sources for vertices and their colors:
+
+```
+SDL_Vertex|SDL_RenderGeometry\b
+\.color\.(r|g|b|a)\s*=
+```
+
+Check that every vertex color is a float from 0 to 1. `SDL_RenderGeometryRaw` takes `SDL_FColor` as well, so the compiler catches a byte color array passed to it.
+
+**Fix:** divide byte values by 255:
+
+```c
+SDL_Vertex v = { { 10, 10 }, { 1.0f, 128 / 255.0f, 0.0f, 1.0f }, { 0, 0 } };
+v.color.a = sprite_color.a / 255.0f;
+```
+
+**Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "SDL_Vertex has been changed to use floating point colors, in the range of [0..1] for SDR content." The clamp comes from SDL's software renderer, in `src/render/software/SDL_render_sw.c` at `release-3.4.16`.
+
+**Fixture:** `fixtures/vertex-color-float/`.
