@@ -177,7 +177,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 
 ## M6: Coverage
 
-- [ ] Widen the scope to surfaces and `SDL_IOStream` in the README, `SKILL.md` and this file.
+- [x] Widen the scope to surfaces and `SDL_IOStream` in the README, `SKILL.md` and this file.
 - [ ] Add the 7 strong traps, each with a card, fixtures, a sample and an eval case:
 
 | Area | Trap | What breaks |
