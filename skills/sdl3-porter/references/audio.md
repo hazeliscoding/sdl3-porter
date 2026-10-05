@@ -73,3 +73,37 @@ SDL_MixAudio(dst, src, SDL_AUDIO_S16, len, 0.5f);
 **Source:** SDL `docs/README-migration.md`, `SDL_audio.h` section: "SDL_MixAudioFormat() and SDL_MIX_MAXVOLUME have been removed in favour of SDL_MixAudio(), which now takes the audio format, and a float volume between 0.0 and 1.0." `SDL_MixAudio` in `SDL_audio.h` ([wiki](https://wiki.libsdl.org/SDL3/SDL_MixAudio)): "volume ranges from 0.0 - 1.0, and should be set to 1.0 for full audio volume." The wrap comes from SDL's `src/audio/SDL_mixer.c` at `release-3.4.16`, not from the docs: it rounds `volume * 128` to an `int` without clamping it, and scales 8- and 16-bit samples within their own type before the overflow clipping the header describes. 32-bit and float samples don't overflow when scaled, so they clip.
 
 **Fixture:** `fixtures/mix-volume-float/`.
+
+## audio-init-implicit
+
+**What compiles:**
+
+```c
+SDL_Init(SDL_INIT_VIDEO);    /* SDL2's SDL_OpenAudio started audio by itself */
+/* ... */
+SDL_AudioStream *stream = SDL_OpenAudioDeviceStream(SDL_AUDIO_DEVICE_DEFAULT_PLAYBACK, &spec, callback, NULL);    /* NULL */
+```
+
+**What breaks:** SDL2's legacy `SDL_OpenAudio` initialized the audio subsystem if the program hadn't, so many programs initialized only video and still had sound. SDL3 has no `SDL_OpenAudio`, and its replacements, `SDL_OpenAudioDeviceStream` and `SDL_OpenAudioDevice`, fail with "Audio subsystem is not initialized" unless something initialized `SDL_INIT_AUDIO` first. The port runs silent, or crashes if it uses the stream without checking it. SDL2's `SDL_OpenAudioDevice` never initialized audio by itself, so code that called it already initializes audio.
+
+**How to find it:** check `git diff` for `SDL_OpenAudio(` in the SDL2 code, then search the ported sources for how SDL starts and where audio opens:
+
+```
+SDL_Init(SubSystem)?\s*\(|SDL_INIT_AUDIO
+SDL_OpenAudioDevice\w*\s*\(
+```
+
+If the project opens an audio device and no `SDL_Init` or `SDL_InitSubSystem` call passes `SDL_INIT_AUDIO` before it, add it. Watch for SDL2's `SDL_INIT_EVERYTHING` too: SDL3 removed it, and the flags that replace it have to include `SDL_INIT_AUDIO` when the program plays sound.
+
+**Fix:** initialize audio explicitly:
+
+```c
+if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
+    SDL_Log("SDL_Init failed: %s", SDL_GetError());
+    return 1;
+}
+```
+
+**Source:** SDL `docs/README-migration.md`, `SDL_audio.h` section: "SDL3 will not implicitly initialize the audio subsystem on your behalf if you open a device without doing so. Please explicitly call SDL_Init(SDL_INIT_AUDIO) at some point." SDL2's implicit initialization is in `SDL_OpenAudio`, in `src/audio/SDL_audio.c` at `release-2.32.10`.
+
+**Fixture:** `fixtures/audio-init-implicit/`.
