@@ -1,6 +1,6 @@
 # Input traps
 
-Read this when the project uses the keyboard, text input, joysticks or gamepads. Each trap compiles cleanly against SDL3 with warnings as errors, and breaks at runtime.
+Read this when the project uses the mouse, the keyboard, text input, joysticks or gamepads. Each trap compiles cleanly against SDL3 with warnings as errors, and breaks at runtime.
 
 ## gamepad-index-vs-id
 
@@ -85,3 +85,41 @@ The migration guide warns that starting text input may show an input method edit
 **Source:** SDL `docs/README-migration.md`, `SDL_keyboard.h` section: "Text input is no longer automatically enabled when initializing video, you should call SDL_StartTextInput() when you want to receive text input and call SDL_StopTextInput() when you are done. Starting text input may shown an input method editor (IME) and cause key up/down events to be skipped, so should only be enabled when the application wants text input." SDL's `src/events/SDL_keyboard.c` at `release-3.4.16` drops text and editing events unless `SDL_TextInputActive` is true for the focused window.
 
 **Fixture:** `fixtures/text-input-off/`.
+
+## mouse-logical-coords
+
+**What compiles:**
+
+```c
+SDL_SetRenderLogicalPresentation(renderer, 320, 240, SDL_LOGICAL_PRESENTATION_LETTERBOX);
+/* ... */
+case SDL_EVENT_MOUSE_BUTTON_DOWN:
+    click_at(event.button.x, event.button.y);    /* window coordinates, not logical */
+    break;
+```
+
+**What breaks:** in SDL2, a renderer with a logical size from `SDL_RenderSetLogicalSize` rewrote mouse, wheel and touch events into logical coordinates before the app saw them. SDL3 doesn't, so those events arrive in window coordinates. Code that hit-tests clicks against things drawn in logical coordinates misses as soon as the window isn't at the logical size: in a 640×480 window showing 320×240, a click on a button at (120, 120) arrives as (240, 240). Relative motion isn't scaled either.
+
+**How to find it:** search the ported sources for a logical size, and for coordinates read from mouse, wheel and touch events:
+
+```
+SDL_SetRenderLogicalPresentation|SDL_RenderSetLogicalSize
+\b(button|motion|wheel|tfinger)\.(x|y|xrel|yrel|mouse_x|mouse_y)\b
+```
+
+If the project sets a logical size, find every place it compares an event's coordinates with positions in logical space: buttons, menus, tiles, aiming. `SDL_GetMouseState` was never converted, even in SDL2, so code that already converts its result is fine.
+
+**Fix:** convert each event before using its coordinates:
+
+```c
+case SDL_EVENT_MOUSE_BUTTON_DOWN:
+    SDL_ConvertEventToRenderCoordinates(renderer, &event);
+    click_at(event.button.x, event.button.y);
+    break;
+```
+
+For a point that doesn't come from an event, use `SDL_RenderCoordinatesFromWindow`.
+
+**Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "Mouse and touch events are no longer filtered to change their coordinates, instead you can call SDL_ConvertEventToRenderCoordinates() to explicitly map event coordinates into the rendering viewport." `SDL_hints.h` section: "SDL_HINT_MOUSE_RELATIVE_SCALING - mouse coordinates are no longer automatically scaled by the SDL renderer". SDL2's conversion is `SDL_RendererEventWatch` in `src/render/SDL_render.c` at `release-2.32.10`, which rescaled mouse, wheel and touch events while a logical size was set.
+
+**Fixture:** `fixtures/mouse-logical-coords/`.
