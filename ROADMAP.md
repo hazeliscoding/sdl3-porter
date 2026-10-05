@@ -156,6 +156,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - Evals for Codex and other harnesses.
 - A catalog marketplace repo that lists this and future skills.
 - Listings in plugin directories.
+- A write-up of how the skill was built and tested: the eval results with and without it, the header search that hung the evals, and how its ports compare with maintainers' own SDL3 migrations.
 
 ## Not planned
 
