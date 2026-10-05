@@ -1,0 +1,42 @@
+name: Missed trap
+description: SDL2 code that sdl3-porter ported, that compiles against SDL3, but breaks at runtime.
+title: "Missed trap: "
+labels: ["missed trap"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A trap is code that compiles cleanly against SDL3 and then misbehaves when it runs. If the port didn't compile, that's a different bug: open a blank issue instead.
+  - type: input
+    id: sdl-version
+    attributes:
+      label: SDL3 version
+      description: The SDL3 you built against, such as 3.4.16.
+    validations:
+      required: true
+  - type: textarea
+    id: snippet
+    attributes:
+      label: Minimal SDL2 code
+      description: The smallest SDL2 snippet that shows the problem once ported.
+      render: c
+    validations:
+      required: true
+  - type: textarea
+    id: port
+    attributes:
+      label: What sdl3-porter turned it into
+      description: The ported code, or the relevant part of the diff.
+      render: c
+  - type: textarea
+    id: broke
+    attributes:
+      label: What went wrong
+      description: What you expected, what happened instead, and on which platform.
+    validations:
+      required: true
+  - type: input
+    id: agent
+    attributes:
+      label: Agent and model
+      description: For example, Claude Code 2.1.289 with Sonnet 5.
