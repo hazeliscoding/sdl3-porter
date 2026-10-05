@@ -9,7 +9,7 @@
 
 SDL's rename scripts handle most of a port, and the compiler catches most of the rest. Neither catches code that still compiles but now means something else. SDL3 functions return `true` on success, so a leftover `if (SDL_Init(...) != 0)` exits on every launch. A device opened with `SDL_OpenAudioDeviceStream` starts paused, so the ported game plays no sound. Textures now filter linearly by default, so pixel art blurs. Coding agents make the same mistakes, because most of the SDL code they learned from is SDL2.
 
-> **Status:** planning. There is nothing to install yet. See [ROADMAP.md](ROADMAP.md).
+> **Status:** working toward v0.1.0. Until it's tagged, installs follow the latest commit. See [ROADMAP.md](ROADMAP.md).
 
 ## Before and after
 
@@ -26,7 +26,7 @@ SDL_AudioStream *music = SDL_OpenAudioDeviceStream(
 SDL_PutAudioStreamData(music, samples, size);          // the device is paused: silence
 ```
 
-The planned report after sdl3-porter finishes the port:
+The report after sdl3-porter fixes the port:
 
 ```text
 3 traps found, 3 fixed
@@ -37,6 +37,26 @@ src/sprites.c:9   linear-by-default    SDL_HINT_RENDER_SCALE_QUALITY no longer e
 
 Needs a human: check the window on a high-DPI display.
 ```
+
+## Quick start
+
+In Claude Code, add the marketplace and install the plugin:
+
+```text
+/plugin marketplace add hazeliscoding/sdl3-porter
+/plugin install sdl3-porter@sdl3-porter
+```
+
+Then open your SDL2 project and ask Claude Code to port it to SDL3. The skill loads on its own, or you can start it with `/sdl3-porter:sdl3-porter`. Commit your work first, because the port is meant to be reviewed as a diff.
+
+Python 3 on your `PATH` lets the skill run SDL's rename scripts. Without it, the agent renames by hand from the migration guide. With SDL3 installed, the skill builds the port and runs it where it can. Without SDL3, it compiles the changed files against the SDL3 headers it ships with, and its report says so.
+
+## What's supported
+
+- **SDL 3.2 and later.** The headers, migration guide and rename scripts that ship with the skill are pinned to SDL 3.4.16, and the fixtures run against it.
+- **C and C++.** The build reference covers CMake, vendored SDL, pkg-config, `sdl2-config` and Makefiles, Windows DLLs, Linux, Emscripten and package managers.
+- **Claude Code.** The skill is also a plain Agent Skill, but no other harness has been tested.
+- **Out of scope:** SDL_image, SDL_ttf, SDL_mixer and SDL_net, whose includes the skill ports and whose calls it leaves for you; SDL 1.2; and language bindings.
 
 ## What it does
 
