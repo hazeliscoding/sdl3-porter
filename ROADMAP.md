@@ -173,6 +173,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - A catalog marketplace repo that lists this and future skills.
 - Listings in plugin directories.
 - Build the port inside evals: install SDL3 on the eval runner so the agent can build its port and run it headless.
+- Before GitHub moves `ubuntu-latest` to Ubuntu 26 (from 2026-10-19), pin the CI and `Evals` runners to `ubuntu-24.04`, or check that their apt packages still install on 26.
 - A write-up of how the skill was built and tested: the eval results with and without it, the header search that hung the evals, and how its ports compare with maintainers' own SDL3 migrations.
 
 ## Not planned
