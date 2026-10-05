@@ -77,6 +77,10 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **Every dogfood report counted changes without a trap id as traps.** jage's, gbemu's and chip8's reports all did, the last two after a first rule against it. `SKILL.md` step 8 now requires a trap id on every trap line.
 - **Evals still don't build the port.** This answers M1's note that M3 would revisit it. A trap compiles cleanly by definition, so a build wouldn't change any trap score, and graders can't see whether a build succeeded. `SKILL.md` step 5's syntax check against the bundled headers already catches compile errors when SDL3 isn't installed. Installing SDL3 on the eval runner moves to Later.
 
+### Added during M5 (2026-10-05)
+
+- **The pre-release eval run passed.** All 10 cases scored 1.00 with the skill over 3 runs, and the skill fired in all 30 runs, with Sonnet 5 and Claude Code 2.1.289, for $26.58. `blend-by-default` scored 0.00 without the skill. The median run with the skill took 202 seconds, but three took 746, 808 and 1130 seconds with ordinary turn counts, so something in them waited, close to the 1200-second timeout. Those runs kept no transcripts, so the cause is still open.
+
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (zlib), `.gitignore` and `.gitattributes`.
@@ -143,7 +147,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 
 ## M5: v0.1.0
 
-- [ ] Run every eval case 3 times with and without the skill, and regenerate the README table.
+- [x] Run every eval case 3 times with and without the skill, and regenerate the README table.
 - [ ] README quick start: install with `/plugin marketplace add hazeliscoding/sdl3-porter`, checked on a clean machine.
 - [ ] Document what's supported: SDL 3.2 and later, C and C++, Claude Code. Other harnesses are untested.
 - [ ] `CONTRIBUTING.md`: how to add a trap as a card, three fixtures and an eval case.
