@@ -67,6 +67,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **Case scores leave out `skill-fired`.** In a with-without run, `claude plugin eval` reports the `tool_used: Skill` grader separately instead of scoring it in either arm, so a case's score measures only the port.
 - **The smoke run passed, and showed a slow header search (2026-10-04).** `text-input-off` scored 1.0 with the skill and 1.0 without it, for $0.69, with Sonnet 5 and Claude Code 2.1.289. The run with the skill took 13 minutes for 33 turns. A traced rerun took 3.5 minutes, 87 seconds of it in a `find /` for SDL3 headers that the sandbox doesn't have. `SKILL.md` now says to find headers through the build and to fall back on the migration guide. Trap cases now get `port-sample`'s 20 minutes, and the `Evals` job 3 hours.
 - **The skill bundles SDL 3.4.16's public headers.** The first full eval run scored every case 1.00 with the skill except `bool-returns`, at 0.67: one of its runs timed out after 1200 seconds. A traced rerun showed the agent still searching the whole disk for SDL3 headers, despite the new line in `SKILL.md`, and one search outlasted the Bash tool's 2-minute limit. So the agent now gets exact signatures from the skill: 66 headers in `scripts/sdl/include/SDL3/`, 2.3 MB, leaving out the test library and the Khronos OpenGL and EGL headers. The byte-identity check covers them. `SKILL.md` says to check each function's `\since` against the oldest SDL3 the project supports. Every case runs again so the README table reflects the skill as shipped.
+- **M3 results (2026-10-05).** With the headers bundled, every case scored 1.00 with the skill over 3 runs, and the skill fired in all 27 runs, with Sonnet 5 and Claude Code 2.1.289, for $24.36. Without the skill, Sonnet 5 scored 0.00 on `linear-by-default`, 0.78 on `hint-string-ignored` and 0.76 on the whole program. In the whole program it missed `text-input-off` and `linear-by-default` in every run, although it fixed `text-input-off` in that trap's own sample. The other six cases scored 1.00 either way. The slowest run with the skill took 342 seconds, down from 1200. M3's runs cost $50.80 in all, counting the smoke and traced runs and the first full run. The README table comes from the nine dispatches' `--json` results, which use the `aggregate-result.json` schema.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -118,8 +119,8 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 
 - [x] One eval case per trap: scaffold its sample from `samples/<id>/`, ask for a port, and grade that the skill fired, the naive pattern is gone and the fix is present.
 - [x] A whole-program case: the sample with several traps at once.
-- [ ] Run every case 3 times with and without the skill in the `Evals` workflow.
-- [ ] A README table of with-skill and without-skill scores per trap, with the model and the date.
+- [x] Run every case 3 times with and without the skill in the `Evals` workflow.
+- [x] A README table of with-skill and without-skill scores per trap, with the model and the date.
 
 **Done when:** every case scores at least 0.9 with the skill across 3 runs, and the README table is generated from `aggregate-result.json`.
 
