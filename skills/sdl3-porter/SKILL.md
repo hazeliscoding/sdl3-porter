@@ -80,6 +80,8 @@ Build with the project's own build system. For each error:
 
 Repeat until it builds with no warnings that the SDL2 build didn't have.
 
+If SDL3 isn't installed, compile without linking instead. Compile each changed source file against the bundled headers, with the project's own include paths and defines: `cc -fsyntax-only -I"${CLAUDE_SKILL_DIR}/scripts/sdl/include"`, `c++` for C++, or `cl /Zs` with MSVC. The bundle leaves out `SDL_opengl.h` and SDL's other Khronos headers, so skip any file that includes them. Fix every error as above, and say in the report that the port was only syntax-checked.
+
 Never add a cast just to make a type error go away. A cast that hides a changed type is itself a trap. For example, don't cast an `SDL_Rect *` to `SDL_FRect *`. Convert the rectangle instead.
 
 Some strings that SDL2 handed over for you to free are now `const` in SDL3, because SDL owns them. When `SDL_free` or a `char *` rejects one, delete the `SDL_free` and keep the pointer `const`. Casting `const` away compiles, then frees memory SDL still owns. Two examples:
