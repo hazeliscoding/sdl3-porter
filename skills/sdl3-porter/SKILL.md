@@ -99,6 +99,7 @@ Code that compiles can still be wrong. For each subsystem the project uses, read
 |---|---|
 | Init and error handling (always read) | [references/init.md](references/init.md) |
 | Events | [references/events.md](references/events.md) |
+| Windows, displays and display modes | [references/video.md](references/video.md) |
 | Mouse, keyboard, text input, joysticks and gamepads | [references/input.md](references/input.md) |
 | 2D renderer | [references/render.md](references/render.md) |
 | Audio | [references/audio.md](references/audio.md) |
