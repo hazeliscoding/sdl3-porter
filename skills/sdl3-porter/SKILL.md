@@ -126,9 +126,12 @@ Use this format, one line per trap, with no emoji:
 src/main.c:14     bool-returns   SDL_Init returns true on success, so `< 0` never caught a failure.
 src/net.c:88      bool-returns   SDL_SetHint returns bool, so `!= 0` treated success as failure.
 
+Also changed: src/input.c:31 SDL_GetKeyboardState now returns const bool *.
 Build: find_package(SDL3), SDL2main removed, SDL_main.h added to src/main.c.
 Not checked: couldn't build here (SDL3 isn't installed).
 Needs a human: audio by ear, a real gamepad, SDL_mixer (out of scope).
 ```
+
+Only ids from the trap files are traps. List renamed or removed APIs and other fixes the compiler forced under `Also changed:`, one per line, and don't count them as traps.
 
 If no traps were found, say `0 traps found` and list the trap files you checked.
