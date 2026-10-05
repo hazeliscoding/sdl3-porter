@@ -96,7 +96,7 @@ Claude Code ported each trap's SDL2 sample, and the bounce game, three times wit
 
 ## Contributing
 
-Each trap will be one reference entry, three small fixture programs, and one eval case with its own SDL2 sample. A contributor guide arrives with v0.1.
+Each trap is one reference entry, three small fixture programs, and one eval case with its own SDL2 sample. [CONTRIBUTING.md](CONTRIBUTING.md) explains how to add one, and the **Missed trap** issue form is the place to report one the skill didn't catch.
 
 ## License
 
