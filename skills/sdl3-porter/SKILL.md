@@ -132,6 +132,6 @@ Not checked: couldn't build here (SDL3 isn't installed).
 Needs a human: audio by ear, a real gamepad, SDL_mixer (out of scope).
 ```
 
-Only ids from the trap files are traps. List renamed or removed APIs and other fixes the compiler forced under `Also changed:`, one per line, and don't count them as traps.
+Every trap line names an id from a trap file, one line for each place you fixed it. Nothing else is a trap. Put renamed or removed APIs, changed signatures and every other change under `Also changed:`, one per line, even when the port needed them, and leave them out of `N traps found`.
 
 If no traps were found, say `0 traps found` and list the trap files you checked.
