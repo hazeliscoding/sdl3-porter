@@ -85,6 +85,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **The broader rule holds.** The same 9 runs against the new `SKILL.md`, for $5.11, all scored 1.00, and none ran `find` or `locate` outside the project. No command took longer than 15 seconds, and the slowest run took 202 seconds. Every run compiled its port against the bundled headers with `cc -fsyntax-only`, and most checked for SDL3 with `pkg-config`.
 - **The first clean-machine attempt installed into the Windows setup instead.** On a fresh WSL Ubuntu 24.04, the README's two commands added the marketplace and installed the plugin, at commit `73efb77`. But no Linux `claude` existed yet, and WSL appends the Windows `PATH`, so the `claude` in that terminal was the owner's Windows install, with its own config and plugins. The commands work in a real setup, then, but not yet in a clean one, so the quick start item stays open until a Linux-native Claude Code installs the plugin from a new terminal. Ubuntu 24.04 doesn't package SDL3, so the test distro builds SDL 3.4.16 from source. Under WSLg, the SDL2 bounce sample drew 300 frames in 4,835 ms, so vsync works there.
 - **The clean-machine check passed.** On the same fresh WSL Ubuntu 24.04, a Linux-native Claude Code 2.1.289, logged in for the first time, installed the plugin with the README's two commands, at `55d487a`. A fresh session on the owner's default model, Opus 5.5, ported the bounce sample in 16 turns for $0.69, and its report listed all 7 of the sample's traps by id. Another ported AKrikler/chip8 in 25 turns for $1.13 and listed all 4 of its traps. Both ports built against SDL 3.4.16 without warnings and ran on WSLg. The bounce port drew 300 frames in 5,097 ms, against 4,835 ms for the SDL2 original, so vsync still paces it. The owner saw a crisp sprite and their typing in the title, heard clean beeps, and played chip8's Pong with sharp pixels.
+- **Versioning starts at 0.1.0.** Claude Code compares a plugin's `version` to decide whether an install has an update, so from now on users only get changes when `plugin.json`'s version goes up. Every release bumps it, tags `vX.Y.Z` and publishes a GitHub release, and changes between releases wait on `main` until the next one.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -158,7 +159,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - [x] `CONTRIBUTING.md`: how to add a trap as a card, three fixtures and an eval case.
 - [x] `SECURITY.md`: the skill edits your code and runs the bundled Python scripts and your build. It downloads nothing at runtime.
 - [x] A "missed trap" issue template that asks for the SDL version, a minimal SDL2 snippet and what went wrong.
-- [ ] Set `plugin.json` to 0.1.0, tag it and publish a GitHub release.
+- [x] Set `plugin.json` to 0.1.0, tag it and publish a GitHub release.
 
 **Done when:** on a clean machine, someone can install from the README, port the sample and build and run it, CI is green, and there are no known critical bugs.
 
