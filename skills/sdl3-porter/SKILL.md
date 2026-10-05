@@ -11,7 +11,7 @@ Port SDL2 code to SDL3, then sweep the port for traps: code that compiles cleanl
 Work from SDL's documentation, never from memory. Most SDL code you have seen is SDL2, and SDL3 changed return values, ownership and defaults without changing how the code looks.
 
 - SDL's migration guide, pinned to SDL 3.4.16: `${CLAUDE_SKILL_DIR}/scripts/sdl/docs/README-migration.md`. It has one `## SDL_<header>.h` section per header. Search it for a symbol before changing code that uses it.
-- Exact SDL3 signatures: the `include/SDL3/*.h` headers of the SDL3 the project builds against. Find them through the build: a vendored copy, the CMake package or `pkg-config --cflags sdl3`. If SDL3 isn't installed, say so and work from the migration guide. Never search the whole filesystem for headers, which can take minutes.
+- Exact SDL3 signatures: SDL 3.4.16's public headers, pinned beside the guide in `${CLAUDE_SKILL_DIR}/scripts/sdl/include/SDL3/`. Each function's comment says which version added it (`\since`), so check that against the oldest SDL3 the project supports. Don't search the filesystem for other SDL headers: a whole-disk search can take minutes.
 
 **Scope:** core SDL3, meaning init, events, video and OpenGL, the renderer, input, audio, timers and the filesystem. SDL_image, SDL_ttf, SDL_mixer and SDL_net are out of scope. Port their includes and nothing else, and list them in the report.
 
@@ -75,7 +75,7 @@ The scripts only rename. They don't fix changed return values, ownership or defa
 Build with the project's own build system. For each error:
 
 1. Search the migration guide for the symbol, under its header's section.
-2. Check the SDL3 header for the exact signature.
+2. Check the bundled SDL3 header for the exact signature.
 3. Fix the code, then rebuild.
 
 Repeat until it builds with no warnings that the SDL2 build didn't have.
