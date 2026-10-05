@@ -72,6 +72,7 @@ It covers core SDL3: init, events, video and OpenGL, the renderer, surfaces, inp
 - **Three programs per trap.** The SDL2 original, the naive port that compiles and fails, and the correct port. CI builds the original against SDL 2.32 and both ports against SDL 3.4.16, and runs all three headless on Windows, Linux and macOS (OpenGL traps on Linux). The original and the correct port must pass and the naive port must fail, or the trap doesn't ship.
 - **Measured against no skill.** Evals run Claude Code with and without sdl3-porter on a small SDL2 program for each trap and on a whole game. The scores are below.
 - **Sourced.** Each trap links the section of SDL's [migration guide](https://wiki.libsdl.org/SDL3/README-migration) it rests on.
+- **Guidance isn't called a trap.** Some changes need hardware or a platform no headless test has, such as Nintendo face buttons, high DPI or Apple app bundles. The skill checks those by reading the code and reports them apart from the traps.
 
 ## Eval scores
 

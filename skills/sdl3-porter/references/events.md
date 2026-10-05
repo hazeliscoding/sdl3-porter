@@ -1,6 +1,6 @@
 # Event guidance
 
-Read this when the project polls SDL events, which nearly every project does. Nothing here is a trap card: each section is a change that no headless fixture can reproduce, so check it by reading the code.
+Read this when the project polls SDL events, which nearly every project does. Nothing here is a trap card: each section is a change that no headless fixture can reproduce, or that shows only in conditions too rare to be worth one, so check it by reading the code.
 
 ## Keeping event text past the poll cycle
 
@@ -28,3 +28,24 @@ case SDL_EVENT_DROP_FILE:
 For events the project queues for later, copy each string when queuing and free the copy after processing.
 
 **Source:** SDL `docs/README-migration.md`, `SDL_events.h` section: "Event memory is now managed by SDL, so you should not free the data in SDL_EVENT_DROP_FILE, and if you want to hold onto the text in SDL_EVENT_TEXT_EDITING and SDL_EVENT_TEXT_INPUT events, you should make a copy of it." When SDL frees it: `src/events/SDL_events.c` at `release-3.4.16`, where `SDL_PumpEventsInternal` starts with `SDL_FreeTemporaryMemory()`, "Free any temporary memory from old events".
+
+## SDL_RegisterEvents failure value
+
+**What changed:** SDL2's `SDL_RegisterEvents` returned `(Uint32)-1` when it couldn't allocate the event types. SDL3's returns 0. The function name and return type didn't change, so an SDL2 check like `if (type == (Uint32)-1)` or `if (type == 0xFFFFFFFF)` ports untouched and never fires. The program then uses event type 0, which no handler matches. SDL only runs out after about 32,000 user event types, so this rarely shows, but the check is dead code.
+
+**How to find it:** search the ported sources for the call, then read the check after it:
+
+```
+SDL_RegisterEvents\s*\(
+```
+
+**Fix:** check for 0:
+
+```c
+Uint32 timer_event = SDL_RegisterEvents(1);
+if (timer_event == 0) {
+    /* handle the failure */
+}
+```
+
+**Source:** SDL `docs/README-migration.md`, `SDL_events.h` section: "SDL_RegisterEvents() now returns 0 if it couldn't allocate any user events."

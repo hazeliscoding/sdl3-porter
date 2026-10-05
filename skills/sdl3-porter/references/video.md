@@ -1,6 +1,6 @@
 # Video traps
 
-Read this when the project creates windows or asks about displays and display modes. Each trap compiles cleanly against SDL3 with warnings as errors, and breaks at runtime.
+Read this when the project creates windows or asks about displays and display modes. Each trap compiles cleanly against SDL3 with warnings as errors, and breaks at runtime. The guidance sections after the traps are changes no headless fixture can reproduce, so check them by reading the code.
 
 ## display-index-vs-id
 
@@ -66,3 +66,59 @@ float hz = (mode && mode->refresh_rate > 0) ? mode->refresh_rate : 60.0f;
 **Source:** SDL `docs/README-migration.md`, `SDL_video.h` section: "The fullscreen mode for a window can be queried with SDL_GetWindowFullscreenMode(), which returns a pointer to the mode, or NULL if the window will be fullscreen desktop.", and the rename "SDL_GetWindowDisplayMode() => SDL_GetWindowFullscreenMode()". `SDL_GetWindowFullscreenMode` in `SDL_video.h` ([wiki](https://wiki.libsdl.org/SDL3/SDL_GetWindowFullscreenMode)): "returns a pointer to the exclusive fullscreen mode to use or NULL for borderless fullscreen desktop mode."
 
 **Fixture:** `fixtures/window-mode-null/`.
+
+## Exclusive fullscreen
+
+**What changed:** in SDL2, `SDL_WINDOW_FULLSCREEN`, at creation or in `SDL_SetWindowFullscreen`, meant exclusive fullscreen: SDL switched the display to the mode set with `SDL_SetWindowDisplayMode`, or to the mode closest to the window's size. `SDL_WINDOW_FULLSCREEN_DESKTOP` meant a borderless window over the desktop. SDL3 removes `SDL_WINDOW_FULLSCREEN_DESKTOP` and makes borderless the default for every fullscreen window, exclusive only after `SDL_SetWindowFullscreenMode` with a real mode. `SDL_SetWindowFullscreen` now takes a `bool`, and SDL2's `SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN)` still compiles, as `true`. So a game that switched the display to 640×480 now gets a window the size of the desktop. Unless it scales its drawing, it fills only the top-left corner.
+
+**How to find it:** search the ported sources for fullscreen:
+
+```
+SDL_WINDOW_FULLSCREEN\b|SDL_SetWindowFullscreen\s*\(
+```
+
+Check what the SDL2 code asked for. `SDL_WINDOW_FULLSCREEN_DESKTOP` ports as is. `SDL_WINDOW_FULLSCREEN` without a scaled drawing path, meaning no logical size and no viewport from the window's pixel size, needs a fix.
+
+**Fix:** scale to the window, for example with `SDL_SetRenderLogicalPresentation`. That's usually what players want, and it doesn't change the display. To keep exclusive fullscreen, set a mode before going fullscreen:
+
+```c
+SDL_DisplayMode mode;
+if (SDL_GetClosestFullscreenDisplayMode(SDL_GetDisplayForWindow(window), 640, 480, 0.0f, false, &mode)) {
+    SDL_SetWindowFullscreenMode(window, &mode);
+}
+SDL_SetWindowFullscreen(window, true);
+```
+
+**Source:** SDL `docs/README-migration.md`, `SDL_video.h` section: "Windows now have an explicit fullscreen mode that is set, using SDL_SetWindowFullscreenMode(). [...] SDL_SetWindowFullscreen() just takes a boolean value, setting the correct fullscreen state based on the selected mode." and "SDL_WINDOW_FULLSCREEN_DESKTOP has been removed".
+
+## High DPI
+
+**What changed:** SDL2 left a Windows program unaware of display scaling unless it asked, so on a display at 200%, Windows drew a 640×480 window at twice the size, a little blurry. SDL3 makes every Windows program aware of per-monitor scaling, and window sizes are in pixels, so the same window comes out half as big. macOS and Wayland work the other way round: sizes are in points, and the window's pixel size can be larger, with `SDL_WINDOW_HIGH_PIXEL_DENSITY` (SDL2's `SDL_WINDOW_ALLOW_HIGHDPI`). There, code that uses the window size as the size in pixels draws into the wrong area.
+
+**How to find it:** search the ported sources for window sizes used as pixel sizes, and for the pixel density flag:
+
+```
+SDL_GetWindowSize\s*\(|SDL_WINDOW_HIGH_PIXEL_DENSITY
+```
+
+A window size passed to `glViewport`, to a texture or surface the size of the window, or to `SDL_RenderReadPixels`, needs the size in pixels.
+
+**Fix:** use `SDL_GetWindowSizeInPixels` for anything measured in pixels, and resize on `SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED`. For readable sizes on Windows, scale the window by `SDL_GetDisplayContentScale(SDL_GetPrimaryDisplay())` when creating it, and handle `SDL_EVENT_WINDOW_DISPLAY_SCALE_CHANGED`. If you change sizes this way, say so under `Also changed:`. Checking it on a scaled display is for a human.
+
+**Source:** SDL `docs/README-migration.md`, `SDL_hints.h` section: "SDL_HINT_VIDEO_HIGHDPI_DISABLED - high DPI support is always enabled". `SDL_video.h` section: "You should use SDL_GetWindowSizeInPixels() to get the actual pixel size of the window back buffer." SDL `docs/README-highdpi.md` at `release-3.4.16`, with its table of window and pixel sizes on macOS and Windows: "Ignoring this scale factor results in graphics appearing tiny." The Windows default is `WIN_InitDPIAwareness` in `src/video/windows/SDL_windowsvideo.c`, which requests per-monitor awareness when no hint is set. SDL2's default was "Do not change the DPI awareness", in `SDL_hints.h` at `release-2.32.10`.
+
+## Asynchronous window operations
+
+**What changed:** in SDL3, these calls only ask the windowing system for a change, and return before it happens: `SDL_SetWindowSize`, `SDL_SetWindowPosition`, `SDL_MinimizeWindow`, `SDL_MaximizeWindow`, `SDL_RestoreWindow` and `SDL_SetWindowFullscreen`. The windowing system can also refuse, or change the request. Code that reads the window back right after the call, with `SDL_GetWindowSize`, `SDL_GetWindowPosition` or `SDL_GetWindowFlags`, can get the old values, and then sizes a texture, a viewport or a layout for the old window.
+
+**How to find it:** search the ported sources for the requests:
+
+```
+SDL_(SetWindowSize|SetWindowPosition|MinimizeWindow|MaximizeWindow|RestoreWindow|SetWindowFullscreen)\s*\(
+```
+
+Check whether the code right after each call depends on the new state.
+
+**Fix:** react to the window events instead: `SDL_EVENT_WINDOW_RESIZED`, `SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED`, `SDL_EVENT_WINDOW_MOVED`, `SDL_EVENT_WINDOW_MINIMIZED`, `SDL_EVENT_WINDOW_MAXIMIZED`, `SDL_EVENT_WINDOW_RESTORED`, `SDL_EVENT_WINDOW_ENTER_FULLSCREEN` and `SDL_EVENT_WINDOW_LEAVE_FULLSCREEN`. Where the next line really needs the new state, call `SDL_SyncWindow(window)` after the request. It can block while the window animates.
+
+**Source:** SDL `docs/README-migration.md`, `SDL_video.h` section: "The following window operations are now considered to be asynchronous requests and should not be assumed to succeed unless a corresponding event has been received", and "the `SDL_SyncWindow()` function will attempt to wait until all pending window operations have completed."

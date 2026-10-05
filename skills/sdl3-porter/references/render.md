@@ -1,6 +1,6 @@
 # Renderer traps
 
-Read this when the project uses the 2D renderer (`SDL_Renderer`). Each trap compiles cleanly against SDL3 with warnings as errors, and breaks at runtime.
+Read this when the project uses the 2D renderer (`SDL_Renderer`). Each trap compiles cleanly against SDL3 with warnings as errors, and breaks at runtime. The guidance sections after the traps are changes no headless fixture can reproduce, so check them by reading the code.
 
 ## linear-by-default
 
@@ -136,3 +136,17 @@ v.color.a = sprite_color.a / 255.0f;
 **Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "SDL_Vertex has been changed to use floating point colors, in the range of [0..1] for SDR content." The clamp comes from SDL's software renderer, in `src/render/software/SDL_render_sw.c` at `release-3.4.16`.
 
 **Fixture:** `fixtures/vertex-color-float/`.
+
+## Batching with direct OpenGL
+
+**What changed:** SDL2's renderer queued draw calls and sent them to the GPU in batches, but turned batching off when the program asked for a specific backend, such as `SDL_HINT_RENDER_DRIVER` set to `opengl`, because such a program might draw with OpenGL itself. SDL3 always batches. A port that mixes the renderer with its own OpenGL, Direct3D, Metal or Vulkan calls compiles unchanged, then draws in the wrong order: its own drawing runs before the renderer's queued drawing, which paints over it, or the renderer's state ends up in the program's calls.
+
+**How to find it:** check whether a file that uses `SDL_Renderer` also calls a graphics API directly:
+
+```
+\bgl[A-Z]\w*\s*\(|SDL_GetRenderMetalCommandEncoder|SDL_PROP_TEXTURE_OPENGL_TEXTURE_NUMBER|SDL_PROP_RENDERER_\w*(D3D|VULKAN)\w*
+```
+
+**Fix:** call `SDL_FlushRenderer(renderer)` before each stretch of direct graphics calls, so SDL's queued drawing goes first. In SDL2 code that already called `SDL_RenderFlush`, the rename scripts make that `SDL_FlushRenderer`, which is right.
+
+**Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "The 2D renderer API always uses batching in SDL3. [...] all apps that use SDL3's 2D renderer and also want to call directly into the platform's lower-layer graphics API _must_ call SDL_FlushRenderer() before doing so." SDL2's default is in `SDL_hints.h` at `release-2.32.10`, under `SDL_HINT_RENDER_BATCHING`: "SDL will disable batching if a specific render backend is requested".

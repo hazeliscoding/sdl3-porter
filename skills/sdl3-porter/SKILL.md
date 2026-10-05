@@ -107,11 +107,11 @@ Code that compiles can still be wrong. For each subsystem the project uses, read
 | Audio | [references/audio.md](references/audio.md) |
 | Hints, set in code, the environment or config files | [references/hints.md](references/hints.md) |
 
-For each trap:
+For each trap and guidance section:
 
 1. Run its "How to find it" search.
 2. Read every hit in context.
-3. Fix the ones that match, and note `file:line` and the trap id.
+3. Fix the ones that match, and note `file:line` and the trap id. Guidance sections have no id: note their fixes under `Also changed:`, and anything they leave to the owner under `Needs a human:`.
 
 ### 7. Build and run
 

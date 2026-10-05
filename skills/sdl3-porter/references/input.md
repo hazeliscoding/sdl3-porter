@@ -1,6 +1,6 @@
 # Input traps
 
-Read this when the project uses the mouse, the keyboard, text input, joysticks or gamepads. Each trap compiles cleanly against SDL3 with warnings as errors, and breaks at runtime.
+Read this when the project uses the mouse, the keyboard, text input, joysticks or gamepads. Each trap compiles cleanly against SDL3 with warnings as errors, and breaks at runtime. The guidance sections after the traps are changes no headless fixture can reproduce, so check them by reading the code.
 
 ## gamepad-index-vs-id
 
@@ -123,3 +123,53 @@ For a point that doesn't come from an event, use `SDL_RenderCoordinatesFromWindo
 **Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "Mouse and touch events are no longer filtered to change their coordinates, instead you can call SDL_ConvertEventToRenderCoordinates() to explicitly map event coordinates into the rendering viewport." `SDL_hints.h` section: "SDL_HINT_MOUSE_RELATIVE_SCALING - mouse coordinates are no longer automatically scaled by the SDL renderer". SDL2's conversion is `SDL_RendererEventWatch` in `src/render/SDL_render.c` at `release-2.32.10`, which rescaled mouse, wheel and touch events while a logical size was set.
 
 **Fixture:** `fixtures/mouse-logical-coords/`.
+
+## Nintendo face buttons
+
+**What changed:** SDL2 reported the face buttons of Nintendo controllers by label by default (`SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS` was on), so `SDL_CONTROLLER_BUTTON_A` was the button printed A, on the right of a Switch controller. The rename scripts turn A/B/X/Y into `SDL_GAMEPAD_BUTTON_SOUTH`/`EAST`/`WEST`/`NORTH`, which are positions, and SDL3 ignores the hint. On a Nintendo controller, a port that confirms with `SOUTH` now confirms with the bottom button, printed B, and the button printed A cancels. Xbox and PlayStation layouts are unchanged.
+
+**How to find it:** search the ported sources for the face buttons:
+
+```
+SDL_GAMEPAD_BUTTON_(SOUTH|EAST|WEST|NORTH)\b
+```
+
+If the project handles them, it has this change.
+
+**Fix:** the guide recommends a setting that swaps South and East, defaulting to swapped when `SDL_GetGamepadButtonLabel(gamepad, SDL_GAMEPAD_BUTTON_SOUTH)` is `SDL_GAMEPAD_BUTTON_LABEL_B`, which keeps SDL2's behavior on Nintendo controllers. Whether to add that is the owner's call, so report it under `Needs a human:` instead of changing the controls on your own.
+
+**Source:** SDL `docs/README-migration.md`, `SDL_gamecontroller.h` section: "The gamepad face buttons have been renamed from A/B/X/Y to North/South/East/West to indicate that they are positional rather than hardware-specific. [...] The hint SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS is ignored [...] Applications should provide a way for users to swap between South/East as their accept/cancel buttons", followed by example code. SDL2's default is in `SDL_hints.h` at `release-2.32.10`: "The default value is "1"."
+
+## Mouse wheel values
+
+**What changed:** SDL2's `event.wheel.y` was an `Sint32` count of whole scroll steps. SDL added up the small amounts that touchpads and smooth-scrolling wheels send until they made a whole step, and put the raw amount in `preciseY`. SDL3 drops `preciseX` and `preciseY` and makes `x` and `y` the raw `float` amounts. Code that does one thing per event where `y > 0`, such as zoom one level or select the next item, now does it for every fraction, so one swipe on a touchpad scrolls through a whole list. Code that stores `y` in an `int` drops the fractions, so slow scrolling does nothing. A wheel that clicks in whole steps behaves as before.
+
+**How to find it:** search the ported sources for wheel amounts:
+
+```
+\.wheel\.(x|y)\b
+```
+
+**Fix:** for one step per wheel click, read `event.wheel.integer_x` and `event.wheel.integer_y`, which SDL3 adds up into whole steps the way SDL2's `x` and `y` were. They exist since SDL 3.2.12, so a project that must build against an older SDL3 has to add up `y` itself. For smooth scrolling, keep `y` and use it as a `float`.
+
+**Source:** SDL `SDL_MouseWheelEvent` in `SDL_events.h` at `release-3.4.16` ([wiki](https://wiki.libsdl.org/SDL3/SDL_MouseWheelEvent)): `float y`, and `Sint32 integer_y`, "The amount scrolled vertically, accumulated to whole scroll "ticks" (added in 3.2.12)". SDL2's struct, in `SDL_events.h` at `release-2.32.10`, has `Sint32 y` and `float preciseY`, and `SDL_SendMouseWheel` in `src/events/SDL_mouse.c` added up the whole steps.
+
+## Gamepad rumble
+
+**What changed:** SDL2 programs often rumbled a gamepad through the haptic API: `SDL_HapticOpenFromJoystick`, then `SDL_HapticRumbleInit` and `SDL_HapticRumblePlay`. The rename scripts keep that code, as `SDL_OpenHapticFromJoystick`, `SDL_InitHapticRumble` and `SDL_PlayHapticRumble`. In SDL3, gamepads that can only rumble aren't haptic devices any more, so `SDL_OpenHapticFromJoystick` fails for them, and a program that treats that as "this pad can't rumble" never rumbles.
+
+**How to find it:** search the ported sources for haptic calls:
+
+```
+SDL_(OpenHapticFromJoystick|IsJoystickHaptic|InitHapticRumble|PlayHapticRumble|HapticRumbleSupported)\s*\(
+```
+
+**Fix:** rumble through the gamepad, and keep the haptic API for devices with real force feedback:
+
+```c
+SDL_RumbleGamepad(gamepad, (Uint16)(strength * 0xFFFF), (Uint16)(strength * 0xFFFF), duration_ms);
+```
+
+`SDL_PlayHapticRumble` took a strength from 0 to 1, and `SDL_RumbleGamepad` takes one for each motor, from 0 to 0xFFFF. For a joystick that isn't a gamepad, use `SDL_RumbleJoystick`.
+
+**Source:** SDL `docs/README-migration.md`, `SDL_haptic.h` section: "Gamepads with simple rumble capability no longer show up in the SDL haptics interface, instead you should use SDL_RumbleGamepad()."
