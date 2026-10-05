@@ -69,6 +69,10 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **The skill bundles SDL 3.4.16's public headers.** The first full eval run scored every case 1.00 with the skill except `bool-returns`, at 0.67: one of its runs timed out after 1200 seconds. A traced rerun showed the agent still searching the whole disk for SDL3 headers, despite the new line in `SKILL.md`, and one search outlasted the Bash tool's 2-minute limit. So the agent now gets exact signatures from the skill: 66 headers in `scripts/sdl/include/SDL3/`, 2.3 MB, leaving out the test library and the Khronos OpenGL and EGL headers. The byte-identity check covers them. `SKILL.md` says to check each function's `\since` against the oldest SDL3 the project supports. Every case runs again so the README table reflects the skill as shipped.
 - **M3 results (2026-10-05).** With the headers bundled, every case scored 1.00 with the skill over 3 runs, and the skill fired in all 27 runs, with Sonnet 5 and Claude Code 2.1.289, for $24.36. Without the skill, Sonnet 5 scored 0.00 on `linear-by-default`, 0.78 on `hint-string-ignored` and 0.76 on the whole program. In the whole program it missed `text-input-off` and `linear-by-default` in every run, although it fixed `text-input-off` in that trap's own sample. The other six cases scored 1.00 either way. The slowest run with the skill took 342 seconds, down from 1200. M3's runs cost $50.80 in all, counting the smoke and traced runs and the first full run. The README table comes from the nine dispatches' `--json` results, which use the `aggregate-result.json` schema.
 
+### Added during M4 (2026-10-05)
+
+- **jage was ported on a local scratch branch.** jage's own roadmap moves it to SDL3 in its M1, together with CMake, and its last commit doesn't build without workarounds yet. So a fresh headless Claude Code session with the plugin ported jage on a local `sdl3-dogfood` branch, without building it, and the port was then compiled against SDL3's headers without linking. jage's `main` and milestones are unchanged, and the branch isn't pushed. `docs/dogfooding.md` has what the skill caught and missed.
+
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (zlib), `.gitignore` and `.gitattributes`.
@@ -126,7 +130,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 
 ## M4: Dogfood
 
-- [ ] Port jage to SDL3 with the skill.
+- [x] Port jage to SDL3 with the skill.
 - [ ] Port 2 public SDL2 programs in scratch forks. No upstream PRs.
 - [ ] `docs/dogfooding.md`: what it caught and what it missed. Every miss becomes a trap, a reference fix or a Later item.
 
