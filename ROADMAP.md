@@ -72,6 +72,9 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 ### Added during M4 (2026-10-05)
 
 - **jage was ported on a local scratch branch.** jage's own roadmap moves it to SDL3 in its M1, together with CMake, and its last commit doesn't build without workarounds yet. So a fresh headless Claude Code session with the plugin ported jage on a local `sdl3-dogfood` branch, without building it, and the port was then compiled against SDL3's headers without linking. jage's `main` and milestones are unchanged, and the branch isn't pushed. `docs/dogfooding.md` has what the skill caught and missed.
+- **The public programs are gbemu and AKrikler/chip8, in local clones.** Each started from the commit before its maintainer's own SDL3 port, which served as the answer key. pengupop was dropped, because its original is SDL 1.2. Only MSVC was available, so chip8 was built and run, and gbemu, whose build needs GCC or Clang, was compiled without linking. Nothing was forked or pushed.
+- **`blend-by-default` joins the traps.** The skill's gbemu port missed it, and the maintainer's own port fixed it: SDL3 blends textures with an alpha format by default, so a frame buffer of `0x00RRGGBB` pixels draws transparent. Its fixtures prove it like the other traps. Its eval case waits for the full eval run before the next release, which also measures the `SKILL.md` changes made in M4.
+- **Every dogfood report counted changes without a trap id as traps.** jage's, gbemu's and chip8's reports all did, the last two after a first rule against it. `SKILL.md` step 8 now requires a trap id on every trap line.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -111,6 +114,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 | Input | `gamepad-index-vs-id` | Functions that took a device index now take an instance ID, so an index loop opens the wrong pad or none |
 | Render | `vsync-flag-dropped` | Dropping the removed `SDL_RENDERER_PRESENTVSYNC` flag leaves the loop unthrottled |
 | Render | `linear-by-default` | The scale-quality hint is gone and textures default to linear, so pixel art blurs |
+| Render | `blend-by-default` | Textures with an alpha format now blend, so pixels written with alpha 0 vanish (added in M4) |
 | Audio | `audio-stream-paused` | A device opened with `SDL_OpenAudioDeviceStream` starts paused, so nothing plays |
 | Audio | `mix-volume-float` | An SDL2 volume (0–128) passed as `SDL_MixAudio`'s 0–1 float turns 16-bit audio into wrapped-around noise |
 | Hints | `hint-string-ignored` | Hints written as renamed or removed string literals are silently ignored |
@@ -131,13 +135,14 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 ## M4: Dogfood
 
 - [x] Port jage to SDL3 with the skill.
-- [ ] Port 2 public SDL2 programs in scratch forks. No upstream PRs.
-- [ ] `docs/dogfooding.md`: what it caught and what it missed. Every miss becomes a trap, a reference fix or a Later item.
+- [x] Port 2 public SDL2 programs in scratch forks. No upstream PRs.
+- [x] `docs/dogfooding.md`: what it caught and what it missed. Every miss becomes a trap, a reference fix or a Later item.
 
 **Done when:** the log has at least 3 entries and every miss has been turned into one of those three.
 
 ## M5: v0.1.0
 
+- [ ] Run every eval case 3 times with and without the skill, and regenerate the README table.
 - [ ] README quick start: install with `/plugin marketplace add hazeliscoding/sdl3-porter`, checked on a clean machine.
 - [ ] Document what's supported: SDL 3.2 and later, C and C++, Claude Code. Other harnesses are untested.
 - [ ] `CONTRIBUTING.md`: how to add a trap as a card, three fixtures and an eval case.
