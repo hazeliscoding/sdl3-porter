@@ -112,7 +112,7 @@ For each trap:
 
 ### 7. Build and run
 
-Rebuild. Run the project's tests if it has any. If the program can run without a display (SDL's dummy drivers: `SDL_VIDEO_DRIVER=dummy SDL_AUDIO_DRIVER=dummy`, or a test mode or frame limit the program offers), run it and check it exits cleanly.
+Rebuild. If the project's own build can't run on this machine, you may build with throwaway files outside the project, but don't add a build system to the project. Run the project's tests if it has any. If the program can run without a display (SDL's dummy drivers: `SDL_VIDEO_DRIVER=dummy SDL_AUDIO_DRIVER=dummy`, or a test mode or frame limit the program offers), run it and check it exits cleanly.
 
 Don't call the port finished until it builds and, where possible, runs. If you couldn't build or run it, say so plainly.
 
