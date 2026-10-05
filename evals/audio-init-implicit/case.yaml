@@ -1,0 +1,14 @@
+schema_version: "1.1"
+name: audio-init-implicit
+description: Port a metronome that initializes only video and opens audio with SDL_OpenAudio; SDL3 never initializes audio implicitly.
+tags: [trap]
+context:
+  scaffold_script: scaffold.sh
+execution:
+  max_turns: 50
+  timeout_seconds: 1200
+  allowed_tools: [Read, Glob, Grep, Edit, Write, Bash, Skill]
+  prompt: |
+    This is a small SDL2 program. Port it to SDL3.
+
+    SDL3 isn't installed on this machine, so you can't build it here. Do the port anyway, and tell me what you couldn't check.
