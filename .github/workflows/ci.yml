@@ -10,11 +10,13 @@ permissions:
 
 jobs:
   fixtures:
-    name: Fixtures (${{ matrix.os }})
+    name: Fixtures (${{ matrix.os }}, SDL ${{ matrix.sdl3 }})
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-24.04, windows-latest, macos-latest]
+        # The pinned release, and the oldest one the README promises.
+        sdl3: ["3.4.16", "3.2.0"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
@@ -30,7 +32,7 @@ jobs:
           libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev
 
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DSDL3_VERSION=${{ matrix.sdl3 }}
 
       - name: Build
         run: cmake --build build --config Debug --parallel
