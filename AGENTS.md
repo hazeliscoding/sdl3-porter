@@ -17,7 +17,7 @@ cmake --build build --config Debug
 ctest --test-dir build -C Debug --output-on-failure   # originals and fixed ports pass, naive ports fail with their trap
 cmake -S . -B build-sdl320 "-DSDL3_VERSION=3.2.0"       # the same fixtures against the oldest supported SDL3, as CI runs them
 claude plugin validate .                              # plugin and marketplace manifests
-gh workflow run evals.yml -f case=port-sample -f runs=3   # evals run in GitHub Actions, never locally on Windows
+gh workflow run evals.yml -f case=port-sample -f runs=3 -f model=claude-sonnet-5   # evals run in GitHub Actions, never locally on Windows
 ```
 
 Configuring needs Python 3, for the rename smoke test.
