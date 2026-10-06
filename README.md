@@ -11,6 +11,10 @@ SDL's rename scripts handle most of a port, and the compiler catches most of the
 
 > **Status:** v0.3.0, tested against SDL 3.2.0 and 3.4.18. [ROADMAP.md](ROADMAP.md) has what's next.
 
+<img src="docs/demo/port.gif" width="800" alt="Claude Code loads sdl3-porter, ports the bounce sample, builds and runs it, and reports each trap it fixed by file, line and trap id">
+
+A real port of [`samples/bounce`](samples/bounce) with sdl3-porter 0.3.0 and Claude Opus 5.5, sped up 4×.
+
 ## Before and after
 
 This port compiles against SDL3 without a warning:
