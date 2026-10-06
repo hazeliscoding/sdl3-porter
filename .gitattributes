@@ -1,2 +1,6 @@
 # Normalize to LF everywhere.
 * text=auto eol=lf
+
+# Images are never text.
+*.gif binary
+*.png binary
