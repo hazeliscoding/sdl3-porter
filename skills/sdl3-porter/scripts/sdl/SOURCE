@@ -1,5 +1,5 @@
-Copied unmodified from SDL, tag release-3.4.16:
-https://github.com/libsdl-org/SDL/tree/release-3.4.16
+Copied unmodified from SDL, tag release-3.4.18:
+https://github.com/libsdl-org/SDL/tree/release-3.4.18
 
 The files keep SDL's layout, because rename_symbols.py reads
 include/SDL3/SDL_oldnames.h relative to its own location. The headers

@@ -20,10 +20,10 @@ set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 # The skill's files are pinned to SDL3_PINNED. CI also runs the fixtures against
 # the oldest release the README promises, with -DSDL3_VERSION=3.2.0.
-set(SDL3_PINNED 3.4.16)
+set(SDL3_PINNED 3.4.18)
 set(SDL3_VERSION ${SDL3_PINNED} CACHE STRING "SDL3 release to build the ported fixtures against")
-if(SDL3_VERSION STREQUAL "3.4.16")
-  set(sdl3_hash 7322236cd12090c3eb40b9728be4d49c76f66ad17d04369584d4ecad5cf77c68)
+if(SDL3_VERSION STREQUAL "3.4.18")
+  set(sdl3_hash 9c75cf16330322c217dedd2e0609f1124f1b54b8633e763467b4684d0f4334a3)
 elseif(SDL3_VERSION STREQUAL "3.2.0")
   set(sdl3_hash bf308f92c5688b1479faf5cfe24af72f3cd4ce08d0c0670d6ce55bc2ec1e9a5e)
 else()

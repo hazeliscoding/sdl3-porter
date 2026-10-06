@@ -16,7 +16,7 @@ jobs:
       matrix:
         os: [ubuntu-24.04, windows-latest, macos-latest]
         # The pinned release, and the oldest one the README promises.
-        sdl3: ["3.4.16", "3.2.0"]
+        sdl3: ["3.4.18", "3.2.0"]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
@@ -32,7 +32,7 @@ jobs:
           libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev
 
       - name: Configure
-        # Quoted, because PowerShell splits an unquoted -DNAME=3.4.16 at the first dot.
+        # Quoted, because PowerShell splits an unquoted -DNAME=3.4.18 at the first dot.
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug "-DSDL3_VERSION=${{ matrix.sdl3 }}"
 
       - name: Build
