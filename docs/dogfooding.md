@@ -61,3 +61,58 @@ What sdl3-porter caught and missed on real SDL2 code. Every miss becomes a trap,
 
 - The report counted 6 traps, 4 of them API changes with no trap id, and it filed the `audio-stream-paused` fix under one of those. **Reference fix:** `SKILL.md` step 8, as for gbemu.
 - To build with MSVC, the agent added a `CMakeLists.txt` and a `.gitignore` entry to a project built with a Makefile. **Reference fix:** `SKILL.md` step 7 now says to build with throwaway files outside the project instead.
+
+## Woof! (2026-10-06)
+
+[Woof!](https://github.com/fabiangreffrath/woof) is a Doom source port in C, about 165,000 lines, built with CMake. About 520 lines in 23 files touch SDL: the renderer with an 8-bit palette surface, gamepads with rumble and gyro sensors, joysticks, the keyboard and text input, the relative mouse, events, hints and timers. The port started from `150f179`, the commit before the maintainers' own SDL3 port (`cade685`).
+
+**Run:** a fresh headless Claude Code session (Sonnet 5, Claude Code 2.1.291) with the skill loaded from `main`, in WSL Ubuntu 24.04 with SDL 3.4.18 installed. It took 289 turns, 91 minutes and $15.34. The port builds without warnings and plays Freedoom's first demo headless with the dummy drivers, which I checked again from a clean build.
+
+**Caught:**
+
+- `bool-returns`: `SDL_Init` and `SDL_SetRenderLogicalPresentation` checked the SDL2 way.
+- `gamepad-index-vs-id`: Woof passed device indexes through all of its gamepad code, including the `which` of an added gamepad.
+- `display-index-vs-id`: the display number Woof keeps in its config, used for window placement and display modes.
+- `indexed-surface-no-palette`: the 8-bit screen surface, and the setup tool's text screen.
+- Compile-level changes, including renderer creation, vsync, fullscreen modes and `SDL_RenderReadPixels` returning a surface.
+
+**Missed:**
+
+- Nintendo face buttons. Woof numbers its own buttons the way SDL does, so the guidance's search by name found nothing, and on Switch controllers confirm and cancel and the weapon slots now come out swapped. The maintainers added a swap setting. **Reference fix:** the guidance also searches by number, and its choice always goes under `Needs a human:`.
+- SDL3's new buttons 21 to 25 share numbers with Woof's own virtual buttons for triggers and stick directions. **Reference fix:** new guidance, "Gamepad button numbers above 20".
+- The menu maps the mouse into the game with the renderer's viewport and scale, which no longer include the logical presentation, so menu clicks miss when the game is letterboxed. The maintainers' port has the same bug. **Trap:** `logical-scale-separate`, until now a niche candidate, with fixtures and an eval case.
+- Fractional wheel values and relative motion. The wheel guidance already applied and wasn't followed. **Reference fix:** `SKILL.md` step 6 now works through one section at a time and writes a verdict for every hit, and the guidance covers relative motion too.
+- The report said 16 traps over 18 lines, counted two removed functions as traps, listed one fix twice and gave stale line numbers. **Reference fix:** `SKILL.md` step 8 now ties the count to the lines, keeps compile-level changes out and takes line numbers from the ported files.
+
+**Also seen:**
+
+- The maintainers kept `__MACOSX__`, which SDL3's headers no longer define, so some of their macOS-only code silently stops building. The agent's rename to `SDL_PLATFORM_MACOS` was right.
+- GCC flags `SDL_Init(...) < 0` with `-Wall` (`-Wbool-compare`), so the `bool-returns` card no longer presents that form as one that compiles cleanly.
+
+## scrcpy (2026-10-06)
+
+[scrcpy](https://github.com/Genymobile/scrcpy) mirrors an Android device; its client is about 31,000 lines of C, built with Meson. About 830 lines in 35 files touch SDL: the renderer with YUV textures and OpenGL for mipmaps, SDL audio with a callback, gamepads, the keyboard and text input, the mouse, the clipboard, threads and custom events. The port started from `f8e0b9b`, just before the core commit of the maintainer's SDL3 port (PR #6216, ending at `dee1fd4`).
+
+**Run:** the same setup as Woof!. It took 271 turns, 22 minutes and $12.44. The port builds without warnings and its 11 unit tests pass. scrcpy needs an Android device to run, so nothing ran beyond `--version` and `--help`.
+
+**Caught:**
+
+- `bool-returns` in about a dozen places, such as `SDL_Init`, `SDL_SetWindowFullscreen` and `SDL_RenderTexture`.
+- `gamepad-index-vs-id`: the gamepad-added events scrcpy sends itself at startup now carry the joystick ID. The maintainer's port still sends the loop index.
+- `indexed-surface-no-palette`: the 8-bit window icon.
+- `audio-stream-paused`: the stream that replaced the callback device is resumed after opening.
+- The direct OpenGL guidance: `SDL_FlushRenderer` before scrcpy's own GL calls, which the maintainer's port doesn't do.
+
+**Missed:**
+
+- `text-input-off`. scrcpy handles text events but never called `SDL_StartTextInput`, so in its default mode numbers and punctuation never reach the device. The search found the text event and the agent moved on. **Reference fix:** the `SKILL.md` step 6 verdicts, which name this case.
+- The YUV color space. SDL2's automatic mode decoded HD video with BT.709, and SDL3's default is BT.601. **Reference fix:** new guidance, "YUV color space".
+- Window requests in a row: a size set right after leaving fullscreen or restoring is lost. **Reference fix:** the asynchronous window guidance names this case.
+- Under OpenGL ES 2, scrcpy binds texture 0 for its mipmaps, because the texture ID is under a different property. **Reference fix:** the direct OpenGL guidance covers it.
+- Windows- and macOS-only blocks weren't ported: an event watcher that still returns `int`, and `int` pointers passed to `SDL_GetGlobalMouseState`. **Reference fix:** `SKILL.md` step 7 now has the agent port those blocks by hand and report them as not compiled.
+- The report claimed 18 traps over 13 trap lines and 5 lines without an id, and gave the exit status of `head` as the program's. **Reference fix:** `SKILL.md` steps 7 and 8.
+
+**Also seen:**
+
+- The audio callback allocates on every call, where the maintainer preallocates. That's not an SDL3 change.
+- Ubuntu's FFmpeg links SDL2, so every scrcpy build here, the maintainer's included, loads both SDL2 and SDL3.
