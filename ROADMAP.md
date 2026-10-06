@@ -199,7 +199,7 @@ All seven pass CI on Linux, Windows and macOS. Their eval cases haven't run yet.
 
 - [x] Write guidance for the changes no fixture can prove: Nintendo face buttons, exclusive fullscreen, batching with direct OpenGL, mouse wheel values, high DPI, asynchronous window operations, Apple bundle paths, gamepad rumble and `SDL_RegisterEvents`.
 - [x] Keep the 6 niche candidates as candidates: `event-timestamp-ns`, `target-state-persists`, `blit-dstrect-unchanged`, `render-output-size-logical`, `logical-scale-separate` and `resized-on-set-size`. Each becomes a trap only when a port or an issue shows it in real code.
-- [ ] Release 0.2.0.
+- [x] Release 0.2.0.
 
 **Done when:** every strong candidate is either a trap whose fixtures pass in CI or guidance with a decision recorded here, and 0.2.0 is released.
 
