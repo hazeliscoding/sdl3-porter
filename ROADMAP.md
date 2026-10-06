@@ -98,6 +98,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 ### Added during M6 (2026-10-05)
 
 - **Nine changes are guidance, not traps.** Each needs something no headless fixture has: a Nintendo controller (face buttons), a gamepad with a rumble motor, a display with more than one mode (exclusive fullscreen, while the dummy and offscreen drivers offer only 1024×768), an OpenGL context shared with the renderer (batching), a touchpad or smooth-scrolling wheel (pushed events skip the code that adds up wheel steps), a scaled display (high DPI), a window manager that applies requests late (asynchronous window operations) and an Apple app bundle (bundle paths). `SDL_RegisterEvents` could be forced to fail, but only by registering every user event type, which would prove a contrived case. The sections follow the traps in `input.md`, `video.md`, `render.md`, `events.md` and `io.md`, with **What changed** in place of **What compiles**, and the report lists their fixes under `Also changed:` and their open choices under `Needs a human:`.
+- **The `Evals` workflow pins Claude Code to 2.1.289.** Version 2.1.290 came out in the middle of the batch for the 7 new cases, so one ran on each version, and the README table only combines results from one version. The pin keeps the table to one setup. The 6 cases that ran on 2.1.290 run again on 2.1.289, and moving to a newer version means rerunning every case.
 
 ### Added during M7 (2026-10-05)
 
