@@ -1,4 +1,5 @@
 name: Evals
+run-name: "Evals: ${{ inputs.case || 'every case' }} on ${{ inputs.model }}"
 
 # Runs the skill's claude plugin eval cases on demand. Evals cost model usage,
 # so this never runs on push. Windows can't sandbox the Bash tool the skill needs,
@@ -32,12 +33,17 @@ on:
         default: claude-sonnet-5
         type: choice
         options: [claude-sonnet-5, claude-haiku-4-5-20251001]
+      concurrency:
+        description: Agent runs at once (1 to 8)
+        required: false
+        default: "1"
 
 permissions:
   contents: read
 
+# One batch per model at a time, so two models can run side by side.
 concurrency:
-  group: evals
+  group: evals-${{ inputs.model }}
 
 jobs:
   evals:
@@ -79,6 +85,7 @@ jobs:
           RUNS: ${{ inputs.runs }}
           ABLATION: ${{ inputs.ablation }}
           MODEL: ${{ inputs.model }}
+          CONCURRENCY: ${{ inputs.concurrency }}
           KEEP_TEMP: ${{ inputs.traces && '1' || '' }}
         run: |
           # Keep only the token that was provided.
@@ -86,7 +93,7 @@ jobs:
           [ -n "$ANTHROPIC_API_KEY" ] || unset ANTHROPIC_API_KEY
           claude plugin eval . \
             --trust-plugin --scaffold --allow-tools Bash Write Edit \
-            --model "$MODEL" --runs "$RUNS" --ablation "$ABLATION" \
+            --model "$MODEL" --runs "$RUNS" --ablation "$ABLATION" --concurrency "$CONCURRENCY" \
             ${CASE:+--case "$CASE"} ${KEEP_TEMP:+--keep-temp} \
             --no-publish --max-cost-usd 20 \
             --json results.json --report report.html
