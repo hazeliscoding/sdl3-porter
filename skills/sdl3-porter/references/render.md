@@ -18,7 +18,10 @@ SDL_RenderTexture(renderer, sprites, &src, &dst);    /* dst larger than src: blu
 ```
 SDL_CreateTexture\w*|IMG_LoadTexture\w*
 SDL_SetTextureScaleMode|SDL_SetDefaultTextureScaleMode|SCALE_QUALITY
+SDL_SetRenderLogicalPresentation|SDL_SetRenderScale
 ```
+
+If the project sets a logical presentation or a render scale, every texture it draws is scaled, even one drawn at its own size in logical coordinates, unless the window happens to be exactly the logical size. A 16×16 sprite drawn at 16×16 in a 160×120 logical view is scaled up with the rest of the view, so it blurs.
 
 In SDL2, a texture used nearest-pixel scaling unless `SDL_HINT_RENDER_SCALE_QUALITY` was set to `1`, `linear`, `2` or `best` when it was created, or the code called `SDL_SetTextureScaleMode` on it. Check `git diff` for the SDL2 hint. Every texture that was nearest in SDL2 and is ever drawn scaled needs its scale mode set in SDL3. Textures that SDL_image creates count too.
 
@@ -54,6 +57,8 @@ SDL_CreateRenderer\w*|SDL_CreateWindowAndRenderer|SDL_SetRenderVSync|SDL_PROP_RE
 ```
 
 Every renderer that SDL2 created with `SDL_RENDERER_PRESENTVSYNC` needs vsync turned on again in SDL3. `SDL_HINT_RENDER_VSYNC` still works in SDL3, so a renderer that got vsync only from that hint keeps it.
+
+You usually meet this in step 5: SDL3's `SDL_CreateRenderer` has no flags argument, so the old call doesn't compile. When you delete the flags to make it compile, add `SDL_SetRenderVSync` right there if they included `SDL_RENDERER_PRESENTVSYNC`, instead of waiting for the sweep.
 
 **Fix:** turn vsync on once the renderer exists:
 
