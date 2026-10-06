@@ -35,30 +35,30 @@
 <circle cx="700.0" cy="164" r="7" fill="#c2410c"/>
 <text x="728" y="168" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.00 → 1.00</text>
 <text x="848" y="168" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+1.00</text>
-<text x="16" y="196" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">mouse-logical-coords</text>
+<text x="16" y="196" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">linear-by-default</text>
 <rect x="250.0" y="190" width="450.0" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
 <circle cx="250.0" cy="192" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
 <circle cx="700.0" cy="192" r="7" fill="#c2410c"/>
 <text x="728" y="196" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.00 → 1.00</text>
 <text x="848" y="196" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+1.00</text>
-<text x="16" y="224" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">linear-by-default</text>
-<rect x="400.0" y="218" width="300.0" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
-<circle cx="400.0" cy="220" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
+<text x="16" y="224" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">mouse-logical-coords</text>
+<rect x="250.0" y="218" width="450.0" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
+<circle cx="250.0" cy="220" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
 <circle cx="700.0" cy="220" r="7" fill="#c2410c"/>
-<text x="728" y="224" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.33 → 1.00</text>
-<text x="848" y="224" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+0.67</text>
+<text x="728" y="224" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.00 → 1.00</text>
+<text x="848" y="224" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+1.00</text>
 <text x="16" y="252" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">hint-string-ignored</text>
-<rect x="500.0" y="246" width="200.0" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
-<circle cx="500.0" cy="248" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
+<rect x="450.0" y="246" width="250.0" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
+<circle cx="450.0" cy="248" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
 <circle cx="700.0" cy="248" r="7" fill="#c2410c"/>
-<text x="728" y="252" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.56 → 1.00</text>
-<text x="848" y="252" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+0.44</text>
+<text x="728" y="252" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.44 → 1.00</text>
+<text x="848" y="252" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+0.56</text>
 <text x="16" y="280" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">Whole program (bounce)</text>
-<rect x="602.9" y="274" width="97.1" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
-<circle cx="602.9" cy="276" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
+<rect x="655.9" y="274" width="44.1" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
+<circle cx="655.9" cy="276" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
 <circle cx="700.0" cy="276" r="7" fill="#c2410c"/>
-<text x="728" y="280" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.78 → 1.00</text>
-<text x="848" y="280" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+0.22</text>
+<text x="728" y="280" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.90 → 1.00</text>
+<text x="848" y="280" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+0.10</text>
 <text x="16" y="318" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="0.08em" fill="#59636e">SAME SCORE EITHER WAY</text>
 <text x="16" y="344" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">audio-stream-paused</text>
 <circle cx="700.0" cy="340" r="10.5" fill="none" stroke="#8c959f" stroke-width="2.5"/>
@@ -110,5 +110,5 @@
 <circle cx="700.0" cy="592" r="7" fill="#c2410c"/>
 <text x="728" y="596" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">1.00 → 1.00</text>
 <text x="848" y="596" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#59636e">±0.00</text>
-<text x="16" y="644" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#59636e">claude-sonnet-5, Claude Code 2.1.289, 3 runs per case with and without the skill</text>
+<text x="16" y="644" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#59636e">claude-sonnet-5, Claude Code 2.1.290, 3 runs per case with and without the skill</text>
 </svg>
