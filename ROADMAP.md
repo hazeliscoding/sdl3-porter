@@ -118,6 +118,10 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 
 - **The two larger ports are Woof! and scrcpy.** [Woof!](https://github.com/fabiangreffrath/woof), a Doom source port (C, about 165,000 lines), moved to SDL3 in one squashed commit, `cade685`, from `150f179`. About 520 of its lines touch SDL: the renderer, palette surfaces, gamepads with rumble and sensors, text input and the mouse. A Freedoom demo plays headless, so the port can run. [scrcpy](https://github.com/Genymobile/scrcpy) (C, about 31,000 lines) moved in PR #6216, ending at `dee1fd4`, from `f8e0b9b`. About 830 of its lines touch SDL, adding what Woof! lacks: SDL audio with a callback, YUV textures, OpenGL, threads and custom events. It needs an Android device to run, so building is as far as it goes. Neither uses SDL_image, SDL_mixer or SDL_ttf. Projects that keep SDL2 beside SDL3, lean on the satellite libraries or need retail game data were ruled out.
 - **The ports run in WSL Ubuntu 24.04 with SDL 3.4.18 installed**, from fresh headless Claude Code sessions on Sonnet 5 with the skill loaded from `main`. Both SDL2 originals and both maintainer ports build there first, so a build failure in a port is the port's.
+- **Both ports built, and both skipped hits the skill had found.** Woof! took 91 minutes and $15.34, scrcpy 22 minutes and $12.44, and both build without warnings; Woof! also plays a demo headless. Comparing them with the maintainers' ports, the worst misses came from existing cards and guidance whose search matched and whose hit the agent passed over: `text-input-off` in scrcpy, and the wheel, window-request and Nintendo button guidance. Both agents ran every search in one batch. `SKILL.md` step 6 now goes one section at a time and writes a verdict for every hit, and the report gains a `Checked, no change needed:` line with a reason for each. Both reports also miscounted, so step 8 ties the count to the trap lines. `docs/dogfooding.md` has every miss and its fix.
+- **`logical-scale-separate` is a trap.** M6 kept it as a niche candidate until real code showed it. Woof!'s menu maps the mouse with the renderer's viewport and scale, which no longer include the logical presentation, and the maintainers' own port has the same bug. Its naive fixture maps the center of a letterboxed window to (320, 240) instead of (160, 100), against SDL 3.2.0 and 3.4.18. Five niche candidates remain: `event-timestamp-ns`, `target-state-persists`, `blit-dstrect-unchanged`, `render-output-size-logical` and `resized-on-set-size`.
+- **`bool-returns` no longer presents `< 0` as a clean compile.** GCC with `-Wall` flags `SDL_Init(...) < 0` and `== -1` (`-Wbool-compare`, "always false"). `!= 0` and `== 0` stay silent, and the naive fixture uses `!= 0`, so the trap stands. The card still searches for every form, because a build without warnings compiles them all.
+- **Four new guidance sections come from the ports:** gamepad button numbers above 20 and fractional mouse motion from Woof!, and the YUV color space and OpenGL ES 2 texture IDs from scrcpy. None can be a trap: the first needs a project's own button list, the second injected relative motion, and the SDL2 calls behind the last two don't compile in SDL3.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -232,8 +236,8 @@ All seven pass CI on Linux, Windows and macOS. Their eval cases haven't run yet.
 ## M8: Evidence
 
 - [ ] Run every eval case 5 times with and without the skill, on Sonnet 5 and on Haiku 4.5, and show both models in the README table.
-- [ ] Port two public SDL2 projects of 10,000 lines or more in local clones, against their maintainers' own SDL3 ports where they exist, and log them in `docs/dogfooding.md`.
-- [ ] Turn every miss into a trap, a reference fix or a Later item, as in M4.
+- [x] Port two public SDL2 projects of 10,000 lines or more in local clones, against their maintainers' own SDL3 ports where they exist, and log them in `docs/dogfooding.md`.
+- [x] Turn every miss into a trap, a reference fix or a Later item, as in M4.
 - [ ] Release 0.4.0.
 
 **Done when:** every case scores at least 0.9 with the skill on both models, the log has the two larger ports with every miss resolved, and 0.4.0 is released.
