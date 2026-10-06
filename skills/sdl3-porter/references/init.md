@@ -7,7 +7,7 @@ Read this for every port. Each trap compiles cleanly against SDL3 with warnings 
 **What compiles:**
 
 ```c
-if (SDL_Init(SDL_INIT_VIDEO) != 0) {    /* or < 0, or == -1 */
+if (SDL_Init(SDL_INIT_VIDEO) != 0) {    /* true on success, so this runs every launch */
     SDL_Log("SDL_Init failed: %s", SDL_GetError());
     return 1;
 }
@@ -15,9 +15,9 @@ if (SDL_Init(SDL_INIT_VIDEO) != 0) {    /* or < 0, or == -1 */
 
 **What breaks:** SDL3 functions that returned `0` on success and a negative error code on failure now return `bool`: `true` on success, `false` on failure.
 
-- `!= 0` and `== -1` style checks now treat success as failure. The error branch runs on every launch, with an empty `SDL_GetError()`.
-- `< 0` checks never fire, so real failures go unnoticed.
+- `!= 0` checks now treat success as failure. The error branch runs on every launch, with an empty `SDL_GetError()`.
 - `== 0` success checks now take the failure path.
+- `< 0` and `== -1` checks never fire, so real failures go unnoticed. GCC flags these with `-Wall` (`-Wbool-compare`: "comparison of constant with boolean expression is always false"), but a build without warnings compiles them silently. Fix them the same way.
 
 **How to find it:** search the ported sources for SDL calls compared with a number, and for SDL results stored in an `int`:
 
