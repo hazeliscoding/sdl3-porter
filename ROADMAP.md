@@ -214,8 +214,8 @@ All seven pass CI on Linux, Windows and macOS. Their eval cases haven't run yet.
 - [x] Pin the CI and `Evals` runners before GitHub moves `ubuntu-latest` to Ubuntu 26 on 2026-10-19, or check that their packages still install there.
 - [x] Write the stability promise in the README: what stays fixed across 1.x and what only a major version may change.
 - [x] Write down how the pinned SDL moves: to the latest 3.x release before each minor release, with the fixtures and evals run again.
-- [ ] Move the pin to SDL 3.4.18, released 2026-10-02, and run the fixtures and every eval case again.
-- [ ] Release 0.3.0.
+- [x] Move the pin to SDL 3.4.18, released 2026-10-02, and run the fixtures and every eval case again.
+- [x] Release 0.3.0.
 
 **Done when:** CI is green against both SDL versions, the stability promise is in the README, and 0.3.0 is released.
 
