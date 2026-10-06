@@ -183,4 +183,22 @@ SDL_RenderCoordinatesFromWindow(renderer, mouse_x, mouse_y, &game_x, &game_y);
 
 **Fix:** call `SDL_FlushRenderer(renderer)` before each stretch of direct graphics calls, so SDL's queued drawing goes first. In SDL2 code that already called `SDL_RenderFlush`, the rename scripts make that `SDL_FlushRenderer`, which is right.
 
-**Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "The 2D renderer API always uses batching in SDL3. [...] all apps that use SDL3's 2D renderer and also want to call directly into the platform's lower-layer graphics API _must_ call SDL_FlushRenderer() before doing so." SDL2's default is in `SDL_hints.h` at `release-2.32.10`, under `SDL_HINT_RENDER_BATCHING`: "SDL will disable batching if a specific render backend is requested".
+`SDL_GL_BindTexture` is gone too. Its replacement reads the texture's ID from `SDL_GetTextureProperties`, and the property depends on the renderer: `SDL_PROP_TEXTURE_OPENGL_TEXTURE_NUMBER` under `opengl`, `SDL_PROP_TEXTURE_OPENGLES2_TEXTURE_NUMBER` under `opengles2`. The other one reads 0, so code that checks only for an OpenGL renderer by a name prefix and reads the `opengl` property binds texture 0 under OpenGL ES 2. Check `SDL_GetRendererName` and read the matching property.
+
+**Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "The 2D renderer API always uses batching in SDL3. [...] all apps that use SDL3's 2D renderer and also want to call directly into the platform's lower-layer graphics API _must_ call SDL_FlushRenderer() before doing so." SDL2's default is in `SDL_hints.h` at `release-2.32.10`, under `SDL_HINT_RENDER_BATCHING`: "SDL will disable batching if a specific render backend is requested". For texture IDs, the same section: "SDL_GL_BindTexture() - use SDL_GetTextureProperties() to get the OpenGL texture ID and bind the texture directly", and the separate `SDL_PROP_TEXTURE_OPENGL_TEXTURE_NUMBER` and `SDL_PROP_TEXTURE_OPENGLES2_TEXTURE_NUMBER` in `SDL_render.h` at `release-3.4.18`.
+
+## YUV color space
+
+**What changed:** SDL2 set the YUV conversion for every texture at once, with `SDL_SetYUVConversionMode`. Its default was BT.601, and `SDL_YUV_CONVERSION_AUTOMATIC` chose BT.709 for video taller than 576 lines and BT.601 below. SDL3 removes the function, so the old call doesn't compile, and sets the color space per texture instead. A texture created without one uses `SDL_COLORSPACE_YUV_DEFAULT`, which is BT.601 limited range. A port that drops the call, or swaps in the default to make it compile, decodes HD video with BT.601 math where SDL2's automatic mode used BT.709, and the colors shift slightly.
+
+**How to find it:** search the ported sources for YUV textures and color spaces:
+
+```
+SDL_PIXELFORMAT_(YV12|IYUV|NV12|NV21|P010)|SDL_COLORSPACE_|SDL_PROP_TEXTURE_CREATE_COLORSPACE_NUMBER
+```
+
+Check what the SDL2 code passed to `SDL_SetYUVConversionMode`, if anything.
+
+**Fix:** create the texture with `SDL_CreateTextureWithProperties` and `SDL_PROP_TEXTURE_CREATE_COLORSPACE_NUMBER`, choosing what SDL2 chose: `SDL_COLORSPACE_BT709_LIMITED` above 576 lines for `SDL_YUV_CONVERSION_AUTOMATIC`, `SDL_COLORSPACE_BT709_LIMITED` for `SDL_YUV_CONVERSION_BT709`, `SDL_COLORSPACE_JPEG` for `SDL_YUV_CONVERSION_JPEG`, and the default for BT.601. A video decoder that reports the stream's color space, such as FFmpeg, gives a better answer than any of these.
+
+**Source:** SDL `docs/README-migration.md`, `SDL_surface.h` section: "SDL_SetYUVConversionMode() - use SDL_SetSurfaceColorspace() to set the surface colorspace and SDL_PROP_TEXTURE_CREATE_COLORSPACE_NUMBER with SDL_CreateTextureWithProperties() to set the texture colorspace." The guide goes on to say the default is `SDL_COLORSPACE_JPEG`, but `SDL_pixels.h` at `release-3.4.18` defines `SDL_COLORSPACE_YUV_DEFAULT = SDL_COLORSPACE_BT601_LIMITED`, "The default colorspace for YUV surfaces if no colorspace is specified", and SDL's code agrees. SDL2's modes are in `src/video/SDL_yuv.c` at `release-2.32.10`: the default `SDL_YUV_CONVERSION_BT601`, and `SDL_YUV_SD_THRESHOLD` of 576 lines for the automatic mode.
