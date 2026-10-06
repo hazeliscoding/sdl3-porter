@@ -109,7 +109,7 @@ A window size passed to `glViewport`, to a texture or surface the size of the wi
 
 ## Asynchronous window operations
 
-**What changed:** in SDL3, these calls only ask the windowing system for a change, and return before it happens: `SDL_SetWindowSize`, `SDL_SetWindowPosition`, `SDL_MinimizeWindow`, `SDL_MaximizeWindow`, `SDL_RestoreWindow` and `SDL_SetWindowFullscreen`. The windowing system can also refuse, or change the request. Code that reads the window back right after the call, with `SDL_GetWindowSize`, `SDL_GetWindowPosition` or `SDL_GetWindowFlags`, can get the old values, and then sizes a texture, a viewport or a layout for the old window.
+**What changed:** in SDL3, these calls only ask the windowing system for a change, and return before it happens: `SDL_SetWindowSize`, `SDL_SetWindowPosition`, `SDL_MinimizeWindow`, `SDL_MaximizeWindow`, `SDL_RestoreWindow` and `SDL_SetWindowFullscreen`. The windowing system can also refuse, or change the request. Code that reads the window back right after the call, with `SDL_GetWindowSize`, `SDL_GetWindowPosition` or `SDL_GetWindowFlags`, can get the old values, and then sizes a texture, a viewport or a layout for the old window. Requests in a row can cancel out, too: `SDL_SetWindowSize` "has no effect" while the window is fullscreen or maximized, so a size set right after `SDL_SetWindowFullscreen(window, false)` or `SDL_RestoreWindow` is lost if the window hasn't left that state yet.
 
 **How to find it:** search the ported sources for the requests:
 
@@ -121,4 +121,4 @@ Check whether the code right after each call depends on the new state.
 
 **Fix:** react to the window events instead: `SDL_EVENT_WINDOW_RESIZED`, `SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED`, `SDL_EVENT_WINDOW_MOVED`, `SDL_EVENT_WINDOW_MINIMIZED`, `SDL_EVENT_WINDOW_MAXIMIZED`, `SDL_EVENT_WINDOW_RESTORED`, `SDL_EVENT_WINDOW_ENTER_FULLSCREEN` and `SDL_EVENT_WINDOW_LEAVE_FULLSCREEN`. Where the next line really needs the new state, call `SDL_SyncWindow(window)` after the request. It can block while the window animates.
 
-**Source:** SDL `docs/README-migration.md`, `SDL_video.h` section: "The following window operations are now considered to be asynchronous requests and should not be assumed to succeed unless a corresponding event has been received", and "the `SDL_SyncWindow()` function will attempt to wait until all pending window operations have completed."
+**Source:** SDL `docs/README-migration.md`, `SDL_video.h` section: "The following window operations are now considered to be asynchronous requests and should not be assumed to succeed unless a corresponding event has been received", and "the `SDL_SyncWindow()` function will attempt to wait until all pending window operations have completed." `SDL_SetWindowSize` in `SDL_video.h` at `release-3.4.18`: "If the window is in a fullscreen or maximized state, this request has no effect."
