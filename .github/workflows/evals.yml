@@ -70,7 +70,7 @@ jobs:
       # Bump it only together with a rerun of every case.
       - name: Install Claude Code and the sandbox backend
         run: |
-          npm install -g @anthropic-ai/claude-code@2.1.290
+          npm install -g @anthropic-ai/claude-code@2.1.292
           sudo apt-get update && sudo apt-get install -y bubblewrap socat
           # Ubuntu 24.04 blocks the unprivileged user namespaces bubblewrap needs.
           if [ -e /proc/sys/kernel/apparmor_restrict_unprivileged_userns ]; then
