@@ -104,6 +104,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 
 - **CI and evals run on `ubuntu-24.04`, not `ubuntu-latest`.** GitHub moves `ubuntu-latest` to Ubuntu 26 from 2026-10-19. The pin keeps the image that the apt packages and the eval sandbox setup, including the AppArmor change bubblewrap needs, were written for. Moving to Ubuntu 26 is a separate change, with its own check that the packages still install.
 - **The pinned SDL3 moves before each minor release.** The pin moves to the latest SDL 3 release: fresh copies of the bundled files from the new tag, a new `SOURCE`, the CMake hash, and the docs that name the version. Then the fixtures and every eval case run again, and the `Evals` workflow's Claude Code pin moves to the latest version too, since every case reruns anyway. Cards whose cited guide or header text changed between the two tags get checked again. Patch releases keep the pin, and the SDL2 originals stay on the latest 2.32 release.
+- **The fixtures pass on SDL 3.2.0 unchanged.** CI builds and runs every fixture against 3.2.0 as well as the pin, on all three systems. All 16 traps reproduce there with the same lines, and every fixed port passes, so no card needs a note about 3.2. The check that the bundled files match SDL runs only against the pin.
 
 ## M0: Placeholder (as soon as possible)
 
@@ -206,7 +207,7 @@ All seven pass CI on Linux, Windows and macOS. Their eval cases haven't run yet.
 
 ## M7: Support and stability
 
-- [ ] Run the fixtures in CI against SDL 3.2.0 as well as the pinned 3.4 release, because the README promises 3.2 and later. A trap that behaves differently on 3.2 says so on its card.
+- [x] Run the fixtures in CI against SDL 3.2.0 as well as the pinned 3.4 release, because the README promises 3.2 and later. A trap that behaves differently on 3.2 says so on its card.
 - [x] Pin the CI and `Evals` runners before GitHub moves `ubuntu-latest` to Ubuntu 26 on 2026-10-19, or check that their packages still install there.
 - [x] Write the stability promise in the README: what stays fixed across 1.x and what only a major version may change.
 - [x] Write down how the pinned SDL moves: to the latest 3.x release before each minor release, with the fixtures and evals run again.
