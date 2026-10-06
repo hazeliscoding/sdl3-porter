@@ -18,10 +18,21 @@ set(SDL_STATIC ON CACHE BOOL "" FORCE)
 set(SDL_TEST_LIBRARY OFF CACHE BOOL "" FORCE)
 set(SDL_EXAMPLES OFF CACHE BOOL "" FORCE)
 
+# The skill's files are pinned to SDL3_PINNED. CI also runs the fixtures against
+# the oldest release the README promises, with -DSDL3_VERSION=3.2.0.
+set(SDL3_PINNED 3.4.16)
+set(SDL3_VERSION ${SDL3_PINNED} CACHE STRING "SDL3 release to build the ported fixtures against")
+if(SDL3_VERSION STREQUAL "3.4.16")
+  set(sdl3_hash 7322236cd12090c3eb40b9728be4d49c76f66ad17d04369584d4ecad5cf77c68)
+elseif(SDL3_VERSION STREQUAL "3.2.0")
+  set(sdl3_hash bf308f92c5688b1479faf5cfe24af72f3cd4ce08d0c0670d6ce55bc2ec1e9a5e)
+else()
+  message(FATAL_ERROR "No hash for SDL ${SDL3_VERSION}. Add the release tarball's SHA-256 here.")
+endif()
 FetchContent_Declare(
   SDL3
-  URL https://github.com/libsdl-org/SDL/releases/download/release-3.4.16/SDL3-3.4.16.tar.gz
-  URL_HASH SHA256=7322236cd12090c3eb40b9728be4d49c76f66ad17d04369584d4ecad5cf77c68
+  URL https://github.com/libsdl-org/SDL/releases/download/release-${SDL3_VERSION}/SDL3-${SDL3_VERSION}.tar.gz
+  URL_HASH SHA256=${sdl3_hash}
   DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
 FetchContent_MakeAvailable(SDL3)
@@ -74,26 +85,29 @@ function(add_fixture id variant)
   )
 endfunction()
 
-# The SDL files bundled with the skill must match this release byte for byte.
+# The SDL files bundled with the skill must match the pinned release byte for
+# byte, so the check only runs against that release.
 set(sdl_bundle "${CMAKE_CURRENT_SOURCE_DIR}/skills/sdl3-porter/scripts/sdl")
-add_test(NAME bundled-sdl-files
-  COMMAND ${CMAKE_COMMAND} -DBUNDLE_DIR=${sdl_bundle} -DSDL_SOURCE_DIR=${sdl3_SOURCE_DIR}
-          -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-bundled-sdl.cmake
-)
+if(SDL3_VERSION STREQUAL SDL3_PINNED)
+  add_test(NAME bundled-sdl-files
+    COMMAND ${CMAKE_COMMAND} -DBUNDLE_DIR=${sdl_bundle} -DSDL_SOURCE_DIR=${sdl3_SOURCE_DIR}
+            -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-bundled-sdl.cmake
+  )
 
-# Positive control: the same check must fail on a tampered copy.
-set(tampered_bundle "${CMAKE_CURRENT_BINARY_DIR}/tampered-sdl-bundle")
-file(REMOVE_RECURSE "${tampered_bundle}")
-file(COPY "${sdl_bundle}/" DESTINATION "${tampered_bundle}")
-file(APPEND "${tampered_bundle}/build-scripts/rename_symbols.py" "# tampered\n")
-add_test(NAME bundled-sdl-files-tampered
-  COMMAND ${CMAKE_COMMAND} -DBUNDLE_DIR=${tampered_bundle} -DSDL_SOURCE_DIR=${sdl3_SOURCE_DIR}
-          -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-bundled-sdl.cmake
-)
-# Pass only on the specific failure, so an unrelated error can't satisfy the control.
-set_tests_properties(bundled-sdl-files-tampered PROPERTIES
-  PASS_REGULAR_EXPRESSION "differs from the SDL release: build-scripts/rename_symbols.py"
-)
+  # Positive control: the same check must fail on a tampered copy.
+  set(tampered_bundle "${CMAKE_CURRENT_BINARY_DIR}/tampered-sdl-bundle")
+  file(REMOVE_RECURSE "${tampered_bundle}")
+  file(COPY "${sdl_bundle}/" DESTINATION "${tampered_bundle}")
+  file(APPEND "${tampered_bundle}/build-scripts/rename_symbols.py" "# tampered\n")
+  add_test(NAME bundled-sdl-files-tampered
+    COMMAND ${CMAKE_COMMAND} -DBUNDLE_DIR=${tampered_bundle} -DSDL_SOURCE_DIR=${sdl3_SOURCE_DIR}
+            -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-bundled-sdl.cmake
+  )
+  # Pass only on the specific failure, so an unrelated error can't satisfy the control.
+  set_tests_properties(bundled-sdl-files-tampered PROPERTIES
+    PASS_REGULAR_EXPRESSION "differs from the SDL release: build-scripts/rename_symbols.py"
+  )
+endif()
 
 # The bundled rename scripts run from the skill's layout and leave the traps alone.
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
