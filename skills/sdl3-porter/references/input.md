@@ -107,7 +107,7 @@ SDL_SetRenderLogicalPresentation|SDL_RenderSetLogicalSize
 \b(button|motion|wheel|tfinger)\.(x|y|xrel|yrel|mouse_x|mouse_y)\b
 ```
 
-If the project sets a logical size, find every place it compares an event's coordinates with positions in logical space: buttons, menus, tiles, aiming. `SDL_GetMouseState` was never converted, even in SDL2, so code that already converts its result is fine.
+If the project sets a logical size, find every place it compares an event's coordinates with positions in logical space: buttons, menus, tiles, aiming. `SDL_GetMouseState` was never converted, even in SDL2. Code that converts its result itself isn't this trap, but check how it converts: if it uses the renderer's viewport and scale, it's `logical-scale-separate` in `render.md`.
 
 **Fix:** convert each event before using its coordinates:
 

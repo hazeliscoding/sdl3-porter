@@ -137,6 +137,40 @@ v.color.a = sprite_color.a / 255.0f;
 
 **Fixture:** `fixtures/vertex-color-float/`.
 
+## logical-scale-separate
+
+**What compiles:**
+
+```c
+SDL_SetRenderLogicalPresentation(renderer, 320, 200, SDL_LOGICAL_PRESENTATION_LETTERBOX);    /* was SDL_RenderSetLogicalSize */
+SDL_GetRenderViewport(renderer, &viewport);    /* SDL3: 0, 0, 320, 200, with no letterbox offset */
+SDL_GetRenderScale(renderer, &sx, &sy);        /* SDL3: 1.0, not the logical scale */
+int game_x = (int)(mouse_x / sx) - viewport.x;
+```
+
+**What breaks:** SDL2's `SDL_RenderSetLogicalSize` worked by setting the renderer's viewport and scale, so `SDL_RenderGetViewport` returned the letterbox offset and `SDL_RenderGetScale` the logical scale. Code that converted a window position into the logical size, such as one from `SDL_GetMouseState`, used those two. SDL3 keeps the logical presentation apart from the viewport and scale: with a logical size set, the viewport still starts at 0 and the scale is 1. The conversion then returns window coordinates unchanged. In a 640×480 window showing 320×200, the window's center maps to (320, 240) instead of (160, 100), and mouse hover and clicks miss whenever the window isn't at the logical size.
+
+**How to find it:** search the ported sources for code that reads the viewport or the scale:
+
+```
+SDL_GetRenderViewport\s*\(|SDL_GetRenderScale\s*\(
+```
+
+If the project also sets a logical presentation, check what each caller does with the values. Converting a position between the window and the logical size is this trap. Code that reads back a viewport or scale it set itself is fine.
+
+**Fix:** let SDL convert:
+
+```c
+float game_x, game_y;
+SDL_RenderCoordinatesFromWindow(renderer, mouse_x, mouse_y, &game_x, &game_y);
+```
+
+`SDL_RenderCoordinatesToWindow` converts the other way, `SDL_ConvertEventToRenderCoordinates` converts an event in place (see `mouse-logical-coords`), and `SDL_GetRenderLogicalPresentationRect` gives the letterboxed area in window pixels.
+
+**Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "SDL_RenderSetLogicalSize() (now called SDL_SetRenderLogicalPresentation()) in SDL2 would modify the scaling and viewport state. In SDL3, logical presentation maintains its state separately, so the app can use its own viewport and scaling while also setting a logical size."
+
+**Fixture:** `fixtures/logical-scale-separate/`.
+
 ## Batching with direct OpenGL
 
 **What changed:** SDL2's renderer queued draw calls and sent them to the GPU in batches, but turned batching off when the program asked for a specific backend, such as `SDL_HINT_RENDER_DRIVER` set to `opengl`, because such a program might draw with OpenGL itself. SDL3 always batches. A port that mixes the renderer with its own OpenGL, Direct3D, Metal or Vulkan calls compiles unchanged, then draws in the wrong order: its own drawing runs before the renderer's queued drawing, which paints over it, or the renderer's state ends up in the program's calls.
