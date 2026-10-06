@@ -79,6 +79,11 @@ It covers core SDL3: init, events, video and OpenGL, the renderer, surfaces, inp
 Claude Code ported each trap's SDL2 sample, and the bounce game, three times with sdl3-porter and three times without it. Each grader checks for one trap fixed or one porting step done.
 
 <!-- eval-table:start -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/evals/scores-dark.svg">
+  <img alt="Eval scores with and without sdl3-porter for each case, as in the table below" src="docs/evals/scores.svg" width="860">
+</picture>
+
 | Case | With skill | Without skill | Difference | Skill fired |
 |---|---|---|---|---|
 | `audio-init-implicit` | 1.00 | 0.00 | +1.00 | 3 of 3 |

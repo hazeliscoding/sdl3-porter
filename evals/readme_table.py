@@ -5,17 +5,31 @@
 Each file is the --json output of one with-without run (the same schema as
 aggregate-result.json). Several files can be combined, for suites run in batches,
 as long as they used the same model, Claude Code version and runs per case. The
-table replaces everything between the eval-table markers in README.md.
+table, and a chart of the same scores drawn as light and dark SVGs in docs/evals/,
+replace everything between the eval-table markers in README.md.
 """
 
 import json
 import sys
 from pathlib import Path
 
-README = Path(__file__).resolve().parent.parent / "README.md"
+ROOT = Path(__file__).resolve().parent.parent
+README = ROOT / "README.md"
+CHARTS = ROOT / "docs" / "evals"
 START = "<!-- eval-table:start -->"
 END = "<!-- eval-table:end -->"
 WHOLE_PROGRAM = "port-sample"
+
+# GitHub's text colors and the brand accent, from AGENTS.md. "page" is the
+# README background, which fills the hollow dots.
+THEMES = {
+    "scores.svg": {"ink": "#1f2328", "muted": "#59636e", "rule": "#d1d9e0", "accent": "#c2410c",
+                   "without": "#8c959f", "page": "#ffffff"},
+    "scores-dark.svg": {"ink": "#e6edf3", "muted": "#9198a1", "rule": "#3d444d", "accent": "#fb923c",
+                        "without": "#6e7681", "page": "#0d1117"},
+}
+MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"
+SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
 
 
 def load(paths):
@@ -70,6 +84,96 @@ def table(cases, model, version, dates):
     return "\n".join(lines)
 
 
+def chart(cases, colors, footnote):
+    """A dumbbell chart: one row per case, without and with the skill on a 0-1 axis."""
+    left, right, width = 250, 700, 860
+
+    def x(score):
+        return left + score * (right - left)
+
+    groups = [
+        ("The skill raised the score", [c for c in cases.values() if c["aggregates"]["delta"] > 0]),
+        ("Same score either way", [c for c in cases.values() if c["aggregates"]["delta"] == 0]),
+        ("The skill lowered the score", [c for c in cases.values() if c["aggregates"]["delta"] < 0]),
+    ]
+    rows, y = [], 82
+    for title, members in groups:
+        if not members:
+            continue
+        rows.append(("group", title, y))
+        y += 26
+        for case in sorted(members, key=lambda c: (-c["aggregates"]["delta"], c["name"] == WHOLE_PROGRAM, c["name"])):
+            rows.append(("case", case, y))
+            y += 28
+        y += 10
+    height = y + 24
+    c = colors
+    out = [
+        f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}" viewBox="0 0 {width} {height}" '
+        f'role="img" aria-label="Eval scores with and without sdl3-porter for each case">',
+        f'<g font-family="{SANS}" font-size="13" fill="{c["muted"]}">',
+        f'<circle cx="22" cy="20" r="7" fill="{c["accent"]}"/><text x="36" y="24">With sdl3-porter</text>',
+        f'<circle cx="176" cy="20" r="6" fill="{c["page"]}" stroke="{c["without"]}" stroke-width="2.5"/>'
+        f'<text x="190" y="24">Without it</text>',
+        f'<text x="{width - 12}" y="24" text-anchor="end">Share of checks passed, averaged over runs</text>',
+        "</g>",
+        f'<g font-family="{MONO}" font-size="11" fill="{c["muted"]}" text-anchor="middle">',
+    ]
+    ticks = (0, 0.25, 0.5, 0.75, 1)
+    for tick in ticks:
+        text = {0: "0", 1: "1"}.get(tick, f"{tick:.2f}".lstrip("0"))
+        out.append(f'<text x="{x(tick):.1f}" y="58">{text}</text>')
+    out.append("</g>")
+    top, bottom = rows[0][2] - 8, rows[-1][2] + 12
+    for tick in ticks:
+        out.append(f'<line x1="{x(tick):.1f}" y1="{top}" x2="{x(tick):.1f}" y2="{bottom}" '
+                   f'stroke="{c["rule"]}" stroke-width="1"/>')
+    for kind, item, ry in rows:
+        if kind == "group":
+            out.append(f'<text x="16" y="{ry + 4}" font-family="{SANS}" font-size="11" font-weight="600" '
+                       f'letter-spacing="0.08em" fill="{c["muted"]}">{item.upper()}</text>')
+            continue
+        totals = item["aggregates"]
+        score, without, delta = totals["score"], totals["scoreWithout"], totals["delta"]
+        out.append(f'<text x="16" y="{ry + 4}" font-family="{MONO}" font-size="13" fill="{c["ink"]}">'
+                   f'{label(item["name"])}</text>')
+        if score != without:
+            low, high = sorted((score, without))
+            out.append(f'<rect x="{x(low):.1f}" y="{ry - 2}" width="{x(high) - x(low):.1f}" height="4" rx="2" '
+                       f'fill="{c["accent"]}" fill-opacity="0.45"/>')
+            out.append(f'<circle cx="{x(without):.1f}" cy="{ry}" r="6" fill="{c["page"]}" '
+                       f'stroke="{c["without"]}" stroke-width="2.5"/>')
+        else:
+            # Same score: a ring for the run without the skill, around the dot for the run with it.
+            out.append(f'<circle cx="{x(score):.1f}" cy="{ry}" r="10.5" fill="none" '
+                       f'stroke="{c["without"]}" stroke-width="2.5"/>')
+        out.append(f'<circle cx="{x(score):.1f}" cy="{ry}" r="7" fill="{c["accent"]}"/>')
+        out.append(f'<text x="{right + 28}" y="{ry + 4}" font-family="{MONO}" font-size="12" fill="{c["muted"]}">'
+                   f'{without:.2f} → {score:.2f}</text>')
+        sign = "+" if delta > 0 else "−" if delta < 0 else "±"
+        tone, weight = (c["accent"], ' font-weight="700"') if delta > 0 else (c["muted"], "")
+        out.append(f'<text x="{width - 12}" y="{ry + 4}" font-family="{MONO}" font-size="12" text-anchor="end" '
+                   f'fill="{tone}"{weight}>{sign}{abs(delta):.2f}</text>')
+    out.append(f'<text x="16" y="{height - 10}" font-family="{SANS}" font-size="11" fill="{c["muted"]}">'
+               f'{footnote}</text>')
+    out.append("</svg>")
+    return "\n".join(out) + "\n"
+
+
+def label(name):
+    return "Whole program (bounce)" if name == WHOLE_PROGRAM else name
+
+
+def picture():
+    return (
+        "<picture>\n"
+        '  <source media="(prefers-color-scheme: dark)" srcset="docs/evals/scores-dark.svg">\n'
+        '  <img alt="Eval scores with and without sdl3-porter for each case, as in the table below" '
+        'src="docs/evals/scores.svg" width="860">\n'
+        "</picture>\n"
+    )
+
+
 def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
@@ -78,9 +182,15 @@ def main():
         sys.exit(f"README.md has no {START} ... {END} block")
     before, rest = text.split(START, 1)
     _, after = rest.split(END, 1)
-    new = f"{before}{START}\n{table(*load(sys.argv[1:]))}\n{END}{after}"
+    cases, model, version, dates = load(sys.argv[1:])
+    runs = len(next(iter(cases.values()))["arms"]["with"])
+    footnote = f"{model}, Claude Code {version}, {runs} runs per case with and without the skill"
+    CHARTS.mkdir(parents=True, exist_ok=True)
+    for name, colors in THEMES.items():
+        (CHARTS / name).write_text(chart(cases, colors, footnote), encoding="utf-8", newline="\n")
+    new = f"{before}{START}\n{picture()}\n{table(cases, model, version, dates)}\n{END}{after}"
     README.write_text(new, encoding="utf-8", newline="\n")
-    print(f"Updated the eval table in {README}")
+    print(f"Updated the eval table and charts in {README} and {CHARTS}")
 
 
 if __name__ == "__main__":

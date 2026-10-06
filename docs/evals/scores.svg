@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="860" height="654" viewBox="0 0 860 654" role="img" aria-label="Eval scores with and without sdl3-porter for each case">
+<g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13" fill="#59636e">
+<circle cx="22" cy="20" r="7" fill="#c2410c"/><text x="36" y="24">With sdl3-porter</text>
+<circle cx="176" cy="20" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/><text x="190" y="24">Without it</text>
+<text x="848" y="24" text-anchor="end">Share of checks passed, averaged over runs</text>
+</g>
+<g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="11" fill="#59636e" text-anchor="middle">
+<text x="250.0" y="58">0</text>
+<text x="362.5" y="58">.25</text>
+<text x="475.0" y="58">.50</text>
+<text x="587.5" y="58">.75</text>
+<text x="700.0" y="58">1</text>
+</g>
+<line x1="250.0" y1="74" x2="250.0" y2="604" stroke="#d1d9e0" stroke-width="1"/>
+<line x1="362.5" y1="74" x2="362.5" y2="604" stroke="#d1d9e0" stroke-width="1"/>
+<line x1="475.0" y1="74" x2="475.0" y2="604" stroke="#d1d9e0" stroke-width="1"/>
+<line x1="587.5" y1="74" x2="587.5" y2="604" stroke="#d1d9e0" stroke-width="1"/>
+<line x1="700.0" y1="74" x2="700.0" y2="604" stroke="#d1d9e0" stroke-width="1"/>
+<text x="16" y="86" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="0.08em" fill="#59636e">THE SKILL RAISED THE SCORE</text>
+<text x="16" y="112" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">audio-init-implicit</text>
+<rect x="250.0" y="106" width="450.0" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
+<circle cx="250.0" cy="108" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="108" r="7" fill="#c2410c"/>
+<text x="728" y="112" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.00 → 1.00</text>
+<text x="848" y="112" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+1.00</text>
+<text x="16" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">blend-by-default</text>
+<rect x="250.0" y="134" width="450.0" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
+<circle cx="250.0" cy="136" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="136" r="7" fill="#c2410c"/>
+<text x="728" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.00 → 1.00</text>
+<text x="848" y="140" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+1.00</text>
+<text x="16" y="168" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">indexed-surface-no-palette</text>
+<rect x="250.0" y="162" width="450.0" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
+<circle cx="250.0" cy="164" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="164" r="7" fill="#c2410c"/>
+<text x="728" y="168" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.00 → 1.00</text>
+<text x="848" y="168" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+1.00</text>
+<text x="16" y="196" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">mouse-logical-coords</text>
+<rect x="250.0" y="190" width="450.0" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
+<circle cx="250.0" cy="192" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="192" r="7" fill="#c2410c"/>
+<text x="728" y="196" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.00 → 1.00</text>
+<text x="848" y="196" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+1.00</text>
+<text x="16" y="224" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">linear-by-default</text>
+<rect x="400.0" y="218" width="300.0" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
+<circle cx="400.0" cy="220" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="220" r="7" fill="#c2410c"/>
+<text x="728" y="224" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.33 → 1.00</text>
+<text x="848" y="224" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+0.67</text>
+<text x="16" y="252" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">hint-string-ignored</text>
+<rect x="500.0" y="246" width="200.0" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
+<circle cx="500.0" cy="248" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="248" r="7" fill="#c2410c"/>
+<text x="728" y="252" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.56 → 1.00</text>
+<text x="848" y="252" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+0.44</text>
+<text x="16" y="280" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">Whole program (bounce)</text>
+<rect x="602.9" y="274" width="97.1" height="4" rx="2" fill="#c2410c" fill-opacity="0.45"/>
+<circle cx="602.9" cy="276" r="6" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="276" r="7" fill="#c2410c"/>
+<text x="728" y="280" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">0.78 → 1.00</text>
+<text x="848" y="280" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#c2410c" font-weight="700">+0.22</text>
+<text x="16" y="318" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" font-weight="600" letter-spacing="0.08em" fill="#59636e">SAME SCORE EITHER WAY</text>
+<text x="16" y="344" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">audio-stream-paused</text>
+<circle cx="700.0" cy="340" r="10.5" fill="none" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="340" r="7" fill="#c2410c"/>
+<text x="728" y="344" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">1.00 → 1.00</text>
+<text x="848" y="344" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#59636e">±0.00</text>
+<text x="16" y="372" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">bool-returns</text>
+<circle cx="700.0" cy="368" r="10.5" fill="none" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="368" r="7" fill="#c2410c"/>
+<text x="728" y="372" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">1.00 → 1.00</text>
+<text x="848" y="372" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#59636e">±0.00</text>
+<text x="16" y="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">display-index-vs-id</text>
+<circle cx="700.0" cy="396" r="10.5" fill="none" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="396" r="7" fill="#c2410c"/>
+<text x="728" y="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">1.00 → 1.00</text>
+<text x="848" y="400" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#59636e">±0.00</text>
+<text x="16" y="428" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">gamepad-index-vs-id</text>
+<circle cx="700.0" cy="424" r="10.5" fill="none" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="424" r="7" fill="#c2410c"/>
+<text x="728" y="428" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">1.00 → 1.00</text>
+<text x="848" y="428" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#59636e">±0.00</text>
+<text x="16" y="456" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">mix-volume-float</text>
+<circle cx="700.0" cy="452" r="10.5" fill="none" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="452" r="7" fill="#c2410c"/>
+<text x="728" y="456" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">1.00 → 1.00</text>
+<text x="848" y="456" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#59636e">±0.00</text>
+<text x="16" y="484" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">rwread-count-vs-bytes</text>
+<circle cx="700.0" cy="480" r="10.5" fill="none" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="480" r="7" fill="#c2410c"/>
+<text x="728" y="484" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">1.00 → 1.00</text>
+<text x="848" y="484" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#59636e">±0.00</text>
+<text x="16" y="512" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">text-input-off</text>
+<circle cx="700.0" cy="508" r="10.5" fill="none" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="508" r="7" fill="#c2410c"/>
+<text x="728" y="512" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">1.00 → 1.00</text>
+<text x="848" y="512" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#59636e">±0.00</text>
+<text x="16" y="540" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">vertex-color-float</text>
+<circle cx="700.0" cy="536" r="10.5" fill="none" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="536" r="7" fill="#c2410c"/>
+<text x="728" y="540" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">1.00 → 1.00</text>
+<text x="848" y="540" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#59636e">±0.00</text>
+<text x="16" y="568" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">vsync-flag-dropped</text>
+<circle cx="700.0" cy="564" r="10.5" fill="none" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="564" r="7" fill="#c2410c"/>
+<text x="728" y="568" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">1.00 → 1.00</text>
+<text x="848" y="568" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#59636e">±0.00</text>
+<text x="16" y="596" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13" fill="#1f2328">window-mode-null</text>
+<circle cx="700.0" cy="592" r="10.5" fill="none" stroke="#8c959f" stroke-width="2.5"/>
+<circle cx="700.0" cy="592" r="7" fill="#c2410c"/>
+<text x="728" y="596" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" fill="#59636e">1.00 → 1.00</text>
+<text x="848" y="596" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="12" text-anchor="end" fill="#59636e">±0.00</text>
+<text x="16" y="644" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="11" fill="#59636e">claude-sonnet-5, Claude Code 2.1.289, 3 runs per case with and without the skill</text>
+</svg>
