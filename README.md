@@ -9,7 +9,7 @@
 
 SDL's rename scripts handle most of a port, and the compiler catches most of the rest. Neither catches code that still compiles but now means something else. SDL3 functions return `true` on success, so a leftover `if (SDL_Init(...) != 0)` exits on every launch. A device opened with `SDL_OpenAudioDeviceStream` starts paused, so the ported game plays no sound. Textures now filter linearly by default, so pixel art blurs. Coding agents make the same mistakes, because most of the SDL code they learned from is SDL2.
 
-> **Status:** v0.1.0, the first release. [ROADMAP.md](ROADMAP.md) has what's next.
+> **Status:** v0.2.0, with 16 traps proven in CI. [ROADMAP.md](ROADMAP.md) has what's next.
 
 ## Before and after
 
