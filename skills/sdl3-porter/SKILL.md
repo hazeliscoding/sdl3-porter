@@ -107,17 +107,21 @@ Code that compiles can still be wrong. For each subsystem the project uses, read
 | Audio | [references/audio.md](references/audio.md) |
 | Hints, set in code, the environment or config files | [references/hints.md](references/hints.md) |
 
-For each trap and guidance section:
+Work through the sections one at a time, not as one batch of searches. For each trap and guidance section:
 
 1. Run its "How to find it" search.
-2. Read every hit in context.
-3. Fix the ones that match, and note `file:line` and the trap id. Guidance sections have no id: note their fixes under `Also changed:`, and anything they leave to the owner under `Needs a human:`.
+2. Read every hit in context, and decide.
+3. Write the verdict down before moving on: fixed, with `file:line` and the trap id; no change needed, with the reason; or needs a human. Guidance sections have no id: put their fixes under `Also changed:`, and the choices they leave to the owner under `Needs a human:`.
+
+A hit you can't explain away is a fix. For example, code that handles text events but never calls `SDL_StartTextInput` needs the call, whatever else it does with text.
 
 ### 7. Build and run
 
 Rebuild. If the project's own build can't run on this machine, you may build with throwaway files outside the project, but don't add a build system to the project. Run the project's tests if it has any. If the program can run without a display (SDL's dummy drivers: `SDL_VIDEO_DRIVER=dummy SDL_AUDIO_DRIVER=dummy`, or a test mode or frame limit the program offers), run it and check it exits cleanly.
 
-Don't call the port finished until it builds and, where possible, runs. If you couldn't build or run it, say so plainly.
+The build only compiles this platform's code. Read every SDL call inside `#ifdef` blocks for other platforms (`_WIN32`, `__APPLE__`, `__ANDROID__`, `__EMSCRIPTEN__` and the like) against the bundled headers, port it by hand, and say under `Not checked:` that those blocks weren't compiled.
+
+Don't call the port finished until it builds and, where possible, runs. If you couldn't build or run it, say so plainly. When you say a program ran, give its own exit status: after `program | head`, `$?` is `head`'s.
 
 ### 8. Report
 
@@ -126,15 +130,18 @@ Use this format, one line per trap, with no emoji:
 ```
 2 traps found, 2 fixed
 
-src/main.c:14     bool-returns   SDL_Init returns true on success, so `< 0` never caught a failure.
+src/main.c:14     bool-returns   SDL_Init returns true on success, so `!= 0` exited on every launch.
 src/net.c:88      bool-returns   SDL_SetHint returns bool, so `!= 0` treated success as failure.
 
 Also changed: src/input.c:31 SDL_GetKeyboardState now returns const bool *.
+Checked, no change needed: blend-by-default (src/sprite.c:12 writes only opaque pixels).
 Build: find_package(SDL3), SDL2main removed, SDL_main.h added to src/main.c.
 Not checked: couldn't build here (SDL3 isn't installed).
 Needs a human: audio by ear, a real gamepad, SDL_mixer (out of scope).
 ```
 
-Every trap line names an id from a trap file, one line for each place you fixed it. Nothing else is a trap. Put renamed or removed APIs, changed signatures and every other change under `Also changed:`, one per line, even when the port needed them, and leave them out of `N traps found`.
+`N traps found` is the number of trap lines. Every trap line names an id from a trap file, one line for each place you fixed it, and no place twice. Nothing else is a trap. Code that wouldn't compile against SDL3, such as a removed or renamed function or a changed signature, goes under `Also changed:`, one per line, even when the port needed it. An SDL2-style check that survived such a rewrite, such as an old error test on a call you had to change, is still a trap. Take line numbers from the ported files after your last edit, for example with `grep -n`, not from the SDL2 originals.
+
+List every trap and guidance section whose search matched code that needed no change under `Checked, no change needed:`, each with its reason.
 
 If no traps were found, say `0 traps found` and list the trap files you checked.
