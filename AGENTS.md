@@ -12,7 +12,7 @@ These are the working rules for agents in this repo. sdl3-porter is an agent ski
 ## Commands
 
 ```sh
-cmake -S . -B build                                   # fetches and builds SDL 3.4.16 and 2.32.10 the first time
+cmake -S . -B build                                   # fetches and builds SDL 3.4.18 and 2.32.10 the first time
 cmake --build build --config Debug
 ctest --test-dir build -C Debug --output-on-failure   # originals and fixed ports pass, naive ports fail with their trap
 cmake -S . -B build-sdl320 "-DSDL3_VERSION=3.2.0"       # the same fixtures against the oldest supported SDL3, as CI runs them
@@ -41,7 +41,7 @@ The skill is only worth trusting if these hold.
 - A trap card has **What compiles**, **What breaks**, **How to find it**, **Fix** and **Source** sections.
 - Trap ids are kebab-case and stable. Renaming one is a breaking change that needs a decision in `ROADMAP.md`.
 - Fixtures are small C programs that test one behavior each. A failing fixture exits non-zero and prints one line that says what went wrong. Only the trap's own check starts that line with the trap id, for example `bool-returns: SDL_Init reported failure`. Setup failures start with `setup:`, so the naive runner, which requires the trap's line, can tell them apart. Only a crash may replace the trap's line.
-- Pin versions: SDL 3.4.16 for ports, SDL 2.32.10 (the latest 2.32 release) for originals. Before each minor release, move the SDL3 pin to the latest SDL 3 release, as `ROADMAP.md` describes. Any other bump needs a decision there.
+- Pin versions: SDL 3.4.18 for ports, SDL 2.32.10 (the latest 2.32 release) for originals. Before each minor release, move the SDL3 pin to the latest SDL 3 release, as `ROADMAP.md` describes. Any other bump needs a decision there.
 - The skill's own output is plain: one line per trap with `file:line`, the trap id and what changed, then what still needs a human. No emoji.
 
 ## Evals

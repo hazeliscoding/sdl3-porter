@@ -53,7 +53,7 @@ Python 3 on your `PATH` lets the skill run SDL's rename scripts. Without it, the
 
 ## What's supported
 
-- **SDL 3.2 and later.** The headers, migration guide and rename scripts that ship with the skill are pinned to SDL 3.4.16, and the fixtures run against it.
+- **SDL 3.2 and later.** The headers, migration guide and rename scripts that ship with the skill are pinned to SDL 3.4.18, and the fixtures run against it.
 - **C and C++.** The build reference covers CMake, vendored SDL, pkg-config, `sdl2-config` and Makefiles, Windows DLLs, Linux, Emscripten and package managers.
 - **Claude Code.** The skill is also a plain Agent Skill, but no other harness has been tested.
 - **Out of scope:** SDL_image, SDL_ttf, SDL_mixer and SDL_net, whose includes the skill ports and whose calls it leaves for you; SDL 1.2; and language bindings.
@@ -69,7 +69,7 @@ It covers core SDL3: init, events, video and OpenGL, the renderer, surfaces, inp
 
 ## Every trap is proven
 
-- **Three programs per trap.** The SDL2 original, the naive port that compiles and fails, and the correct port. CI builds the original against SDL 2.32 and both ports against SDL 3.4.16, and runs all three headless on Windows, Linux and macOS (OpenGL traps on Linux). The original and the correct port must pass and the naive port must fail, or the trap doesn't ship.
+- **Three programs per trap.** The SDL2 original, the naive port that compiles and fails, and the correct port. CI builds the original against SDL 2.32 and both ports against SDL 3.4.18, and runs all three headless on Windows, Linux and macOS (OpenGL traps on Linux). The original and the correct port must pass and the naive port must fail, or the trap doesn't ship.
 - **Measured against no skill.** Evals run Claude Code with and without sdl3-porter on a small SDL2 program for each trap and on a whole game. The scores are below.
 - **Sourced.** Each trap links the section of SDL's [migration guide](https://wiki.libsdl.org/SDL3/README-migration) it rests on.
 - **Guidance isn't called a trap.** Some changes need hardware or a platform no headless test has, such as Nintendo face buttons, high DPI or Apple app bundles. The skill checks those by reading the code and reports them apart from the traps.

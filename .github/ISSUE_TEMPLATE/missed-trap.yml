@@ -11,7 +11,7 @@ body:
     id: sdl-version
     attributes:
       label: SDL3 version
-      description: The SDL3 you built against, such as 3.4.16.
+      description: The SDL3 you built against, such as 3.4.18.
     validations:
       required: true
   - type: textarea

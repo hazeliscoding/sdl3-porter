@@ -10,7 +10,7 @@ sdl3-porter is instructions and reference files for a coding agent, plus SDL's o
 
 The skill downloads nothing itself. Your build might: a CMake project that fetches SDL3 with `FetchContent` downloads it when it configures.
 
-The files in `skills/sdl3-porter/scripts/sdl/` are unmodified copies from SDL's `release-3.4.16` tag, and CI checks them byte for byte against the release archive.
+The files in `skills/sdl3-porter/scripts/sdl/` are unmodified copies from SDL's `release-3.4.18` tag, and CI checks them byte for byte against the release archive.
 
 Give the agent the same permissions you'd give it for any other change to your code, and review its diff before you commit it.
 
