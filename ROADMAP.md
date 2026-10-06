@@ -106,6 +106,7 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **The pinned SDL3 moves before each minor release.** The pin moves to the latest SDL 3 release: fresh copies of the bundled files from the new tag, a new `SOURCE`, the CMake hash, and the docs that name the version. Then the fixtures and every eval case run again, and the `Evals` workflow's Claude Code pin moves to the latest version too, since every case reruns anyway. Cards whose cited guide or header text changed between the two tags get checked again. Patch releases keep the pin, and the SDL2 originals stay on the latest 2.32 release.
 - **The fixtures pass on SDL 3.2.0 unchanged.** CI builds and runs every fixture against 3.2.0 as well as the pin, on all three systems. All 16 traps reproduce there with the same lines, and every fixed port passes, so no card needs a note about 3.2. The check that the bundled files match SDL runs only against the pin.
 - **The pin moved to SDL 3.4.18.** Its migration guide, rename scripts and docs are identical to 3.4.16's, and so is every SDL source file a card cites. Eleven bundled headers changed, adding a pen device type, a Steam gamepad type and a Front key, which no card mentions. `SDL_SetWindowBordered`, `SDL_SetWindowResizable` and `SDL_SetWindowAlwaysOnTop` now fail on video drivers that can't do them, which no fixture or sample calls.
+- **The evals' Claude Code pin moved to 2.1.290** for the full rerun that goes with SDL 3.4.18.
 
 ## M0: Placeholder (as soon as possible)
 
