@@ -91,7 +91,7 @@ SDL_CreateTexture\w*
 SDL_SetTextureBlendMode|SDL_BLENDMODE_
 ```
 
-For each texture with an alpha format, meaning one with an `A` in its name such as `ARGB8888`, `RGBA8888`, `ABGR8888`, `BGRA8888` or `RGBA32`, check whether the code sets its blend mode. If it doesn't, check what it writes into the alpha channel: 0, nothing at all, or values that SDL2 ignored. Formats with an `X` instead, such as `XRGB8888`, have no alpha channel.
+For each texture with an alpha format, meaning one with an `A` in its name such as `ARGB8888`, `RGBA8888`, `ABGR8888`, `BGRA8888` or `RGBA32`, check whether the code sets its blend mode. If it doesn't, check what it writes into the alpha channel. Alpha left at 0, never set, or below 255 draws differently in SDL3, so that's the trap. If every pixel is fully opaque, with alpha 255, blending changes nothing: it isn't this trap and needs no change. Formats with an `X` instead, such as `XRGB8888`, have no alpha channel.
 
 **Fix:** turn blending off to keep SDL2's behavior:
 
