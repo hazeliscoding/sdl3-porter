@@ -128,31 +128,49 @@ For a point that doesn't come from an event, use `SDL_RenderCoordinatesFromWindo
 
 **What changed:** SDL2 reported the face buttons of Nintendo controllers by label by default (`SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS` was on), so `SDL_CONTROLLER_BUTTON_A` was the button printed A, on the right of a Switch controller. The rename scripts turn A/B/X/Y into `SDL_GAMEPAD_BUTTON_SOUTH`/`EAST`/`WEST`/`NORTH`, which are positions, and SDL3 ignores the hint. On a Nintendo controller, a port that confirms with `SOUTH` now confirms with the bottom button, printed B, and the button printed A cancels. Xbox and PlayStation layouts are unchanged.
 
-**How to find it:** search the ported sources for the face buttons:
+**How to find it:** search the ported sources for the face buttons, by name and by number:
 
 ```
 SDL_GAMEPAD_BUTTON_(SOUTH|EAST|WEST|NORTH)\b
+\.gbutton\.button\b|SDL_GetGamepadButton\s*\(
 ```
 
-If the project handles them, it has this change.
+If the project handles gamepad buttons at all, it has this change. Projects with their own button enum, numbered like SDL's, never name the face buttons: buttons 0 to 3 are South, East, West and North. Look for code that already treats Nintendo controllers differently, such as a check of `SDL_GetGamepadType`, because it may have corrected for SDL2's label order.
 
-**Fix:** the guide recommends a setting that swaps South and East, defaulting to swapped when `SDL_GetGamepadButtonLabel(gamepad, SDL_GAMEPAD_BUTTON_SOUTH)` is `SDL_GAMEPAD_BUTTON_LABEL_B`, which keeps SDL2's behavior on Nintendo controllers. Whether to add that is the owner's call, so report it under `Needs a human:` instead of changing the controls on your own.
+**Fix:** the guide recommends a setting that swaps South and East, defaulting to swapped when `SDL_GetGamepadButtonLabel(gamepad, SDL_GAMEPAD_BUTTON_SOUTH)` is `SDL_GAMEPAD_BUTTON_LABEL_B`, which keeps SDL2's behavior on Nintendo controllers. Whether to add that is the owner's call, so report it under `Needs a human:` instead of changing the controls on your own, even when you change nothing.
 
 **Source:** SDL `docs/README-migration.md`, `SDL_gamecontroller.h` section: "The gamepad face buttons have been renamed from A/B/X/Y to North/South/East/West to indicate that they are positional rather than hardware-specific. [...] The hint SDL_HINT_GAMECONTROLLER_USE_BUTTON_LABELS is ignored [...] Applications should provide a way for users to swap between South/East as their accept/cancel buttons", followed by example code. SDL2's default is in `SDL_hints.h` at `release-2.32.10`: "The default value is "1"."
 
-## Mouse wheel values
+## Gamepad button numbers above 20
+
+**What changed:** SDL2's buttons ended at `SDL_CONTROLLER_BUTTON_TOUCHPAD`, number 20, with `SDL_CONTROLLER_BUTTON_MAX` at 21. SDL3 adds `SDL_GAMEPAD_BUTTON_MISC2` to `MISC6` as numbers 21 to 25, and `SDL_GAMEPAD_BUTTON_COUNT` is 26. A project that numbers its own virtual buttons, such as triggers or stick directions, from 21 now shares those numbers with real buttons: pressing one of the new buttons fires the virtual binding. Code that names `SDL_CONTROLLER_BUTTON_MAX` is fine, because the rename scripts make it `SDL_GAMEPAD_BUTTON_COUNT`.
+
+**How to find it:** look for the project's own lists of gamepad buttons, and for numbers or constants that continue after the touchpad:
+
+```
+TOUCHPAD|BUTTON_MAX|BUTTON_COUNT
+```
+
+**Fix:** start the project's own numbers at `SDL_GAMEPAD_BUTTON_COUNT`, or add the five new buttons to its list before its virtual ones.
+
+**Source:** SDL `SDL_GamepadButton` in `SDL_gamepad.h` at `release-3.4.18` ([wiki](https://wiki.libsdl.org/SDL3/SDL_GamepadButton)), which lists `SDL_GAMEPAD_BUTTON_MISC2` to `SDL_GAMEPAD_BUTTON_MISC6`, each "Additional button", after `SDL_GAMEPAD_BUTTON_TOUCHPAD`. SDL2's `SDL_GameControllerButton` in `SDL_gamecontroller.h` at `release-2.32.10` ends with `SDL_CONTROLLER_BUTTON_TOUCHPAD` and `SDL_CONTROLLER_BUTTON_MAX`. `docs/README-migration.md`, `SDL_gamecontroller.h` section: "SDL_CONTROLLER_BUTTON_MAX => SDL_GAMEPAD_BUTTON_COUNT".
+
+## Mouse wheel and motion values
 
 **What changed:** SDL2's `event.wheel.y` was an `Sint32` count of whole scroll steps. SDL added up the small amounts that touchpads and smooth-scrolling wheels send until they made a whole step, and put the raw amount in `preciseY`. SDL3 drops `preciseX` and `preciseY` and makes `x` and `y` the raw `float` amounts. Code that does one thing per event where `y > 0`, such as zoom one level or select the next item, now does it for every fraction, so one swipe on a touchpad scrolls through a whole list. Code that stores `y` in an `int` drops the fractions, so slow scrolling does nothing. A wheel that clicks in whole steps behaves as before.
 
-**How to find it:** search the ported sources for wheel amounts:
+Mouse motion changed the same way. Positions and relative motion are `float`, and SDL3 can report motion smaller than a pixel. Code that stores relative motion from `event.motion.xrel` or `SDL_GetRelativeMouseState` in an `int` drops those fractions on every frame, so slow mouse movement, such as aiming, turns sluggish or stops.
+
+**How to find it:** search the ported sources for wheel amounts and relative motion:
 
 ```
 \.wheel\.(x|y)\b
+\.motion\.(xrel|yrel)\b|SDL_GetRelativeMouseState\s*\(
 ```
 
-**Fix:** for one step per wheel click, read `event.wheel.integer_x` and `event.wheel.integer_y`, which SDL3 adds up into whole steps the way SDL2's `x` and `y` were. They exist since SDL 3.2.12, so a project that must build against an older SDL3 has to add up `y` itself. For smooth scrolling, keep `y` and use it as a `float`.
+**Fix:** for one step per wheel click, read `event.wheel.integer_x` and `event.wheel.integer_y`, which SDL3 adds up into whole steps the way SDL2's `x` and `y` were. They exist since SDL 3.2.12, so a project that must build against an older SDL3 has to add up `y` itself. For smooth scrolling, keep `y` and use it as a `float`. Keep relative motion as `float`, or carry the remainder over to the next frame when the game needs whole pixels.
 
-**Source:** SDL `SDL_MouseWheelEvent` in `SDL_events.h` at `release-3.4.18` ([wiki](https://wiki.libsdl.org/SDL3/SDL_MouseWheelEvent)): `float y`, and `Sint32 integer_y`, "The amount scrolled vertically, accumulated to whole scroll "ticks" (added in 3.2.12)". SDL2's struct, in `SDL_events.h` at `release-2.32.10`, has `Sint32 y` and `float preciseY`, and `SDL_SendMouseWheel` in `src/events/SDL_mouse.c` added up the whole steps.
+**Source:** SDL `SDL_MouseWheelEvent` in `SDL_events.h` at `release-3.4.18` ([wiki](https://wiki.libsdl.org/SDL3/SDL_MouseWheelEvent)): `float y`, and `Sint32 integer_y`, "The amount scrolled vertically, accumulated to whole scroll "ticks" (added in 3.2.12)". SDL2's struct, in `SDL_events.h` at `release-2.32.10`, has `Sint32 y` and `float preciseY`, and `SDL_SendMouseWheel` in `src/events/SDL_mouse.c` added up the whole steps. For motion, `docs/README-migration.md`, `SDL_events.h` section: "Mouse events use floating point values for mouse coordinates and relative motion values. You can get sub-pixel motion depending on the platform and display scaling."
 
 ## Gamepad rumble
 
