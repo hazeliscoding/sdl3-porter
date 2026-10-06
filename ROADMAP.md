@@ -109,6 +109,11 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **The evals' Claude Code pin moved to 2.1.290** for the full rerun that goes with SDL 3.4.18.
 - **A case with an errored run gets one traced rerun.** In the full rerun for 3.4.18, one of the three `gamepad-index-vs-id` runs with the skill timed out at 1,200 s after only 20 turns, and its transcript wasn't kept. A traced diagnostic of 5 more runs found no slow commands: the one slow run spent its time waiting on the API, with replies taking up to 131 s. So when a run errors, the whole case runs once more with transcripts, and the table uses that rerun if none of its runs errors. If one errors again, the table reports it as measured. The errored result stays in the evidence and the release notes mention it.
 
+### Added after v0.3.0 (2026-10-06)
+
+- **The README shows a real port, recorded.** VHS recorded Claude Code with the released plugin porting `samples/bounce` in WSL, sped up 4× into `docs/demo/port.gif`. It runs from `/work/bounce` with its Claude Code config in `/work/.claude`, so no home-folder path shows. Record it again when the report format changes.
+- **`blend-by-default` skips fully opaque textures.** The recorded port reported `blend-by-default` for the bounce sprite, whose pixels all have alpha 255, so blending changes nothing. The card said to look for alpha values "that SDL2 ignored", which covers 255 too. It now says that fully opaque textures aren't the trap. The fix ships in the next release.
+
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (zlib), `.gitignore` and `.gitattributes`.
