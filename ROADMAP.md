@@ -114,6 +114,11 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **The README shows a real port, recorded.** VHS recorded Claude Code with the released plugin porting `samples/bounce` in WSL, sped up 4× into `docs/demo/port.gif`. It runs from `/work/bounce` with its Claude Code config in `/work/.claude`, so no home-folder path shows. Record it again when the report format changes.
 - **`blend-by-default` skips fully opaque textures.** The recorded port reported `blend-by-default` for the bounce sprite, whose pixels all have alpha 255, so blending changes nothing. The card said to look for alpha values "that SDL2 ignored", which covers 255 too. It now says that fully opaque textures aren't the trap. The fix ships in the next release.
 
+### Added during M8 (2026-10-06)
+
+- **The two larger ports are Woof! and scrcpy.** [Woof!](https://github.com/fabiangreffrath/woof), a Doom source port (C, about 165,000 lines), moved to SDL3 in one squashed commit, `cade685`, from `150f179`. About 520 of its lines touch SDL: the renderer, palette surfaces, gamepads with rumble and sensors, text input and the mouse. A Freedoom demo plays headless, so the port can run. [scrcpy](https://github.com/Genymobile/scrcpy) (C, about 31,000 lines) moved in PR #6216, ending at `dee1fd4`, from `f8e0b9b`. About 830 of its lines touch SDL, adding what Woof! lacks: SDL audio with a callback, YUV textures, OpenGL, threads and custom events. It needs an Android device to run, so building is as far as it goes. Neither uses SDL_image, SDL_mixer or SDL_ttf. Projects that keep SDL2 beside SDL3, lean on the satellite libraries or need retail game data were ruled out.
+- **The ports run in WSL Ubuntu 24.04 with SDL 3.4.18 installed**, from fresh headless Claude Code sessions on Sonnet 5 with the skill loaded from `main`. Both SDL2 originals and both maintainer ports build there first, so a build failure in a port is the port's.
+
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (zlib), `.gitignore` and `.gitattributes`.
