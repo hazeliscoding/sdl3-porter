@@ -32,7 +32,8 @@ jobs:
           libdrm-dev libgbm-dev libgl1-mesa-dev libgles2-mesa-dev libegl1-mesa-dev
 
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DSDL3_VERSION=${{ matrix.sdl3 }}
+        # Quoted, because PowerShell splits an unquoted -DNAME=3.4.16 at the first dot.
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug "-DSDL3_VERSION=${{ matrix.sdl3 }}"
 
       - name: Build
         run: cmake --build build --config Debug --parallel
