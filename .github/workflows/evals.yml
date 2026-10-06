@@ -26,6 +26,12 @@ on:
         required: false
         default: false
         type: boolean
+      model:
+        description: Model the agent runs on
+        required: false
+        default: claude-sonnet-5
+        type: choice
+        options: [claude-sonnet-5, claude-haiku-4-5-20251001]
 
 permissions:
   contents: read
@@ -72,6 +78,7 @@ jobs:
           CASE: ${{ inputs.case }}
           RUNS: ${{ inputs.runs }}
           ABLATION: ${{ inputs.ablation }}
+          MODEL: ${{ inputs.model }}
           KEEP_TEMP: ${{ inputs.traces && '1' || '' }}
         run: |
           # Keep only the token that was provided.
@@ -79,7 +86,7 @@ jobs:
           [ -n "$ANTHROPIC_API_KEY" ] || unset ANTHROPIC_API_KEY
           claude plugin eval . \
             --trust-plugin --scaffold --allow-tools Bash Write Edit \
-            --model claude-sonnet-5 --runs "$RUNS" --ablation "$ABLATION" \
+            --model "$MODEL" --runs "$RUNS" --ablation "$ABLATION" \
             ${CASE:+--case "$CASE"} ${KEEP_TEMP:+--keep-temp} \
             --no-publish --max-cost-usd 20 \
             --json results.json --report report.html
