@@ -35,7 +35,7 @@ ctest --test-dir build -C Debug --output-on-failure
 claude plugin validate .
 ```
 
-Configuring needs Python 3, and the first run downloads and builds SDL 3.4.16 and SDL 2.32.10. CI runs the same checks on Windows, Linux and macOS, against SDL 3.4.16 and again against SDL 3.2.0, the oldest release the skill supports. To try 3.2.0 locally, configure a second build with `cmake -S . -B build-sdl320 -DSDL3_VERSION=3.2.0`. A new fixture has to pass on both. Evals cost model usage, so the maintainer runs them by hand before releases.
+Configuring needs Python 3, and the first run downloads and builds SDL 3.4.16 and SDL 2.32.10. CI runs the same checks on Windows, Linux and macOS, against SDL 3.4.16 and again against SDL 3.2.0, the oldest release the skill supports. To try 3.2.0 locally, configure a second build with `cmake -S . -B build-sdl320 "-DSDL3_VERSION=3.2.0"`, with the quotes, which PowerShell needs. A new fixture has to pass on both. Evals cost model usage, so the maintainer runs them by hand before releases.
 
 ## Commits
 

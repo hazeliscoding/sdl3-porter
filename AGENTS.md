@@ -15,7 +15,7 @@ These are the working rules for agents in this repo. sdl3-porter is an agent ski
 cmake -S . -B build                                   # fetches and builds SDL 3.4.16 and 2.32.10 the first time
 cmake --build build --config Debug
 ctest --test-dir build -C Debug --output-on-failure   # originals and fixed ports pass, naive ports fail with their trap
-cmake -S . -B build-sdl320 -DSDL3_VERSION=3.2.0         # the same fixtures against the oldest supported SDL3, as CI runs them
+cmake -S . -B build-sdl320 "-DSDL3_VERSION=3.2.0"       # the same fixtures against the oldest supported SDL3, as CI runs them
 claude plugin validate .                              # plugin and marketplace manifests
 gh workflow run evals.yml -f case=port-sample -f runs=3   # evals run in GitHub Actions, never locally on Windows
 ```
