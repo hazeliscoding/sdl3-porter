@@ -10,8 +10,8 @@ Port SDL2 code to SDL3, then sweep the port for traps: code that compiles cleanl
 
 Work from SDL's documentation, never from memory. Most SDL code you have seen is SDL2, and SDL3 changed return values, ownership and defaults without changing how the code looks.
 
-- SDL's migration guide, pinned to SDL 3.4.16: `${CLAUDE_SKILL_DIR}/scripts/sdl/docs/README-migration.md`. It has one `## SDL_<header>.h` section per header. Search it for a symbol before changing code that uses it.
-- Exact SDL3 signatures: SDL 3.4.16's public headers, pinned beside the guide in `${CLAUDE_SKILL_DIR}/scripts/sdl/include/SDL3/`. Each function's comment says which version added it (`\since`), so check that against the oldest SDL3 the project supports. Never look for SDL outside the project with `find` or `locate`, whether for headers, libraries or CMake and pkg-config files. Those searches take minutes.
+- SDL's migration guide, pinned to SDL 3.4.18: `${CLAUDE_SKILL_DIR}/scripts/sdl/docs/README-migration.md`. It has one `## SDL_<header>.h` section per header. Search it for a symbol before changing code that uses it.
+- Exact SDL3 signatures: SDL 3.4.18's public headers, pinned beside the guide in `${CLAUDE_SKILL_DIR}/scripts/sdl/include/SDL3/`. Each function's comment says which version added it (`\since`), so check that against the oldest SDL3 the project supports. Never look for SDL outside the project with `find` or `locate`, whether for headers, libraries or CMake and pkg-config files. Those searches take minutes.
 
 **Scope:** core SDL3, meaning init, events, video and OpenGL, the renderer, surfaces, input, audio, timers, the filesystem and file I/O (`SDL_IOStream`). SDL_image, SDL_ttf, SDL_mixer and SDL_net are out of scope. Port their includes and nothing else, and list them in the report.
 

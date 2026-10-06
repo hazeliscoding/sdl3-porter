@@ -30,6 +30,6 @@ SDL_Palette *palette = SDL_CreateSurfacePalette(image);
 SDL_SetPaletteColors(palette, colors, 0, 256);
 ```
 
-**Source:** SDL `docs/README-migration.md`, `SDL_surface.h` section: "Indexed format surfaces no longer have a palette by default. Surfaces without a palette will copy the pixels untranslated between surfaces.", followed by the example that replaces `surface->format->palette` with `SDL_CreateSurfacePalette(surface)`. The blit error comes from `Map1toN` in SDL's `src/video/SDL_pixels.c` at `release-3.4.16`.
+**Source:** SDL `docs/README-migration.md`, `SDL_surface.h` section: "Indexed format surfaces no longer have a palette by default. Surfaces without a palette will copy the pixels untranslated between surfaces.", followed by the example that replaces `surface->format->palette` with `SDL_CreateSurfacePalette(surface)`. The blit error comes from `Map1toN` in SDL's `src/video/SDL_pixels.c` at `release-3.4.18`.
 
 **Fixture:** `fixtures/indexed-surface-no-palette/`.

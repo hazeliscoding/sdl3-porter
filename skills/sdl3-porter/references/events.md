@@ -27,7 +27,7 @@ case SDL_EVENT_DROP_FILE:
 
 For events the project queues for later, copy each string when queuing and free the copy after processing.
 
-**Source:** SDL `docs/README-migration.md`, `SDL_events.h` section: "Event memory is now managed by SDL, so you should not free the data in SDL_EVENT_DROP_FILE, and if you want to hold onto the text in SDL_EVENT_TEXT_EDITING and SDL_EVENT_TEXT_INPUT events, you should make a copy of it." When SDL frees it: `src/events/SDL_events.c` at `release-3.4.16`, where `SDL_PumpEventsInternal` starts with `SDL_FreeTemporaryMemory()`, "Free any temporary memory from old events".
+**Source:** SDL `docs/README-migration.md`, `SDL_events.h` section: "Event memory is now managed by SDL, so you should not free the data in SDL_EVENT_DROP_FILE, and if you want to hold onto the text in SDL_EVENT_TEXT_EDITING and SDL_EVENT_TEXT_INPUT events, you should make a copy of it." When SDL frees it: `src/events/SDL_events.c` at `release-3.4.18`, where `SDL_PumpEventsInternal` starts with `SDL_FreeTemporaryMemory()`, "Free any temporary memory from old events".
 
 ## SDL_RegisterEvents failure value
 

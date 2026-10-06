@@ -70,7 +70,7 @@ SDL_MixAudio(dst, src, SDL_AUDIO_S16, len, 0.5f);
 
 `SDL_MIX_MAXVOLUME` becomes `1.0f`. A volume the project keeps on SDL2's 0–128 scale converts with `volume / 128.0f`. Storing it as a float from 0 to 1 is better.
 
-**Source:** SDL `docs/README-migration.md`, `SDL_audio.h` section: "SDL_MixAudioFormat() and SDL_MIX_MAXVOLUME have been removed in favour of SDL_MixAudio(), which now takes the audio format, and a float volume between 0.0 and 1.0." `SDL_MixAudio` in `SDL_audio.h` ([wiki](https://wiki.libsdl.org/SDL3/SDL_MixAudio)): "volume ranges from 0.0 - 1.0, and should be set to 1.0 for full audio volume." The wrap comes from SDL's `src/audio/SDL_mixer.c` at `release-3.4.16`, not from the docs: it rounds `volume * 128` to an `int` without clamping it, and scales 8- and 16-bit samples within their own type before the overflow clipping the header describes. 32-bit and float samples don't overflow when scaled, so they clip.
+**Source:** SDL `docs/README-migration.md`, `SDL_audio.h` section: "SDL_MixAudioFormat() and SDL_MIX_MAXVOLUME have been removed in favour of SDL_MixAudio(), which now takes the audio format, and a float volume between 0.0 and 1.0." `SDL_MixAudio` in `SDL_audio.h` ([wiki](https://wiki.libsdl.org/SDL3/SDL_MixAudio)): "volume ranges from 0.0 - 1.0, and should be set to 1.0 for full audio volume." The wrap comes from SDL's `src/audio/SDL_mixer.c` at `release-3.4.18`, not from the docs: it rounds `volume * 128` to an `int` without clamping it, and scales 8- and 16-bit samples within their own type before the overflow clipping the header describes. 32-bit and float samples don't overflow when scaled, so they clip.
 
 **Fixture:** `fixtures/mix-volume-float/`.
 

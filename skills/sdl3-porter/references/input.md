@@ -45,7 +45,7 @@ if (gamepads) {
 
 To map gamepads to player slots, store the ID in the slot and search the slots for it, or use `SDL_GetGamepadFromID`, instead of indexing by the ID.
 
-**Source:** SDL `docs/README-migration.md`, `SDL_joystick.h` section: "SDL_JoystickID has changed from Sint32 to Uint32, with an invalid ID being 0", "Rather than iterating over joysticks using device index, there is a new function SDL_GetJoysticks()" and "SDL_AttachVirtualJoystick() now returns the joystick instance ID instead of a device index". `SDL_gamecontroller.h` section: "The SDL_EVENT_GAMEPAD_ADDED event now provides the joystick instance ID in the which member". The shared counter comes from SDL's source at `release-3.4.16`, not from the docs: joystick drivers take IDs from `SDL_GetNextObjectID()` in `src/SDL_utils.c`, which `src/video/SDL_video.c`, `src/timer/SDL_timer.c` and the sensor and haptic drivers use too.
+**Source:** SDL `docs/README-migration.md`, `SDL_joystick.h` section: "SDL_JoystickID has changed from Sint32 to Uint32, with an invalid ID being 0", "Rather than iterating over joysticks using device index, there is a new function SDL_GetJoysticks()" and "SDL_AttachVirtualJoystick() now returns the joystick instance ID instead of a device index". `SDL_gamecontroller.h` section: "The SDL_EVENT_GAMEPAD_ADDED event now provides the joystick instance ID in the which member". The shared counter comes from SDL's source at `release-3.4.18`, not from the docs: joystick drivers take IDs from `SDL_GetNextObjectID()` in `src/SDL_utils.c`, which `src/video/SDL_video.c`, `src/timer/SDL_timer.c` and the sensor and haptic drivers use too.
 
 **Fixture:** `fixtures/gamepad-index-vs-id/`.
 
@@ -82,7 +82,7 @@ SDL_StopTextInput(window);     /* when it loses focus */
 
 The migration guide warns that starting text input may show an input method editor (IME) and skip key events, so prefer turning it on only around text fields. To keep SDL2's always-on behavior, call `SDL_StartTextInput(window)` once after creating the window.
 
-**Source:** SDL `docs/README-migration.md`, `SDL_keyboard.h` section: "Text input is no longer automatically enabled when initializing video, you should call SDL_StartTextInput() when you want to receive text input and call SDL_StopTextInput() when you are done. Starting text input may shown an input method editor (IME) and cause key up/down events to be skipped, so should only be enabled when the application wants text input." SDL's `src/events/SDL_keyboard.c` at `release-3.4.16` drops text and editing events unless `SDL_TextInputActive` is true for the focused window.
+**Source:** SDL `docs/README-migration.md`, `SDL_keyboard.h` section: "Text input is no longer automatically enabled when initializing video, you should call SDL_StartTextInput() when you want to receive text input and call SDL_StopTextInput() when you are done. Starting text input may shown an input method editor (IME) and cause key up/down events to be skipped, so should only be enabled when the application wants text input." SDL's `src/events/SDL_keyboard.c` at `release-3.4.18` drops text and editing events unless `SDL_TextInputActive` is true for the focused window.
 
 **Fixture:** `fixtures/text-input-off/`.
 
@@ -152,7 +152,7 @@ If the project handles them, it has this change.
 
 **Fix:** for one step per wheel click, read `event.wheel.integer_x` and `event.wheel.integer_y`, which SDL3 adds up into whole steps the way SDL2's `x` and `y` were. They exist since SDL 3.2.12, so a project that must build against an older SDL3 has to add up `y` itself. For smooth scrolling, keep `y` and use it as a `float`.
 
-**Source:** SDL `SDL_MouseWheelEvent` in `SDL_events.h` at `release-3.4.16` ([wiki](https://wiki.libsdl.org/SDL3/SDL_MouseWheelEvent)): `float y`, and `Sint32 integer_y`, "The amount scrolled vertically, accumulated to whole scroll "ticks" (added in 3.2.12)". SDL2's struct, in `SDL_events.h` at `release-2.32.10`, has `Sint32 y` and `float preciseY`, and `SDL_SendMouseWheel` in `src/events/SDL_mouse.c` added up the whole steps.
+**Source:** SDL `SDL_MouseWheelEvent` in `SDL_events.h` at `release-3.4.18` ([wiki](https://wiki.libsdl.org/SDL3/SDL_MouseWheelEvent)): `float y`, and `Sint32 integer_y`, "The amount scrolled vertically, accumulated to whole scroll "ticks" (added in 3.2.12)". SDL2's struct, in `SDL_events.h` at `release-2.32.10`, has `Sint32 y` and `float preciseY`, and `SDL_SendMouseWheel` in `src/events/SDL_mouse.c` added up the whole steps.
 
 ## Gamepad rumble
 

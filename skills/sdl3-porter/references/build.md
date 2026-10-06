@@ -1,6 +1,6 @@
 # Build systems
 
-How to move a project's build from SDL2 to SDL3. Facts come from SDL's docs at `release-3.4.16` and sdl2-compat's README at `release-2.32.72`. Where SDL's docs are silent, this file says so. Don't fill those gaps from memory.
+How to move a project's build from SDL2 to SDL3. Facts come from SDL's docs at `release-3.4.18` and sdl2-compat's README at `release-2.32.72`. Where SDL's docs are silent, this file says so. Don't fill those gaps from memory.
 
 ## Contents
 
@@ -53,8 +53,8 @@ FetchContent provides the same targets. SDL's docs have no FetchContent example;
 include(FetchContent)
 FetchContent_Declare(
   SDL3
-  URL https://github.com/libsdl-org/SDL/releases/download/release-3.4.16/SDL3-3.4.16.tar.gz
-  URL_HASH SHA256=7322236cd12090c3eb40b9728be4d49c76f66ad17d04369584d4ecad5cf77c68
+  URL https://github.com/libsdl-org/SDL/releases/download/release-3.4.18/SDL3-3.4.18.tar.gz
+  URL_HASH SHA256=9c75cf16330322c217dedd2e0609f1124f1b54b8633e763467b4684d0f4334a3
 )
 FetchContent_MakeAvailable(SDL3)
 ```
@@ -70,11 +70,11 @@ Source: `docs/README-cmake.md` ("Using a vendored SDL", "SDL-specific CMake opti
 | SDL2 | SDL3 |
 |---|---|
 | `pkg-config --cflags --libs sdl2` | `pkg-config --cflags --libs sdl3` |
-| `sdl2-config --cflags --libs` | `pkg-config --cflags --libs sdl3`. SDL 3.4.16 installs no `sdl3-config` script. |
+| `sdl2-config --cflags --libs` | `pkg-config --cflags --libs sdl3`. SDL 3.4.18 installs no `sdl3-config` script. |
 | Autotools `PKG_CHECK_MODULES([SDL2], [sdl2])` | `PKG_CHECK_MODULES([SDL3], [sdl3])` |
 | `-lSDL2main -lSDL2` | `-lSDL3`, with no main library |
 
-Source: `docs/README-migration.md` (intro), `cmake/sdl3.pc.in`. The absence of `sdl3-config` comes from the 3.4.16 `CMakeLists.txt`, not from a doc.
+Source: `docs/README-migration.md` (intro), `cmake/sdl3.pc.in`. The absence of `sdl3-config` comes from the 3.4.18 `CMakeLists.txt`, not from a doc.
 
 ## Includes
 

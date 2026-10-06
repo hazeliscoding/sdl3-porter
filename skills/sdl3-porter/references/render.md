@@ -133,7 +133,7 @@ SDL_Vertex v = { { 10, 10 }, { 1.0f, 128 / 255.0f, 0.0f, 1.0f }, { 0, 0 } };
 v.color.a = sprite_color.a / 255.0f;
 ```
 
-**Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "SDL_Vertex has been changed to use floating point colors, in the range of [0..1] for SDR content." The clamp comes from SDL's software renderer, in `src/render/software/SDL_render_sw.c` at `release-3.4.16`.
+**Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "SDL_Vertex has been changed to use floating point colors, in the range of [0..1] for SDR content." The clamp comes from SDL's software renderer, in `src/render/software/SDL_render_sw.c` at `release-3.4.18`.
 
 **Fixture:** `fixtures/vertex-color-float/`.
 
