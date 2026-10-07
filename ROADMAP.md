@@ -241,7 +241,7 @@ All seven pass CI on Linux, Windows and macOS. Their eval cases haven't run yet.
 
 ## M8: Evidence
 
-- [ ] Run every eval case 5 times with and without the skill, on Sonnet 5 and on Haiku 4.5, and show both models in the README table.
+- [x] Run every eval case 5 times with and without the skill, on Sonnet 5 and on Haiku 4.5, and show both models in the README table.
 - [x] Port two public SDL2 projects of 10,000 lines or more in local clones, against their maintainers' own SDL3 ports where they exist, and log them in `docs/dogfooding.md`.
 - [x] Turn every miss into a trap, a reference fix or a Later item, as in M4.
 - [ ] Release 0.4.0.
