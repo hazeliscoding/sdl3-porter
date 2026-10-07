@@ -24,7 +24,10 @@ MAX_HITS = 40
 
 
 def sections(references):
-    """Yields (file name, section title, [compiled patterns]) for every section with a search."""
+    """Yields (file name, section title, [compiled patterns], section text) for every section with a search.
+
+    The text leaves out the Source and Fixture paragraphs, which a verdict doesn't need.
+    """
     for md in sorted(references.glob("*.md")):
         text = md.read_text(encoding="utf-8")
         for part in re.split(r"^## ", text, flags=re.M)[1:]:
@@ -35,7 +38,9 @@ def sections(references):
             blocks = re.findall(r"```[^\n]*\n(.*?)```", search.group(1), re.S)
             lines = [line.strip() for block in blocks for line in block.splitlines() if line.strip()]
             if lines:
-                yield md.name, title, [re.compile(line) for line in lines]
+                body = re.split(r"\n\*\*(?:Source|Fixture):\*\*", part, maxsplit=1)[0]
+                body = "\n".join(body.splitlines()[1:]).strip()
+                yield md.name, title, [re.compile(line) for line in lines], body
 
 
 def hint_notes():
@@ -131,7 +136,7 @@ def main():
     hints = hint_notes()
     quiet = []
     matched = 0
-    for name, title, patterns in sections(Path(args.references)):
+    for name, title, patterns, body in sections(Path(args.references)):
         hits = []
         for f in files:
             for label, lines in (("", current[f]), (" (HEAD)", heads.get(f))):
@@ -149,11 +154,11 @@ def main():
             print(hit)
         if len(hits) > MAX_HITS:
             print(f"... and {len(hits) - MAX_HITS} more; run this section's search for the rest")
-        print()
+        print(f"\n--- {title}, from {name} ---\n{body}\n")
     if quiet:
         print("No hits: " + "; ".join(quiet))
     if matched:
-        print(f"\n{matched} section{'s' if matched != 1 else ''} with hits. Read each one in its file, and write a verdict "
+        print(f"\n{matched} section{'s' if matched != 1 else ''} with hits, each printed in full above. Write a verdict "
               "for each before moving on: fixed, no change needed with the reason, or needs a human.")
 
 

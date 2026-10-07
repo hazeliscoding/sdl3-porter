@@ -119,7 +119,7 @@ It prints the hits for each section, including hits in the SDL2 version git has 
 
 Then work through the sections with hits, one at a time:
 
-1. Read the section in its file.
+1. Read the section, which the script prints in full under its hits. Without the script, read it in its file, all of it.
 2. Read every hit in context, and decide.
 3. Write the verdict down before moving on: fixed, with `file:line` and the trap id; no change needed, with the reason; or needs a human. Guidance sections have no id: put their fixes under `Also changed:`, and the choices they leave to the owner under `Needs a human:`.
 
