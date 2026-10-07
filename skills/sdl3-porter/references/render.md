@@ -170,7 +170,7 @@ float game_x, game_y;
 SDL_RenderCoordinatesFromWindow(renderer, mouse_x, mouse_y, &game_x, &game_y);
 ```
 
-`SDL_RenderCoordinatesToWindow` converts the other way, `SDL_ConvertEventToRenderCoordinates` converts an event in place (see `mouse-logical-coords`), and `SDL_GetRenderLogicalPresentationRect` gives the letterboxed area in window pixels.
+`SDL_RenderCoordinatesToWindow` converts the other way, `SDL_ConvertEventToRenderCoordinates` converts an event in place (see `mouse-logical-coords`), and `SDL_GetRenderLogicalPresentationRect` gives the letterboxed area in window pixels. Don't work the scale out yourself from `SDL_GetRenderOutputSize`, `SDL_GetCurrentRenderOutputSize` or the window size: that misses the letterbox offset, and on a high-DPI display the output size is in pixels while mouse positions are in window coordinates.
 
 **Source:** SDL `docs/README-migration.md`, `SDL_render.h` section: "SDL_RenderSetLogicalSize() (now called SDL_SetRenderLogicalPresentation()) in SDL2 would modify the scaling and viewport state. In SDL3, logical presentation maintains its state separately, so the app can use its own viewport and scaling while also setting a logical size."
 

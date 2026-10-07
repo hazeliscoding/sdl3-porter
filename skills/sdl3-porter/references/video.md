@@ -54,7 +54,7 @@ float hz = mode->refresh_rate;                                        /* mode is
 SDL_GetWindowFullscreenMode\s*\(
 ```
 
-Check what each caller wants. The mode the display runs in now, with its refresh rate and resolution, comes from `SDL_GetCurrentDisplayMode`. Only code that sets up exclusive fullscreen wants `SDL_GetWindowFullscreenMode`, and it has to treat NULL as fullscreen on the desktop.
+Check what each caller wants. The mode the display runs in now, with its refresh rate and resolution, comes from `SDL_GetCurrentDisplayMode`. Only code that sets up exclusive fullscreen wants `SDL_GetWindowFullscreenMode`, and it has to treat NULL as fullscreen on the desktop. Adding a NULL check to the old call isn't a fix: a window that isn't in exclusive fullscreen always gets NULL, so the code silently takes its fallback, such as a fixed 60 Hz.
 
 **Fix:** ask the display:
 
