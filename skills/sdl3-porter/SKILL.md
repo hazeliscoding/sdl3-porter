@@ -93,11 +93,17 @@ Some strings that SDL2 handed over for you to free are now `const` in SDL3, beca
 
 ### 6. Sweep for traps
 
-Code that compiles can still be wrong. For each subsystem the project uses, read its file and check every trap and guidance section in it against all ported files:
+Code that compiles can still be wrong. Every trap and guidance section in the files below has a "How to find it" search. Run them all at once over the project's own sources:
+
+```sh
+python3 "${CLAUDE_SKILL_DIR}/scripts/find_traps.py" src include
+```
+
+It prints the hits for each section, including hits in the SDL2 version git has committed, marked `(HEAD)`, and lists the sections with no hits. It reads only C, C++ and Objective-C sources, so hints set in config files or the environment still need `hints.md`'s own check. Without Python, run each section's search yourself.
 
 | Subsystem | File |
 |---|---|
-| Init and error handling (always read) | [references/init.md](references/init.md) |
+| Init and error handling | [references/init.md](references/init.md) |
 | Events | [references/events.md](references/events.md) |
 | Windows, displays and display modes | [references/video.md](references/video.md) |
 | Mouse, keyboard, text input, joysticks and gamepads | [references/input.md](references/input.md) |
@@ -107,13 +113,13 @@ Code that compiles can still be wrong. For each subsystem the project uses, read
 | Audio | [references/audio.md](references/audio.md) |
 | Hints, set in code, the environment or config files | [references/hints.md](references/hints.md) |
 
-Work through the sections one at a time, not as one batch of searches. For each trap and guidance section:
+Then work through the sections with hits, one at a time:
 
-1. Run its "How to find it" search.
+1. Read the section in its file.
 2. Read every hit in context, and decide.
 3. Write the verdict down before moving on: fixed, with `file:line` and the trap id; no change needed, with the reason; or needs a human. Guidance sections have no id: put their fixes under `Also changed:`, and the choices they leave to the owner under `Needs a human:`.
 
-A hit you can't explain away is a fix. For example, code that handles text events but never calls `SDL_StartTextInput` needs the call, whatever else it does with text.
+A section with no hits needs no verdict. A hit you can't explain away is a fix. For example, code that handles text events but never calls `SDL_StartTextInput` needs the call, whatever else it does with text.
 
 ### 7. Build and run
 
