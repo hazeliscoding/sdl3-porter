@@ -234,3 +234,24 @@ set_tests_properties(trap-cards-orphan-card PROPERTIES
 set_tests_properties(trap-cards-orphan-fixture PROPERTIES
   PASS_REGULAR_EXPRESSION "fixture folder without a trap card: orphan-fixture"
 )
+
+# Every trap card's search finds its own naive fixture, so the skill's
+# one-command sweep, find_traps.py, can't miss a known trap.
+set(find_traps "${CMAKE_CURRENT_SOURCE_DIR}/skills/sdl3-porter/scripts/find_traps.py")
+add_test(NAME trap-searches
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-searches.py
+          ${find_traps} ${references} ${fixtures}
+)
+
+# Positive control: without init.md, the bool-returns search is gone.
+set(searchless "${CMAKE_CURRENT_BINARY_DIR}/trap-searches-missing")
+file(REMOVE_RECURSE "${searchless}")
+file(COPY "${references}/" DESTINATION "${searchless}")
+file(REMOVE "${searchless}/init.md")
+add_test(NAME trap-searches-missing
+  COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-searches.py
+          ${find_traps} ${searchless} ${fixtures}
+)
+set_tests_properties(trap-searches-missing PROPERTIES
+  PASS_REGULAR_EXPRESSION "bool-returns: its search finds nothing in fixtures/bool-returns/naive"
+)
