@@ -130,6 +130,11 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **Two batch scripts ran twice over.** Stopping a background batch didn't stop its script, and GitHub sometimes started a run while reporting the dispatch as failed. That cost one duplicate Sonnet run (about $4.50), several cancelled duplicates and an hour of GitHub API limits. The eval batch scripts now match runs by title, poll slowly and re-dispatch only when no run appeared.
 - **Four new guidance sections come from the ports:** gamepad button numbers above 20 and fractional mouse motion from Woof!, and the YUV color space and OpenGL ES 2 texture IDs from scrcpy. None can be a trap: the first needs a project's own button list, the second injected relative motion, and the SDL2 calls behind the last two don't compile in SDL3.
 
+### Added during M9 (2026-10-07)
+
+- **The sweep starts with one command.** `scripts/find_traps.py` runs every trap and guidance search over the project, and over the SDL2 version at git's HEAD, and prints the hits by section. `SKILL.md` step 6 asks for verdicts only on sections with hits. A new test checks that every trap card's search finds its own naive fixture. Running the script on Woof!'s port showed that seven searches missed pointer access such as `ev->gbutton.button`, which is why the Nintendo button guidance never fired there; they now use word boundaries.
+- **Hint hits say what SDL3 did with the hint.** In a traced check of the whole-program case after the change ($3.09), Haiku 4.5 finished within 60 turns in 2 of 5 runs, up from 1 of 5 in M8's batch, and still scored 0.87. All five runs left the removed `SDL_RENDER_SCALE_QUALITY` hint in place, though the script had listed it, and none gave that section a verdict. The script now looks each quoted hint up in the bundled header and guide and prints "removed" or "renamed, use ..." under the hit.
+
 ## M0: Placeholder (as soon as possible)
 
 - [x] Add `LICENSE` (zlib), `.gitignore` and `.gitattributes`.
