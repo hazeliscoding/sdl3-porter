@@ -1,6 +1,6 @@
 {
   "name": "sdl3-porter",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Port C and C++ code from SDL2 to SDL3, and catch the changes that compile cleanly but break at runtime.",
   "author": {
     "name": "Hazel Granados",
