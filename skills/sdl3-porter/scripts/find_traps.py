@@ -130,6 +130,7 @@ def main():
 
     hints = hint_notes()
     quiet = []
+    matched = 0
     for name, title, patterns in sections(Path(args.references)):
         hits = []
         for f in files:
@@ -142,6 +143,7 @@ def main():
         if not hits:
             quiet.append(f"{name}: {title}")
             continue
+        matched += 1
         print(f"== {name}: {title} ({len(hits)} hit{'s' if len(hits) != 1 else ''})")
         for hit in hits[:MAX_HITS]:
             print(hit)
@@ -150,6 +152,9 @@ def main():
         print()
     if quiet:
         print("No hits: " + "; ".join(quiet))
+    if matched:
+        print(f"\n{matched} section{'s' if matched != 1 else ''} with hits. Read each one in its file, and write a verdict "
+              "for each before moving on: fixed, no change needed with the reason, or needs a human.")
 
 
 if __name__ == "__main__":
