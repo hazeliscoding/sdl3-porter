@@ -1,6 +1,6 @@
 ---
 name: sdl3-porter
-description: Ports C and C++ projects from SDL2 to SDL3, including build files, includes and renamed APIs, then checks the port for changes that compile cleanly but break at runtime. Use when migrating or upgrading code from SDL2 to SDL3, or when ported SDL3 code misbehaves.
+description: Ports C and C++ projects from SDL2 to SDL3, including build files, includes and renamed APIs, then checks the port for changes that compile cleanly but break at runtime. Use when migrating or upgrading code from SDL2 to SDL3, however small the program, or when ported SDL3 code misbehaves.
 license: Zlib
 ---
 
@@ -83,6 +83,8 @@ Repeat until it builds with no warnings that the SDL2 build didn't have.
 Work in batches, because each search and edit costs a turn. Look up every symbol from one round of errors in a single search, for example `grep -n -E 'SDL_CreateWindow\(|SDL_RenderTexture\(|SDL_GetTicks\('` over the headers, and the same over the guide. Make all of a file's changes in one edit where they sit close together. For a small file, writing the whole ported file at once is fine.
 
 To find out whether SDL3 is installed, ask the build: configure the project, or run `pkg-config --exists sdl3`. If SDL3 isn't installed, compile without linking instead. Compile each changed source file against the bundled headers, with the project's own include paths and defines: `cc -fsyntax-only -I"${CLAUDE_SKILL_DIR}/scripts/sdl/include"`, `c++` for C++, or `cl /Zs` with MSVC. The bundle leaves out `SDL_opengl.h` and SDL's other Khronos headers, so skip any file that includes them. Fix every error as above, and say in the report that the port was only syntax-checked.
+
+When an SDL3 call needs an argument that SDL2 didn't take, pass the value that keeps SDL2's behavior. The common one is `SDL_SetRenderLogicalPresentation`: SDL2's `SDL_RenderSetLogicalSize` letterboxed, so pass `SDL_LOGICAL_PRESENTATION_LETTERBOX`. Use `SDL_LOGICAL_PRESENTATION_OVERSCAN` only if the project set `SDL_HINT_RENDER_LOGICAL_SIZE_MODE` to overscan, and `SDL_LOGICAL_PRESENTATION_INTEGER_SCALE` if it called `SDL_RenderSetIntegerScale`. `SDL_LOGICAL_PRESENTATION_STRETCH` distorts the picture.
 
 Never add a cast just to make a type error go away. A cast that hides a changed type is itself a trap. For example, don't cast an `SDL_Rect *` to `SDL_FRect *`. Convert the rectangle instead.
 
