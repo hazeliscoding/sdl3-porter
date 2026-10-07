@@ -11,7 +11,7 @@ SDL's rename scripts handle most of a port, and the compiler catches most of the
 
 > **Status:** v0.4.0, tested against SDL 3.2.0 and 3.4.18, and evaluated on Sonnet 5 and Haiku 4.5. [ROADMAP.md](ROADMAP.md) has what's next.
 
-<img src="docs/demo/port.gif" width="800" alt="Claude Code loads sdl3-porter, ports the bounce sample, builds and runs it, and reports each trap it fixed by file, line and trap id">
+![Claude Code loads sdl3-porter, ports the bounce sample, builds and runs it, and reports each trap it fixed by file, line and trap id](docs/demo/port.gif)
 
 A real port of [`samples/bounce`](samples/bounce) with sdl3-porter 0.3.0 and Claude Opus 5.5, sped up 4×.
 
@@ -51,7 +51,11 @@ In Claude Code, add the marketplace and install the plugin:
 /plugin install sdl3-porter@sdl3-porter
 ```
 
-Then open your SDL2 project and ask Claude Code to port it to SDL3. The skill loads on its own, or you can start it with `/sdl3-porter:sdl3-porter`. Commit your work first, because the port is meant to be reviewed as a diff.
+Then open your SDL2 project and ask Claude Code to port it to SDL3. The skill loads on its own, or you can start it with `/sdl3-porter:sdl3-porter`. Commit your work first, because the port is meant to be reviewed as a diff. For example:
+
+- `Port this project from SDL2 to SDL3.`
+- `Port src/ to SDL3, keep the CMake build working, and build it.`
+- `Port this game to SDL3 and tell me what still needs checking by hand.`
 
 Python 3 on your `PATH` lets the skill run SDL's rename scripts. Without it, the agent renames by hand from the migration guide. With SDL3 installed, the skill builds the port and runs it where it can. Without SDL3, it compiles the changed files against the SDL3 headers it ships with, and its report says so.
 
