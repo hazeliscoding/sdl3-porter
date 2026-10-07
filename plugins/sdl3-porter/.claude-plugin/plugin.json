@@ -8,6 +8,9 @@
   },
   "homepage": "https://github.com/hazeliscoding/sdl3-porter",
   "repository": "https://github.com/hazeliscoding/sdl3-porter",
+  "documentationUrl": "https://github.com/hazeliscoding/sdl3-porter#readme",
+  "supportUrl": "https://github.com/hazeliscoding/sdl3-porter/issues",
+  "privacyPolicyUrl": "https://github.com/hazeliscoding/sdl3-porter/blob/main/SECURITY.md#privacy",
   "license": "Zlib",
   "keywords": ["sdl", "sdl3", "sdl2", "porting", "migration", "gamedev", "c", "cpp"]
 }
