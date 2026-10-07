@@ -72,13 +72,15 @@ The scripts only rename. They don't fix changed return values, ownership or defa
 
 ### 5. Build and fix until it compiles
 
-Build with the project's own build system. For each error:
+Build with the project's own build system. For each round of errors:
 
-1. Search the migration guide for the symbol, under its header's section.
-2. Check the bundled SDL3 header for the exact signature.
+1. Search the migration guide for the symbols, under their headers' sections.
+2. Check the bundled SDL3 headers for the exact signatures.
 3. Fix the code, then rebuild.
 
 Repeat until it builds with no warnings that the SDL2 build didn't have.
+
+Work in batches, because each search and edit costs a turn. Look up every symbol from one round of errors in a single search, for example `grep -n -E 'SDL_CreateWindow\(|SDL_RenderTexture\(|SDL_GetTicks\('` over the headers, and the same over the guide. Make all of a file's changes in one edit where they sit close together. For a small file, writing the whole ported file at once is fine.
 
 To find out whether SDL3 is installed, ask the build: configure the project, or run `pkg-config --exists sdl3`. If SDL3 isn't installed, compile without linking instead. Compile each changed source file against the bundled headers, with the project's own include paths and defines: `cc -fsyntax-only -I"${CLAUDE_SKILL_DIR}/scripts/sdl/include"`, `c++` for C++, or `cl /Zs` with MSVC. The bundle leaves out `SDL_opengl.h` and SDL's other Khronos headers, so skip any file that includes them. Fix every error as above, and say in the report that the port was only syntax-checked.
 
