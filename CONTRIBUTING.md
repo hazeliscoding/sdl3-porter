@@ -16,13 +16,13 @@ A change that fails one of these can still go in a reference file as guidance, l
 
 Pick a kebab-case id, such as `audio-stream-paused`. Ids are stable once added. A trap is four pieces, and CI checks that they match:
 
-1. **A card:** a `## <id>` section in `skills/sdl3-porter/references/<subsystem>.md`, with **What compiles**, **What breaks**, **How to find it**, **Fix** and **Source** parts. **How to find it** holds a code block with one Python regular expression per line, which `scripts/find_traps.py` runs, and it must find the naive fixture. Add the file to the table in `SKILL.md` step 6 if it's new.
+1. **A card:** a `## <id>` section in `plugins/sdl3-porter/skills/sdl3-porter/references/<subsystem>.md`, with **What compiles**, **What breaks**, **How to find it**, **Fix** and **Source** parts. **How to find it** holds a code block with one Python regular expression per line, which `scripts/find_traps.py` runs, and it must find the naive fixture. Add the file to the table in `SKILL.md` step 6 if it's new.
 2. **Three fixtures** in `fixtures/<id>/`: `sdl2/main.c`, the original against SDL 2.32; `naive/main.c`, the port that keeps the trap; and `fixed/main.c`, the correct port. Each is a small C program that tests one behavior.
    - A failing check exits non-zero and prints one line that starts with the trap id, such as `bool-returns: SDL_Init reported failure`. Failures in setup, such as a window that doesn't open, start with `setup:` instead.
    - In the naive fixture, one comment at the trap line saying what SDL3 changed is enough.
    - The original and the fixed port must pass, and the naive port must fail with its trap's line or crash.
 3. **A sample:** `samples/<id>/CMakeLists.txt` and `samples/<id>/src/main.c`, a plausible SDL2 program that contains the trap. Give it a neutral name and no self-check, so it doesn't point the model at the trap.
-4. **An eval case** in `evals/<id>/`: `case.yaml`, a `scaffold.sh` that copies the sample, a `skill-fired.md` grader, and one or more regex graders named `trap-*.md` that check the fix. Each trap grader must fail on a port that only ran SDL's rename scripts.
+4. **An eval case** in `plugins/sdl3-porter/evals/<id>/`: `case.yaml`, a `scaffold.sh` that copies the sample, a `skill-fired.md` grader, and one or more regex graders named `trap-*.md` that check the fix. Each trap grader must fail on a port that only ran SDL's rename scripts.
 
 Copy an existing trap, such as `blend-by-default`, as a starting point.
 
@@ -33,6 +33,7 @@ cmake -S . -B build
 cmake --build build --config Debug
 ctest --test-dir build -C Debug --output-on-failure
 claude plugin validate .
+claude plugin validate plugins/sdl3-porter
 ```
 
 Configuring needs Python 3, and the first run downloads and builds SDL 3.4.18 and SDL 2.32.10. CI runs the same checks on Windows, Linux and macOS, against SDL 3.4.18 and again against SDL 3.2.0, the oldest release the skill supports. To try 3.2.0 locally, configure a second build with `cmake -S . -B build-sdl320 "-DSDL3_VERSION=3.2.0"`, with the quotes, which PowerShell needs. A new fixture has to pass on both. Evals cost model usage, so the maintainer runs them by hand before releases.

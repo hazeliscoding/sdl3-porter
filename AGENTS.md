@@ -16,7 +16,8 @@ cmake -S . -B build                                   # fetches and builds SDL 3
 cmake --build build --config Debug
 ctest --test-dir build -C Debug --output-on-failure   # originals and fixed ports pass, naive ports fail with their trap
 cmake -S . -B build-sdl320 "-DSDL3_VERSION=3.2.0"       # the same fixtures against the oldest supported SDL3, as CI runs them
-claude plugin validate .                              # plugin and marketplace manifests
+claude plugin validate .                              # the marketplace manifest
+claude plugin validate plugins/sdl3-porter            # the plugin manifest
 gh workflow run evals.yml -f case=port-sample -f runs=3 -f model=claude-sonnet-5   # evals run in GitHub Actions, never locally on Windows
 ```
 
@@ -31,11 +32,13 @@ The skill is only worth trusting if these hold.
 - **No trap without fixtures.** A trap card needs `fixtures/<id>/sdl2/`, `naive/` and `fixed/`. The naive fixture is the positive control: it must fail in CI, and `cmake/run-naive.cmake` passes its test only on that failure. The SDL2 original must pass against SDL 2.32. A trap without a failing naive fixture isn't done.
 - **Compiles cleanly, then breaks.** A trap's naive fixture must compile against SDL3 with warnings as errors (`-Wall -Wextra -Werror`, `/W4 /WX`). If it doesn't compile, or any compiler warns about it, the compiler already catches it, so it goes in a reference file, not a trap card. Never silence a warning in a naive fixture to make it qualify.
 - **Cite the source.** Every trap card links the README-migration section or SDL wiki page it rests on. If you can't find one, don't add the trap.
-- **Don't edit bundled SDL files.** Everything under `skills/sdl3-porter/scripts/sdl/` is byte-identical to the SDL tag named in its `SOURCE` file. To update, copy fresh files from a new tag, update `SOURCE` and record a decision.
+- **Don't edit bundled SDL files.** Everything under `plugins/sdl3-porter/skills/sdl3-porter/scripts/sdl/` is byte-identical to the SDL tag named in its `SOURCE` file. To update, copy fresh files from a new tag, update `SOURCE` and record a decision.
 - **Headless and offline.** Fixtures run without a display, audio hardware, gamepads or network: the offscreen video driver, dummy or disk audio, the virtual joystick API and the software renderer. A fixture that needs real hardware isn't a fixture.
 - **The skill never calls a port done without building it.** When the project has tests or a runnable target, the skill runs them too.
 
 ## Skill and trap conventions
+
+- The plugin lives in `plugins/sdl3-porter/`: its manifest, `skills/`, `evals/` and icon. Keep everything else outside it, including CI, docs, fixtures, samples and tools. Anthropic's plugin directory scans the whole plugin folder, and installs download it.
 
 - `SKILL.md` holds the workflow and stays under 500 lines. Detail goes in `references/`, one file per subsystem, so the agent loads only what the project uses.
 - A trap card has **What compiles**, **What breaks**, **How to find it**, **Fix** and **Source** sections.
@@ -66,7 +69,7 @@ The skill is only worth trusting if these hold.
 
 ## Working style
 
-- **Releases:** installed plugins only update when `version` in `.claude-plugin/plugin.json` changes. A release bumps it, tags `vX.Y.Z` and publishes a GitHub release. Don't bump it outside a release.
+- **Releases:** installed plugins only update when `version` in `plugins/sdl3-porter/.claude-plugin/plugin.json` changes. A release bumps it, tags `vX.Y.Z` and publishes a GitHub release. Don't bump it outside a release.
 - **Commits:** [Conventional Commits](https://www.conventionalcommits.org/) (`feat:`, `fix:`, `docs:`, `chore:`, `test:`, `ci:`, `build:`, `refactor:`). Keep each commit atomic, and use a scope when it adds clarity (`feat(skill): …`, `test(fixtures): …`).
 - **No AI attribution** in commits or PRs. That means no `Co-Authored-By` trailers, no "Generated with" lines and no session links.
 - **`AGENTS.md`, `CLAUDE.md` and `.claude-plugin/` are committed.** `.gitignore` un-ignores them, overriding the global gitignore. Keep them free of secrets and private paths.
