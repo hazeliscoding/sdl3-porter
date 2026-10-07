@@ -126,7 +126,7 @@ v.color.a = sprite_color.a;                                       /* a 0-255 byt
 
 ```
 SDL_Vertex|SDL_RenderGeometry\b
-\.color\.(r|g|b|a)\s*=
+\bcolor\.(r|g|b|a)\s*=
 ```
 
 Check that every vertex color is a float from 0 to 1. `SDL_RenderGeometryRaw` takes `SDL_FColor` as well, so the compiler catches a byte color array passed to it.

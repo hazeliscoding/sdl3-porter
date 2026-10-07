@@ -9,7 +9,7 @@ Read this when the project polls SDL events, which nearly every project does. No
 **How to find it:** search the ported sources for the fields that point to event memory:
 
 ```
-\.text\.text|\.edit\.text|\.drop\.(data|source)
+\btext\.text\b|\bedit\.text\b|\bdrop\.(data|source)\b
 ```
 
 For each hit, check whether the pointer, or an `SDL_Event` that holds it, outlives the current poll cycle: a global or `static`, a struct field, an event queue or list, or another thread. Using the text inside the `while (SDL_PollEvent(&event))` loop, or copying it there, is fine.

@@ -66,7 +66,7 @@ while (SDL_PollEvent(&event)) {
 **How to find it:** search the ported sources for text events, and for the calls that control text input:
 
 ```
-SDL_EVENT_TEXT_(INPUT|EDITING)|\.text\.text|\.edit\.text
+SDL_EVENT_TEXT_(INPUT|EDITING)|\btext\.text\b|\bedit\.text\b
 SDL_(Start|Stop)TextInput|SDL_TextInputActive
 ```
 
@@ -132,7 +132,7 @@ For a point that doesn't come from an event, use `SDL_RenderCoordinatesFromWindo
 
 ```
 SDL_GAMEPAD_BUTTON_(SOUTH|EAST|WEST|NORTH)\b
-\.gbutton\.button\b|SDL_GetGamepadButton\s*\(
+\bgbutton\.button\b|SDL_GetGamepadButton\s*\(
 ```
 
 If the project handles gamepad buttons at all, it has this change. Projects with their own button enum, numbered like SDL's, never name the face buttons: buttons 0 to 3 are South, East, West and North. Look for code that already treats Nintendo controllers differently, such as a check of `SDL_GetGamepadType`, because it may have corrected for SDL2's label order.
@@ -164,8 +164,8 @@ Mouse motion changed the same way. Positions and relative motion are `float`, an
 **How to find it:** search the ported sources for wheel amounts and relative motion:
 
 ```
-\.wheel\.(x|y)\b
-\.motion\.(xrel|yrel)\b|SDL_GetRelativeMouseState\s*\(
+\bwheel\.(x|y)\b
+\bmotion\.(xrel|yrel)\b|SDL_GetRelativeMouseState\s*\(
 ```
 
 **Fix:** for one step per wheel click, read `event.wheel.integer_x` and `event.wheel.integer_y`, which SDL3 adds up into whole steps the way SDL2's `x` and `y` were. They exist since SDL 3.2.12, so a project that must build against an older SDL3 has to add up `y` itself. For smooth scrolling, keep `y` and use it as a `float`. Keep relative motion as `float`, or carry the remainder over to the next frame when the game needs whole pixels.
