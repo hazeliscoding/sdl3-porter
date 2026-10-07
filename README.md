@@ -66,6 +66,15 @@ Python 3 on your `PATH` lets the skill run SDL's rename scripts. Without it, the
 - **Claude Code.** The skill is also a plain Agent Skill, but no other harness has been tested.
 - **Out of scope:** SDL_image, SDL_ttf, SDL_mixer and SDL_net, whose includes the skill ports and whose calls it leaves for you; SDL 1.2; and language bindings.
 
+Known gaps:
+
+- **Some changes are guidance, not proven traps.** Nintendo face buttons, rumble, exclusive fullscreen, high DPI, asynchronous window operations, direct OpenGL, YUV color, Apple app bundles and a few more need hardware or a platform no headless test has. The skill checks them by reading the code.
+- **Five rarer traps are still candidates:** `event-timestamp-ns`, `target-state-persists`, `blit-dstrect-unchanged`, `render-output-size-logical` and `resized-on-set-size`. The skill doesn't check for them yet. Each becomes a trap when real code shows it.
+- **Other platforms' code isn't compiled.** The skill ports SDL calls inside `#ifdef` blocks for systems it can't build on, and says so in its report.
+- **Some things need a person:** sound, real gamepads, real displays and anything that needs a device.
+- **Smaller models struggle more on large ports.** On the whole-game eval, Haiku 4.5 often reaches the 60-turn limit.
+- **Writing new SDL3 code isn't covered,** including main callbacks and the GPU API. The skill ports existing code.
+
 ## What it does
 
 - **Decides whether to port.** If you only need your SDL2 game to run on SDL3, it recommends [sdl2-compat](https://github.com/libsdl-org/sdl2-compat) and asks before porting.
