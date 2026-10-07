@@ -263,7 +263,7 @@ All seven pass CI on Linux, Windows and macOS. Their eval cases haven't run yet.
 - [x] Cut the sweep's turn count so Haiku 4.5 finishes the whole-program case within its 60 turns, for example with one command that runs every trap and guidance search and prints the hits. The full eval rerun before 1.0 measures it. Partly met: the score rose to 0.92, but 3 of 5 runs still reach the limit.
 - [ ] List the plugin in plugin directories.
 - [ ] Publish the write-up: how the skill was built and tested, the eval results with and without it, the header search that hung the evals, and how its ports compare with maintainers' own SDL3 migrations.
-- [ ] Set `plugin.json` to 1.0.0, tag it and publish a GitHub release.
+- [x] Set `plugin.json` to 1.0.0, tag it and publish a GitHub release.
 
 **Done when:** 1.0.0 is released, CI is green, and every open "missed trap" issue has a decision.
 
