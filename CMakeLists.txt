@@ -255,3 +255,17 @@ add_test(NAME trap-searches-missing
 set_tests_properties(trap-searches-missing PROPERTIES
   PASS_REGULAR_EXPRESSION "bool-returns: its search finds nothing in fixtures/bool-returns/naive"
 )
+
+# find_traps.py notes which hint strings SDL3 removed or renamed, from the
+# bundled header and guide. These break if either file's format changes.
+foreach(kind IN ITEMS removed renamed)
+  add_test(NAME find-traps-hint-${kind}
+    COMMAND ${Python3_EXECUTABLE} ${find_traps} ${CMAKE_CURRENT_SOURCE_DIR}/samples/hint-string-ignored/src
+  )
+endforeach()
+set_tests_properties(find-traps-hint-removed PROPERTIES
+  PASS_REGULAR_EXPRESSION "SDL_RENDER_SCALE_QUALITY. is not an SDL3 hint: removed"
+)
+set_tests_properties(find-traps-hint-renamed PROPERTIES
+  PASS_REGULAR_EXPRESSION "SDL_ALLOW_TOPMOST. is not an SDL3 hint: renamed, use SDL_HINT_WINDOW_ALLOW_TOPMOST"
+)

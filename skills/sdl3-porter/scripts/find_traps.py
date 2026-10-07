@@ -18,6 +18,7 @@ import sys
 from pathlib import Path
 
 REFERENCES = Path(__file__).resolve().parent.parent / "references"
+SDL = Path(__file__).resolve().parent / "sdl"
 SOURCES = {".c", ".cc", ".cpp", ".cxx", ".c++", ".h", ".hh", ".hpp", ".hxx", ".inl", ".m", ".mm"}
 MAX_HITS = 40
 
@@ -35,6 +36,40 @@ def sections(references):
             lines = [line.strip() for block in blocks for line in block.splitlines() if line.strip()]
             if lines:
                 yield md.name, title, [re.compile(line) for line in lines]
+
+
+def hint_notes():
+    """Returns a function that says what SDL3 did with each hint name a line quotes or sets.
+
+    The bundled SDL_hints.h gives SDL3's hint strings, and the migration guide's
+    SDL_hints.h section lists the hints SDL3 renamed and removed. A hint's string
+    is its macro name with SDL_HINT_ replaced by SDL_.
+    """
+    try:
+        header = (SDL / "include" / "SDL3" / "SDL_hints.h").read_text(encoding="utf-8")
+        guide = (SDL / "docs" / "README-migration.md").read_text(encoding="utf-8")
+    except OSError:
+        return lambda line: []
+    current = set(re.findall(r'^#define SDL_HINT_\w+\s+"(SDL_\w+)"', header, re.M))
+    section = guide.split("\n## SDL_hints.h", 1)[-1].split("\n## ", 1)[0]
+    renamed = dict(re.findall(r"^\* (SDL_HINT_\w+) => (SDL_HINT_\w+)", section, re.M))
+    removed = {name: why for name, why in re.findall(r"^\* (SDL_HINT_\w+)(?: - (.*))?$", section, re.M)}
+
+    def notes(line):
+        found = []
+        for name in dict.fromkeys(re.findall(r'"(SDL_[A-Z0-9_]+)"|\b(SDL_[A-Z0-9_]+)=', line)):
+            name = name[0] or name[1]
+            if name in current:
+                continue
+            macro = "SDL_HINT_" + name[len("SDL_"):]
+            if macro in renamed:
+                found.append(f'"{name}" is not an SDL3 hint: renamed, use {renamed[macro]}')
+            elif macro in removed:
+                why = f": {removed[macro]}" if removed[macro] else ""
+                found.append(f'"{name}" is not an SDL3 hint: removed{why}')
+        return found
+
+    return notes
 
 
 def source_files(paths):
@@ -93,6 +128,7 @@ def main():
     current = {f: f.read_text(encoding="utf-8", errors="replace").splitlines() for f in files}
     heads = head_versions(files)
 
+    hints = hint_notes()
     quiet = []
     for name, title, patterns in sections(Path(args.references)):
         hits = []
@@ -101,6 +137,8 @@ def main():
                 for number, line in enumerate(lines or [], 1):
                     if any(p.search(line) for p in patterns):
                         hits.append(f"{f.as_posix()}:{number}{label}: {line.strip()[:160]}")
+                        if title == "hint-string-ignored":
+                            hits.extend(f"    ^ {note}" for note in hints(line))
         if not hits:
             quiet.append(f"{name}: {title}")
             continue

@@ -99,7 +99,7 @@ Code that compiles can still be wrong. Every trap and guidance section in the fi
 python3 "${CLAUDE_SKILL_DIR}/scripts/find_traps.py" src include
 ```
 
-It prints the hits for each section, including hits in the SDL2 version git has committed, marked `(HEAD)`, and lists the sections with no hits. It reads only C, C++ and Objective-C sources, so hints set in config files or the environment still need `hints.md`'s own check. Without Python, run each section's search yourself.
+It prints the hits for each section, including hits in the SDL2 version git has committed, marked `(HEAD)`, and lists the sections with no hits. Under a hint it adds what SDL3 did with it, when SDL3 renamed or removed it. It reads only C, C++ and Objective-C sources, so hints set in config files or the environment still need `hints.md`'s own check. Without Python, run each section's search yourself.
 
 | Subsystem | File |
 |---|---|
