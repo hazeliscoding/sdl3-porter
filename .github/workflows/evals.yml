@@ -91,7 +91,7 @@ jobs:
           # Keep only the token that was provided.
           [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ] || unset CLAUDE_CODE_OAUTH_TOKEN
           [ -n "$ANTHROPIC_API_KEY" ] || unset ANTHROPIC_API_KEY
-          claude plugin eval . \
+          claude plugin eval plugins/sdl3-porter \
             --trust-plugin --scaffold --allow-tools Bash Write Edit \
             --model "$MODEL" --runs "$RUNS" --ablation "$ABLATION" --concurrency "$CONCURRENCY" \
             ${CASE:+--case "$CASE"} ${KEEP_TEMP:+--keep-temp} \

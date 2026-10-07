@@ -54,5 +54,8 @@ jobs:
       - name: Install Claude Code
         run: npm install -g @anthropic-ai/claude-code
 
+      # The marketplace at the root, then the plugin it points to.
       - name: Validate
-        run: claude plugin validate .
+        run: |
+          claude plugin validate .
+          claude plugin validate plugins/sdl3-porter

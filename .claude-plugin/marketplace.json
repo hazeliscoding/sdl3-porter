@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "sdl3-porter",
-      "source": "./",
+      "source": "./plugins/sdl3-porter",
       "description": "Port C and C++ code from SDL2 to SDL3, and catch the changes that compile cleanly but break at runtime."
     }
   ]

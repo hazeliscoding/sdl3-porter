@@ -5,7 +5,7 @@ out/
 CMakeUserPresets.json
 
 # Eval runs
-evals/**/results/
+plugins/sdl3-porter/evals/**/results/
 
 # Python
 __pycache__/

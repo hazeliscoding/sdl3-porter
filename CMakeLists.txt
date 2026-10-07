@@ -87,7 +87,7 @@ endfunction()
 
 # The SDL files bundled with the skill must match the pinned release byte for
 # byte, so the check only runs against that release.
-set(sdl_bundle "${CMAKE_CURRENT_SOURCE_DIR}/skills/sdl3-porter/scripts/sdl")
+set(sdl_bundle "${CMAKE_CURRENT_SOURCE_DIR}/plugins/sdl3-porter/skills/sdl3-porter/scripts/sdl")
 if(SDL3_VERSION STREQUAL SDL3_PINNED)
   add_test(NAME bundled-sdl-files
     COMMAND ${CMAKE_COMMAND} -DBUNDLE_DIR=${sdl_bundle} -DSDL_SOURCE_DIR=${sdl3_SOURCE_DIR}
@@ -162,7 +162,7 @@ endforeach()
 
 # Every trap grader in the evals must fail on a port that only ran SDL's rename
 # scripts, so it can tell an unfixed trap from a fixed one.
-set(evals "${CMAKE_CURRENT_SOURCE_DIR}/evals")
+set(evals "${CMAKE_CURRENT_SOURCE_DIR}/plugins/sdl3-porter/evals")
 set(samples "${CMAKE_CURRENT_SOURCE_DIR}/samples")
 add_test(NAME eval-graders
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-eval-graders.py
@@ -202,7 +202,7 @@ add_runner_control(run-naive-other-failure bool-returns-naive other-trap "withou
 add_runner_control(run-naive-crashed crash crash "The naive port crashed, which counts as its trap")
 
 # Every trap card has fixtures, and every fixture folder has a trap card.
-set(references "${CMAKE_CURRENT_SOURCE_DIR}/skills/sdl3-porter/references")
+set(references "${CMAKE_CURRENT_SOURCE_DIR}/plugins/sdl3-porter/skills/sdl3-porter/references")
 set(fixtures "${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
 add_test(NAME trap-cards
   COMMAND ${CMAKE_COMMAND} -DREFERENCES=${references} -DFIXTURES=${fixtures}
@@ -237,7 +237,7 @@ set_tests_properties(trap-cards-orphan-fixture PROPERTIES
 
 # Every trap card's search finds its own naive fixture, so the skill's
 # one-command sweep, find_traps.py, can't miss a known trap.
-set(find_traps "${CMAKE_CURRENT_SOURCE_DIR}/skills/sdl3-porter/scripts/find_traps.py")
+set(find_traps "${CMAKE_CURRENT_SOURCE_DIR}/plugins/sdl3-porter/skills/sdl3-porter/scripts/find_traps.py")
 add_test(NAME trap-searches
   COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-searches.py
           ${find_traps} ${references} ${fixtures}
