@@ -1,6 +1,6 @@
 # Roadmap
 
-sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and catches the changes that compile cleanly but break at runtime. This file tracks what gets built, in what order, and the decisions already made.
+sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and catches the changes that compile cleanly but break at runtime. This file holds the decisions already made, what shipped and what's out of scope. Open work is in GitHub issues.
 
 ## Decisions (2026-09-27)
 
@@ -141,145 +141,29 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 - **Haiku reads reference files only partway.** The 180 Haiku transcripts show it often read the reference files with a line limit: `render.md` with a limit of 80, 100 or 150, so `logical-scale-separate`, at line 145, often went unread. The fix prints each matched section in full in `find_traps.py`'s output, so no file needs opening. It waits, unmeasured, on the `find-traps-full-sections` branch, for the next eval run.
 - **Hint hits say what SDL3 did with the hint.** In a traced check of the whole-program case after the change ($3.09), Haiku 4.5 finished within 60 turns in 2 of 5 runs and still scored 0.87. M8's batch also had 2 of 5, and the rerun behind M8's table 1 of 5, so the script alone made no clear difference. All five runs left the removed `SDL_RENDER_SCALE_QUALITY` hint in place, though the script had listed it, and none gave that section a verdict. The script now looks each quoted hint up in the bundled header and guide and prints "removed" or "renamed, use ..." under the hit. A second check ($2.95) scored 0.95: Haiku left the hint in 1 of 5 runs, and both runs that finished within the limit scored 1.00. 3 of 5 runs still reach 60 turns, so the turn count stays open until the full rerun before 1.0.
 
-## M0: Placeholder (as soon as possible)
+### Added after 1.0 (2026-10-13)
 
-- [x] Add `LICENSE` (zlib), `.gitignore` and `.gitattributes`.
-- [x] Write `README.md`, `ROADMAP.md`, `AGENTS.md` and `CLAUDE.md`.
-- [x] Brand: pick a logo option from a claude.ai design project, export `mark.svg` and `lockup.svg` with `-dark` variants to `docs/brand/`, and add the `<picture>` header to the README. Convert the text to paths.
-- [x] Plugin skeleton: `.claude-plugin/plugin.json`, `.claude-plugin/marketplace.json` and a placeholder `skills/sdl3-porter/SKILL.md`.
-- [x] Fixture harness: a top-level `CMakeLists.txt` that fetches SDL 3.4.16 and registers each `fixtures/<id>/naive` and `fixtures/<id>/fixed` program as a CTest test. Naive tests are marked `WILL_FAIL`, so a naive fixture that passes breaks the build.
-- [x] First trap, `bool-returns`: an `SDL_Init(...) != 0` check that exits on success.
-- [x] CI: configure, build and `ctest` on Linux, Windows and macOS, with the dummy video and audio drivers, plus `claude plugin validate`.
+- **Open work moves to GitHub issues.** Now that 1.0 is public, open work lives in issues, where users can find it, comment on it and react to it, and each release gets a GitHub milestone. This file keeps the decisions, a line per shipped milestone and what's out of scope. The Later list became #5 to #11, the five niche trap candidates #12 to #16, and the directory listing #4. There's no Projects board: with one maintainer, the issues and the milestone already show where things stand.
+- **v1.1 closes Haiku 4.5's known gaps.** It runs the Evals workflow as a matrix (#1), measures and merges `find-traps-full-sections` (#2), then moves to the latest SDL 3 and releases after a full rerun (#3). SDL_image, SDL_ttf and SDL_mixer (#5) are the likely v1.2, because they need more work than one minor release should hold.
 
-**Done when:** CI is green on all three platforms, with `bool-returns` naive failing and fixed passing, and the plugin installs from its local marketplace and `/sdl3-porter` loads in Claude Code.
+## Shipped
 
-## M1: Porting workflow
+Each milestone's checklist is in git history.
 
-- [x] `SKILL.md` workflow, under 500 lines: survey, port or sdl2-compat, build system, renames, compile loop, trap sweep, report. Details go in `references/`.
-- [x] `references/build.md`: `find_package(SDL3)`, FetchContent, pkg-config, include paths, `SDL_main.h`, and copying the SDL3 DLL on Windows.
-- [x] Bundle `scripts/sdl/build-scripts/` (the three rename scripts), `scripts/sdl/include/SDL3/SDL_oldnames.h` and `scripts/sdl/docs/README-migration.md` from `release-3.4.16`, with SDL's license text and a `SOURCE` file naming the tag.
-- [x] CI check: the bundled files are byte-identical to the tag.
-- [x] A sample SDL2 program that uses video, the renderer, input and audio, for the whole-port eval.
-- [x] Eval `port-sample`: the skill fires, no SDL2 include remains, `SDL3/SDL.h` and `SDL3/SDL_main.h` are included, and the CMake file finds SDL3.
-- [x] `Evals` workflow: a manual GitHub Actions job on Ubuntu that runs `claude plugin eval`.
-- [x] Add a `CLAUDE_CODE_OAUTH_TOKEN` or `ANTHROPIC_API_KEY` repository secret (owner), then run `port-sample` 3 times.
+- **M0: Placeholder.** The repo, the brand, a fixture harness, the first trap (`bool-returns`) and CI on Linux, Windows and macOS.
+- **M1: Porting workflow.** The `SKILL.md` workflow, SDL's rename scripts bundled and checked byte for byte, and the first eval case.
+- **M2: Traps.** Nine trap cards, each with SDL2, naive and fixed fixtures, and a check that cards and fixtures match.
+- **M3: Evals.** One eval case per trap plus the whole program, run with and without the skill, and the README table.
+- **M4: Dogfood.** Ports of jage, gbemu and chip8, logged in `docs/dogfooding.md`. `blend-by-default` came from gbemu.
+- **M5: v0.1.0.** The first release, installed and checked on a clean machine.
+- **M6: Coverage.** Seven more traps, guidance for what no fixture can prove, and 0.2.0.
+- **M7: Support and stability.** CI against SDL 3.2.0, the stability promise, the pin policy, SDL 3.4.18 and 0.3.0.
+- **M8: Evidence.** Evals on Sonnet 5 and Haiku 4.5, ports of Woof! and scrcpy, and 0.4.0.
+- **M9: v1.0.0.** The one-command sweep, 1.0.0 and the write-up. The directory listing continues in [#4](https://github.com/hazeliscoding/sdl3-porter/issues/4).
 
-**Done when:** the byte-identity check passes and fails on a tampered copy, and `port-sample` passes 3 of 3 runs.
+## Next
 
-## M2: Traps
-
-- [x] Trap cards in `references/<subsystem>.md`. Each has: what compiles, what breaks, how to find it, the fix and the source.
-- [x] Fixtures for each trap: `sdl2/` (builds against SDL 2.32), `naive/` and `fixed/`.
-- [x] The traps:
-
-| Area | Trap | What breaks |
-|---|---|---|
-| Init | `bool-returns` | A leftover `SDL_Init(...) != 0` treats success as failure and exits on every launch |
-| Input | `text-input-off` | Text input is no longer on by default, so no text events arrive |
-| Input | `gamepad-index-vs-id` | Functions that took a device index now take an instance ID, so an index loop opens the wrong pad or none |
-| Render | `vsync-flag-dropped` | Dropping the removed `SDL_RENDERER_PRESENTVSYNC` flag leaves the loop unthrottled |
-| Render | `linear-by-default` | The scale-quality hint is gone and textures default to linear, so pixel art blurs |
-| Render | `blend-by-default` | Textures with an alpha format now blend, so pixels written with alpha 0 vanish (added in M4) |
-| Audio | `audio-stream-paused` | A device opened with `SDL_OpenAudioDeviceStream` starts paused, so nothing plays |
-| Audio | `mix-volume-float` | An SDL2 volume (0–128) passed as `SDL_MixAudio`'s 0–1 float turns 16-bit audio into wrapped-around noise |
-| Hints | `hint-string-ignored` | Hints written as renamed or removed string literals are silently ignored |
-
-- [x] Consistency check: every trap card has a fixture folder, and every fixture folder has a trap card.
-
-**Done when:** every naive fixture fails and every fixed fixture passes, the consistency check passes and fails on a card without fixtures, and any trap that couldn't be reproduced headless has moved to guidance with a decision recorded here.
-
-## M3: Evals
-
-- [x] One eval case per trap: scaffold its sample from `samples/<id>/`, ask for a port, and grade that the skill fired, the naive pattern is gone and the fix is present.
-- [x] A whole-program case: the sample with several traps at once.
-- [x] Run every case 3 times with and without the skill in the `Evals` workflow.
-- [x] A README table of with-skill and without-skill scores per trap, with the model and the date.
-
-**Done when:** every case scores at least 0.9 with the skill across 3 runs, and the README table is generated from `aggregate-result.json`.
-
-## M4: Dogfood
-
-- [x] Port jage to SDL3 with the skill.
-- [x] Port 2 public SDL2 programs in scratch forks. No upstream PRs.
-- [x] `docs/dogfooding.md`: what it caught and what it missed. Every miss becomes a trap, a reference fix or a Later item.
-
-**Done when:** the log has at least 3 entries and every miss has been turned into one of those three.
-
-## M5: v0.1.0
-
-- [x] Run every eval case 3 times with and without the skill, and regenerate the README table.
-- [x] README quick start: install with `/plugin marketplace add hazeliscoding/sdl3-porter`, checked on a clean machine.
-- [x] Document what's supported: SDL 3.2 and later, C and C++, Claude Code. Other harnesses are untested.
-- [x] `CONTRIBUTING.md`: how to add a trap as a card, three fixtures and an eval case.
-- [x] `SECURITY.md`: the skill edits your code and runs the bundled Python scripts and your build. It downloads nothing at runtime.
-- [x] A "missed trap" issue template that asks for the SDL version, a minimal SDL2 snippet and what went wrong.
-- [x] Set `plugin.json` to 0.1.0, tag it and publish a GitHub release.
-
-**Done when:** on a clean machine, someone can install from the README, port the sample and build and run it, CI is green, and there are no known critical bugs.
-
-## M6: Coverage
-
-- [x] Widen the scope to surfaces and `SDL_IOStream` in the README, `SKILL.md` and this file.
-- [x] Add the 7 strong traps, each with a card, fixtures, a sample and an eval case:
-
-| Area | Trap | What breaks |
-|---|---|---|
-| Input | `mouse-logical-coords` | Mouse events are no longer converted to the logical size, so clicks land in the wrong place |
-| Video | `display-index-vs-id` | Display functions take an ID, not an index, so display 0 is invalid |
-| I/O | `rwread-count-vs-bytes` | `SDL_ReadIO` returns bytes, not a count of items, so a `!= 1` check fails every read |
-| Surfaces | `indexed-surface-no-palette` | Indexed surfaces no longer get a palette, so palette calls and blits fail |
-| Audio | `audio-init-implicit` | Opening audio no longer initializes the audio subsystem, so the device doesn't open |
-| Render | `vertex-color-float` | `SDL_Vertex` colors are floats from 0 to 1, so 0–255 values draw white |
-| Video | `window-mode-null` | `SDL_GetWindowFullscreenMode` returns NULL for a windowed window, which crashes on use |
-
-All seven pass CI on Linux, Windows and macOS. Their eval cases haven't run yet.
-
-- [x] Write guidance for the changes no fixture can prove: Nintendo face buttons, exclusive fullscreen, batching with direct OpenGL, mouse wheel values, high DPI, asynchronous window operations, Apple bundle paths, gamepad rumble and `SDL_RegisterEvents`.
-- [x] Keep the 6 niche candidates as candidates: `event-timestamp-ns`, `target-state-persists`, `blit-dstrect-unchanged`, `render-output-size-logical`, `logical-scale-separate` and `resized-on-set-size`. Each becomes a trap only when a port or an issue shows it in real code.
-- [x] Release 0.2.0.
-
-**Done when:** every strong candidate is either a trap whose fixtures pass in CI or guidance with a decision recorded here, and 0.2.0 is released.
-
-## M7: Support and stability
-
-- [x] Run the fixtures in CI against SDL 3.2.0 as well as the pinned 3.4 release, because the README promises 3.2 and later. A trap that behaves differently on 3.2 says so on its card.
-- [x] Pin the CI and `Evals` runners before GitHub moves `ubuntu-latest` to Ubuntu 26 on 2026-10-19, or check that their packages still install there.
-- [x] Write the stability promise in the README: what stays fixed across 1.x and what only a major version may change.
-- [x] Write down how the pinned SDL moves: to the latest 3.x release before each minor release, with the fixtures and evals run again.
-- [x] Move the pin to SDL 3.4.18, released 2026-10-02, and run the fixtures and every eval case again.
-- [x] Release 0.3.0.
-
-**Done when:** CI is green against both SDL versions, the stability promise is in the README, and 0.3.0 is released.
-
-## M8: Evidence
-
-- [x] Run every eval case 5 times with and without the skill, on Sonnet 5 and on Haiku 4.5, and show both models in the README table.
-- [x] Port two public SDL2 projects of 10,000 lines or more in local clones, against their maintainers' own SDL3 ports where they exist, and log them in `docs/dogfooding.md`.
-- [x] Turn every miss into a trap, a reference fix or a Later item, as in M4.
-- [x] Release 0.4.0.
-
-**Done when:** every case scores at least 0.9 with the skill on both models, the log has the two larger ports with every miss resolved, and 0.4.0 is released.
-
-## M9: v1.0.0
-
-- [x] Cut the sweep's turn count so Haiku 4.5 finishes the whole-program case within its 60 turns, for example with one command that runs every trap and guidance search and prints the hits. The full eval rerun before 1.0 measures it. Partly met: the score rose to 0.92, but 3 of 5 runs still reach the limit.
-- [ ] List the plugin in plugin directories.
-- [x] Publish the write-up: how the skill was built and tested, the eval results with and without it, the header search that hung the evals, and how its ports compare with maintainers' own SDL3 migrations. Published 2026-10-08 as [Every trap is proven](https://www.hazeliscoding.dev/blog/every-trap-is-proven).
-- [x] Set `plugin.json` to 1.0.0, tag it and publish a GitHub release.
-
-**Done when:** 1.0.0 is released, CI is green, and every open "missed trap" issue has a decision.
-
-## Later
-
-- A deterministic trap checker built from the trap cards' patterns, runnable in CI without a model, and a hook that runs it on every file the agent edits.
-- SDL_image 3, SDL_ttf 3 and SDL_mixer 3.
-- Writing new SDL3: main callbacks, properties and the GPU API. This is the 2.x track.
-- A visual high-DPI check, beyond M6's guidance.
-- Evals for Codex and other harnesses.
-- A catalog marketplace repo that lists this and future skills.
-- Build the port inside evals: install SDL3 on the eval runner so the agent can build its port and run it headless.
-- Measure and merge the `find-traps-full-sections` branch, which prints each matched section in full, then rerun Haiku 4.5 on `window-mode-null` and `logical-scale-separate`.
-- Run the Evals workflow as a matrix, one job per case, so a full rerun takes minutes instead of hours and needs no dispatch script.
+Open work is in [GitHub issues](https://github.com/hazeliscoding/sdl3-porter/issues). The current milestone is [v1.1](https://github.com/hazeliscoding/sdl3-porter/milestone/1): close Haiku 4.5's known gaps and make full eval reruns fast. Issues without a milestone are ideas for later, and the five trap candidates carry the `trap candidate` label.
 
 ## Not planned
 
