@@ -5,8 +5,8 @@ These are the working rules for agents in this repo. sdl3-porter is an agent ski
 ## Sources of truth
 
 - `README.md`: the pitch and the "every trap is proven" promises.
-- `ROADMAP.md`: decisions already made, the milestones, and what is out of scope. Check it before proposing features. Respect those decisions unless the owner reopens them. Record new or changed decisions there, with the date.
-- Work from the next unchecked item in `ROADMAP.md`. Don't build past the current milestone without asking.
+- `ROADMAP.md`: decisions already made, what shipped, and what is out of scope. Check it before proposing features. Respect those decisions unless the owner reopens them. Record new or changed decisions there, with the date.
+- GitHub issues: the open work. Work from the open issues in the current milestone, which `ROADMAP.md` links under **Next** (`gh issue list --milestone <name>`). Close an issue with the commit or PR that finishes it. Don't build past the current milestone without asking.
 - SDL facts come from SDL itself: `docs/README-migration.md`, the headers and the wiki at the pinned tag. Never from memory, and never from SDL2-era tutorials.
 
 ## Commands
@@ -75,5 +75,5 @@ The skill is only worth trusting if these hold.
 - **`AGENTS.md`, `CLAUDE.md` and `.claude-plugin/` are committed.** `.gitignore` un-ignores them, overriding the global gitignore. Keep them free of secrets and private paths.
 - **Checks:** automate acceptance checks instead of handing manual steps to the owner. Give every check that tests for an absence a positive control, meaning a case that proves the check can fail.
 - **Validation:** evidence comes from the evals, the dogfooding log and public async signals (issues, PRs, installs). Don't plan interviews, recruiting or outreach.
-- **Docs:** short and concise. Prefer editing `ROADMAP.md` over creating new planning documents. Repo files never reference the owner's private notes.
+- **Docs:** short and concise. Track work in GitHub issues and decisions in `ROADMAP.md`. Don't create other planning documents. Repo files never reference the owner's private notes.
 - **Code comments:** explain why, not what. In fixtures, one comment at the trap line saying what SDL3 changed is enough. Don't leave commented-out code.
