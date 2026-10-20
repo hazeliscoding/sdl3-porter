@@ -201,16 +201,19 @@ add_runner_control(run-naive-passed bool-returns-fixed bool-returns "the bool-re
 add_runner_control(run-naive-other-failure bool-returns-naive other-trap "without a line starting with \"other-trap: \"")
 add_runner_control(run-naive-crashed crash crash "The naive port crashed, which counts as its trap")
 
-# Every trap card has fixtures, and every fixture folder has a trap card.
+# Every trap card has fixtures, samples and an eval case.
 set(references "${CMAKE_CURRENT_SOURCE_DIR}/plugins/sdl3-porter/skills/sdl3-porter/references")
 set(fixtures "${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
+set(samples_dir "${CMAKE_CURRENT_SOURCE_DIR}/samples")
+set(evals_dir "${CMAKE_CURRENT_SOURCE_DIR}/plugins/sdl3-porter/evals")
 add_test(NAME trap-cards
   COMMAND ${CMAKE_COMMAND} -DREFERENCES=${references} -DFIXTURES=${fixtures}
+          -DSAMPLES=${samples_dir} -DEVALS=${evals_dir}
           -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-cards.cmake
 )
 
-# Positive controls: the check must fail on a card without fixtures, and on
-# fixtures without a card.
+# Positive controls: the check must fail on a card without fixtures, on
+# fixtures without a card, and on a card without samples or a case.
 set(orphans "${CMAKE_CURRENT_BINARY_DIR}/trap-cards-orphans")
 file(REMOVE_RECURSE "${orphans}")
 file(COPY "${references}/" DESTINATION "${orphans}/references")
@@ -220,12 +223,20 @@ foreach(dir IN LISTS fixture_dirs)
   file(MAKE_DIRECTORY "${orphans}/fixtures/${id}")
 endforeach()
 file(MAKE_DIRECTORY "${orphans}/fixtures/orphan-fixture")
+file(MAKE_DIRECTORY "${orphans}/samples")
 add_test(NAME trap-cards-orphan-card
   COMMAND ${CMAKE_COMMAND} -DREFERENCES=${orphans}/references -DFIXTURES=${fixtures}
+          -DSAMPLES=${samples_dir} -DEVALS=${evals_dir}
           -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-cards.cmake
 )
 add_test(NAME trap-cards-orphan-fixture
   COMMAND ${CMAKE_COMMAND} -DREFERENCES=${references} -DFIXTURES=${orphans}/fixtures
+          -DSAMPLES=${samples_dir} -DEVALS=${evals_dir}
+          -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-cards.cmake
+)
+add_test(NAME trap-cards-orphan-sample
+  COMMAND ${CMAKE_COMMAND} -DREFERENCES=${references} -DFIXTURES=${fixtures}
+          -DSAMPLES=${orphans}/samples -DEVALS=${evals_dir}
           -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-cards.cmake
 )
 set_tests_properties(trap-cards-orphan-card PROPERTIES
@@ -233,6 +244,9 @@ set_tests_properties(trap-cards-orphan-card PROPERTIES
 )
 set_tests_properties(trap-cards-orphan-fixture PROPERTIES
   PASS_REGULAR_EXPRESSION "fixture folder without a trap card: orphan-fixture"
+)
+set_tests_properties(trap-cards-orphan-sample PROPERTIES
+  PASS_REGULAR_EXPRESSION "trap card bool-returns missing samples/bool-returns/CMakeLists.txt"
 )
 
 # Every trap card's search finds its own naive fixture, so the skill's
