@@ -143,8 +143,13 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 
 ### Added after 1.0 (2026-10-13)
 
-- **Open work moves to GitHub issues.** Now that 1.0 is public, open work lives in issues, where users can find it, comment on it and react to it, and each release gets a GitHub milestone. This file keeps the decisions, a line per shipped milestone and what's out of scope. The Later list became #5 to #11, the five niche trap candidates #12 to #16, and the directory listing #4. There's no Projects board: with one maintainer, the issues and the milestone already show where things stand.
+- **Open work moves to GitHub issues.** Now that 1.0 is public, open work lives in issues, where users can find it, comment on it and react to it, and each release gets a GitHub milestone. This file keeps the decisions, a line per shipped milestone and what's out of scope. The Later list became #5 to #11, the five niche trap candidates #12 to #16, and the directory listing #4. There's no Projects board: with one maintainer, the issues and the milestone already show where things stand. (Superseded on 2026-10-20: a public Project board now shows the open issues. See below.)
 - **v1.1 closes Haiku 4.5's known gaps.** It runs the Evals workflow as a matrix (#1), measures and merges `find-traps-full-sections` (#2), then moves to the latest SDL 3 and releases after a full rerun (#3). SDL_image, SDL_ttf and SDL_mixer (#5) are the likely v1.2, because they need more work than one minor release should hold.
+
+### A Project board and the `later` label (2026-10-20)
+
+- **A public Project board shows the open work (the owner's choice).** The [sdl3-porter project](https://github.com/users/hazeliscoding/projects/10) holds every open issue, as Prompuff's does, so both repos read the same way. The issues and milestones stay the source; the board only shows them. That costs one more place to keep current, since a new issue has to join the board.
+- **Ideas for later carry the `later` label.** "No milestone" also described the good first issues and the directory listing (#4), so #6 to #11 now have the label, and each says what has to be settled before it gets a milestone.
 
 ## Shipped
 
@@ -163,7 +168,7 @@ Each milestone's checklist is in git history.
 
 ## Next
 
-Open work is in [GitHub issues](https://github.com/hazeliscoding/sdl3-porter/issues). The current milestone is [v1.1](https://github.com/hazeliscoding/sdl3-porter/milestone/1): close Haiku 4.5's known gaps and make full eval reruns fast. Issues without a milestone are ideas for later, and the five trap candidates carry the `trap candidate` label.
+Open work is in [GitHub issues](https://github.com/hazeliscoding/sdl3-porter/issues). The current milestone is [v1.1](https://github.com/hazeliscoding/sdl3-porter/milestone/1): close Haiku 4.5's known gaps and make full eval reruns fast. The [sdl3-porter project](https://github.com/users/hazeliscoding/projects/10) shows all of it. Issues labeled `later` are ideas without a milestone, and the five trap candidates carry the `trap candidate` label.
 
 ## Not planned
 

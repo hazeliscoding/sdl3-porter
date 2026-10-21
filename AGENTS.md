@@ -6,7 +6,7 @@ These are the working rules for agents in this repo. sdl3-porter is an agent ski
 
 - `README.md`: the pitch and the "every trap is proven" promises.
 - `ROADMAP.md`: decisions already made, what shipped, and what is out of scope. Check it before proposing features. Respect those decisions unless the owner reopens them. Record new or changed decisions there, with the date.
-- GitHub issues: the open work. Work from the open issues in the current milestone, which `ROADMAP.md` links under **Next** (`gh issue list --milestone <name>`). Close an issue with the commit or PR that finishes it. Don't build past the current milestone without asking.
+- GitHub issues: the open work. Work from the open issues in the current milestone, which `ROADMAP.md` links under **Next** (`gh issue list --milestone <name>`). Close an issue with the commit or PR that finishes it. Don't build past the current milestone without asking. The [sdl3-porter project](https://github.com/users/hazeliscoding/projects/10) shows every open issue, and a new one joins it: `gh issue create --project sdl3-porter`, with a milestone, or the `later` label until it has one.
 - SDL facts come from SDL itself: `docs/README-migration.md`, the headers and the wiki at the pinned tag. Never from memory, and never from SDL2-era tutorials.
 
 ## Commands
