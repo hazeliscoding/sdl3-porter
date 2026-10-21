@@ -283,3 +283,20 @@ set_tests_properties(find-traps-hint-removed PROPERTIES
 set_tests_properties(find-traps-hint-renamed PROPERTIES
   PASS_REGULAR_EXPRESSION "SDL_ALLOW_TOPMOST. is not an SDL3 hint: renamed, use SDL_HINT_WINDOW_ALLOW_TOPMOST"
 )
+
+# Positive control: card without a required part
+set(incomplete_card "${CMAKE_CURRENT_BINARY_DIR}/trap-cards-incomplete")
+file(REMOVE_RECURSE "${incomplete_card}")
+file(COPY "${references}/" DESTINATION "${incomplete_card}/references")
+# Remove "**Source:**" part from bool-returns in init.md
+file(READ "${incomplete_card}/references/init.md" init_content)
+string(REPLACE "**Source:**" "REMOVED_SOURCE" init_content "${init_content}")
+file(WRITE "${incomplete_card}/references/init.md" "${init_content}")
+add_test(NAME trap-cards-incomplete-part
+  COMMAND ${CMAKE_COMMAND} -DREFERENCES=${incomplete_card}/references -DFIXTURES=${fixtures}
+          -DSAMPLES=${samples_dir} -DEVALS=${evals_dir}
+          -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-cards.cmake
+)
+set_tests_properties(trap-cards-incomplete-part PROPERTIES
+  PASS_REGULAR_EXPRESSION "trap card bool-returns has no \\*\\*Source:\\*\\* part"
+)
