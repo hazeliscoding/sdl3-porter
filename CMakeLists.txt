@@ -110,6 +110,7 @@ if(SDL3_VERSION STREQUAL SDL3_PINNED)
 endif()
 
 # The bundled rename scripts run from the skill's layout and leave the traps alone.
+find_package(Git REQUIRED)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 foreach(control IN ITEMS OFF ON)
   set(name rename-smoke)
@@ -299,4 +300,15 @@ add_test(NAME trap-cards-incomplete-part
 )
 set_tests_properties(trap-cards-incomplete-part PROPERTIES
   PASS_REGULAR_EXPRESSION "trap card bool-returns has no \\*\\*Source:\\*\\* part"
+)
+
+
+# Positive control: find_traps.py's search of the committed SDL2 code
+set(head_search_test_dir "${CMAKE_CURRENT_BINARY_DIR}/find-traps-head-search-test")
+add_test(NAME find-traps-head-search
+  COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/run-head-test.sh "${head_search_test_dir}" "${Python3_EXECUTABLE}" "${find_traps}"
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+set_tests_properties(find-traps-head-search PROPERTIES
+  PASS_REGULAR_EXPRESSION "main.c:[0-9]+ \\(HEAD\\): .*if \\(SDL_Init\\(SDL_INIT_VIDEO\\) != 0\\)"
 )
