@@ -110,6 +110,7 @@ if(SDL3_VERSION STREQUAL SDL3_PINNED)
 endif()
 
 # The bundled rename scripts run from the skill's layout and leave the traps alone.
+find_package(Git REQUIRED)
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 foreach(control IN ITEMS OFF ON)
   set(name rename-smoke)
@@ -201,16 +202,19 @@ add_runner_control(run-naive-passed bool-returns-fixed bool-returns "the bool-re
 add_runner_control(run-naive-other-failure bool-returns-naive other-trap "without a line starting with \"other-trap: \"")
 add_runner_control(run-naive-crashed crash crash "The naive port crashed, which counts as its trap")
 
-# Every trap card has fixtures, and every fixture folder has a trap card.
+# Every trap card has fixtures, samples and an eval case.
 set(references "${CMAKE_CURRENT_SOURCE_DIR}/plugins/sdl3-porter/skills/sdl3-porter/references")
 set(fixtures "${CMAKE_CURRENT_SOURCE_DIR}/fixtures")
+set(samples_dir "${CMAKE_CURRENT_SOURCE_DIR}/samples")
+set(evals_dir "${CMAKE_CURRENT_SOURCE_DIR}/plugins/sdl3-porter/evals")
 add_test(NAME trap-cards
   COMMAND ${CMAKE_COMMAND} -DREFERENCES=${references} -DFIXTURES=${fixtures}
+          -DSAMPLES=${samples_dir} -DEVALS=${evals_dir}
           -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-cards.cmake
 )
 
-# Positive controls: the check must fail on a card without fixtures, and on
-# fixtures without a card.
+# Positive controls: the check must fail on a card without fixtures, on
+# fixtures without a card, and on a card without samples or a case.
 set(orphans "${CMAKE_CURRENT_BINARY_DIR}/trap-cards-orphans")
 file(REMOVE_RECURSE "${orphans}")
 file(COPY "${references}/" DESTINATION "${orphans}/references")
@@ -220,12 +224,20 @@ foreach(dir IN LISTS fixture_dirs)
   file(MAKE_DIRECTORY "${orphans}/fixtures/${id}")
 endforeach()
 file(MAKE_DIRECTORY "${orphans}/fixtures/orphan-fixture")
+file(MAKE_DIRECTORY "${orphans}/samples")
 add_test(NAME trap-cards-orphan-card
   COMMAND ${CMAKE_COMMAND} -DREFERENCES=${orphans}/references -DFIXTURES=${fixtures}
+          -DSAMPLES=${samples_dir} -DEVALS=${evals_dir}
           -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-cards.cmake
 )
 add_test(NAME trap-cards-orphan-fixture
   COMMAND ${CMAKE_COMMAND} -DREFERENCES=${references} -DFIXTURES=${orphans}/fixtures
+          -DSAMPLES=${samples_dir} -DEVALS=${evals_dir}
+          -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-cards.cmake
+)
+add_test(NAME trap-cards-orphan-sample
+  COMMAND ${CMAKE_COMMAND} -DREFERENCES=${references} -DFIXTURES=${fixtures}
+          -DSAMPLES=${orphans}/samples -DEVALS=${evals_dir}
           -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-cards.cmake
 )
 set_tests_properties(trap-cards-orphan-card PROPERTIES
@@ -233,6 +245,9 @@ set_tests_properties(trap-cards-orphan-card PROPERTIES
 )
 set_tests_properties(trap-cards-orphan-fixture PROPERTIES
   PASS_REGULAR_EXPRESSION "fixture folder without a trap card: orphan-fixture"
+)
+set_tests_properties(trap-cards-orphan-sample PROPERTIES
+  PASS_REGULAR_EXPRESSION "trap card bool-returns missing samples/bool-returns/CMakeLists.txt"
 )
 
 # Every trap card's search finds its own naive fixture, so the skill's
@@ -268,4 +283,32 @@ set_tests_properties(find-traps-hint-removed PROPERTIES
 )
 set_tests_properties(find-traps-hint-renamed PROPERTIES
   PASS_REGULAR_EXPRESSION "SDL_ALLOW_TOPMOST. is not an SDL3 hint: renamed, use SDL_HINT_WINDOW_ALLOW_TOPMOST"
+)
+
+# Positive control: card without a required part
+set(incomplete_card "${CMAKE_CURRENT_BINARY_DIR}/trap-cards-incomplete")
+file(REMOVE_RECURSE "${incomplete_card}")
+file(COPY "${references}/" DESTINATION "${incomplete_card}/references")
+# Remove "**Source:**" part from bool-returns in init.md
+file(READ "${incomplete_card}/references/init.md" init_content)
+string(REPLACE "**Source:**" "REMOVED_SOURCE" init_content "${init_content}")
+file(WRITE "${incomplete_card}/references/init.md" "${init_content}")
+add_test(NAME trap-cards-incomplete-part
+  COMMAND ${CMAKE_COMMAND} -DREFERENCES=${incomplete_card}/references -DFIXTURES=${fixtures}
+          -DSAMPLES=${samples_dir} -DEVALS=${evals_dir}
+          -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/check-trap-cards.cmake
+)
+set_tests_properties(trap-cards-incomplete-part PROPERTIES
+  PASS_REGULAR_EXPRESSION "trap card bool-returns has no \\*\\*Source:\\*\\* part"
+)
+
+
+# Positive control: find_traps.py's search of the committed SDL2 code
+set(head_search_test_dir "${CMAKE_CURRENT_BINARY_DIR}/find-traps-head-search-test")
+add_test(NAME find-traps-head-search
+  COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmake/run-head-test.sh "${head_search_test_dir}" "${Python3_EXECUTABLE}" "${find_traps}"
+  WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+)
+set_tests_properties(find-traps-head-search PROPERTIES
+  PASS_REGULAR_EXPRESSION "main.c:[0-9]+ \\(HEAD\\): .*if \\(SDL_Init\\(SDL_INIT_VIDEO\\) != 0\\)"
 )

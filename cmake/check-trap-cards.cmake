@@ -2,17 +2,18 @@
 # a trap card. A trap card is a "## <id>" section of a reference file with a
 # "**What compiles:**" part.
 #
-#   cmake -DREFERENCES=<dir> -DFIXTURES=<dir> -P check-trap-cards.cmake
+#   cmake -DREFERENCES=<dir> -DFIXTURES=<dir> -DSAMPLES=<dir> -DEVALS=<dir> -P check-trap-cards.cmake
 
 cmake_minimum_required(VERSION 3.25)
 
-foreach(var IN ITEMS REFERENCES FIXTURES)
+foreach(var IN ITEMS REFERENCES FIXTURES SAMPLES EVALS)
   if(NOT DEFINED ${var})
     message(FATAL_ERROR "${var} is not set")
   endif()
 endforeach()
 
 set(cards "")
+set(problems "")
 file(GLOB reference_files "${REFERENCES}/*.md")
 foreach(path IN LISTS reference_files)
   file(READ "${path}" text)
@@ -22,11 +23,19 @@ foreach(path IN LISTS reference_files)
   endforeach()
   string(REPLACE "\n## " ";" sections "${text}")
   foreach(section IN LISTS sections)
-    string(FIND "${section}" "**What compiles:**" at)
-    if(NOT at EQUAL -1)
+    string(FIND "${section}" "**What compiles:**" at_compiles)
+    if(NOT at_compiles EQUAL -1)
       string(REGEX MATCH "^[^\n]*" id "${section}")
       string(STRIP "${id}" id)
       list(APPEND cards "${id}")
+
+      # Verify required parts
+      foreach(part IN ITEMS "**What compiles:**" "**What breaks:**" "**How to find it:**" "**Fix:**" "**Source:**")
+        string(FIND "${section}" "${part}" at)
+        if(at EQUAL -1)
+          list(APPEND problems "trap card ${id} has no ${part} part")
+        endif()
+      endforeach()
     endif()
   endforeach()
 endforeach()
@@ -39,10 +48,19 @@ foreach(name IN LISTS entries)
   endif()
 endforeach()
 
-set(problems "")
 foreach(id IN LISTS cards)
   if(NOT id IN_LIST fixtures)
     list(APPEND problems "trap card without a fixture folder: ${id}")
+  endif()
+  
+  if(NOT EXISTS "${SAMPLES}/${id}/CMakeLists.txt")
+    list(APPEND problems "trap card ${id} missing samples/${id}/CMakeLists.txt")
+  endif()
+  if(NOT EXISTS "${SAMPLES}/${id}/src/main.c")
+    list(APPEND problems "trap card ${id} missing samples/${id}/src/main.c")
+  endif()
+  if(NOT EXISTS "${EVALS}/${id}/case.yaml")
+    list(APPEND problems "trap card ${id} missing ${EVALS}/${id}/case.yaml")
   endif()
 endforeach()
 foreach(id IN LISTS fixtures)
