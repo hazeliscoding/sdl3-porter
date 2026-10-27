@@ -183,8 +183,9 @@ Close Haiku 4.5's known gaps and make full eval reruns fast.
 ## M11: v1.2, SDL_image, SDL_ttf and SDL_mixer
 
 - [ ] SDL_image 3, SDL_ttf 3 and SDL_mixer 3. Today the skill ports these libraries' includes and leaves their calls to the user. Supporting them means a reference file each, traps proven with fixtures that fetch the library in CMake, and eval cases.
+- [ ] Release 1.2.0, as 1.1.0 is: rerun every eval case on Sonnet 5 and Haiku 4.5, regenerate the README table from the rerun, bump `plugin.json`, tag and publish, with CI green.
 
-**Done when:** each of the three libraries has a reference file, traps proven with fixtures, and eval cases.
+**Done when:** each of the three libraries has a reference file, traps proven with fixtures, and eval cases, and 1.2.0 is released.
 
 ## Later
 
