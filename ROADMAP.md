@@ -1,6 +1,6 @@
 # Roadmap
 
-sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and catches the changes that compile cleanly but break at runtime. This file holds the decisions already made, what shipped and what's out of scope. Open work is in GitHub issues.
+sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and catches the changes that compile cleanly but break at runtime. This file holds the decisions already made, what shipped, the milestones still to build and what's out of scope.
 
 ## Decisions (2026-09-27)
 
@@ -143,13 +143,17 @@ sdl3-porter is an agent skill that ports C and C++ code from SDL2 to SDL3 and ca
 
 ### Added after 1.0 (2026-10-13)
 
-- **Open work moves to GitHub issues.** Now that 1.0 is public, open work lives in issues, where users can find it, comment on it and react to it, and each release gets a GitHub milestone. This file keeps the decisions, a line per shipped milestone and what's out of scope. The Later list became #5 to #11, the five niche trap candidates #12 to #16, and the directory listing #4. There's no Projects board: with one maintainer, the issues and the milestone already show where things stand. (Superseded on 2026-10-20: a public Project board now shows the open issues. See below.)
+- **Open work moves to GitHub issues.** Now that 1.0 is public, open work lives in issues, where users can find it, comment on it and react to it, and each release gets a GitHub milestone. This file keeps the decisions, a line per shipped milestone and what's out of scope. The Later list became #5 to #11, the five niche trap candidates #12 to #16, and the directory listing #4. There's no Projects board: with one maintainer, the issues and the milestone already show where things stand. (Superseded on 2026-10-20: a public Project board now shows the open issues. Superseded again on 2026-10-27: open work is back in this file. See below.)
 - **v1.1 closes Haiku 4.5's known gaps.** It runs the Evals workflow as a matrix (#1), measures and merges `find-traps-full-sections` (#2), then moves to the latest SDL 3 and releases after a full rerun (#3). SDL_image, SDL_ttf and SDL_mixer (#5) are the likely v1.2, because they need more work than one minor release should hold.
 
 ### A Project board and the `later` label (2026-10-20)
 
-- **A public Project board shows the open work (the owner's choice).** The [sdl3-porter project](https://github.com/users/hazeliscoding/projects/10) holds every open issue, as Prompuff's does, so both repos read the same way. The issues and milestones stay the source; the board only shows them. That costs one more place to keep current, since a new issue has to join the board.
-- **Ideas for later carry the `later` label.** "No milestone" also described the good first issues and the directory listing (#4), so #6 to #11 now have the label, and each says what has to be settled before it gets a milestone.
+- **A public Project board shows the open work (the owner's choice).** The [sdl3-porter project](https://github.com/users/hazeliscoding/projects/10) holds every open issue, as Prompuff's does, so both repos read the same way. The issues and milestones stay the source; the board only shows them. That costs one more place to keep current, since a new issue has to join the board. (Superseded on 2026-10-27: the board is closed. See below.)
+- **Ideas for later carry the `later` label.** "No milestone" also described the good first issues and the directory listing (#4), so #6 to #11 now have the label, and each says what has to be settled before it gets a milestone. (Superseded on 2026-10-27: Later is a list in this file again. See below.)
+
+### Open work back in this file (2026-10-27)
+
+- **Open work moves back into this file (the owner's call).** The milestones and Later live here again, and work goes from the next unchecked item, as it did before 1.0. v1.1's #1 to #3 and v1.2's #5 became M10 and M11 below, and the `later` issues #6 to #11 became Later. Those issues are closed as not planned, each with a comment pointing here, and the v1.1 and v1.2 milestones and the [sdl3-porter project](https://github.com/users/hazeliscoding/projects/10) are closed, not deleted. Issues stay for what people outside the repo bring: bug reports, missed traps, the `trap candidate` issues #12 to #16, the good first issues and the directory listing (#4). This gives up a public board where users could follow planned work, comment on it and react to it.
 
 ## Shipped
 
@@ -166,9 +170,32 @@ Each milestone's checklist is in git history.
 - **M8: Evidence.** Evals on Sonnet 5 and Haiku 4.5, ports of Woof! and scrcpy, and 0.4.0.
 - **M9: v1.0.0.** The one-command sweep, 1.0.0 and the write-up. The directory listing continues in [#4](https://github.com/hazeliscoding/sdl3-porter/issues/4).
 
-## Next
+## M10: v1.1, Haiku 4.5's known gaps
 
-Open work is in [GitHub issues](https://github.com/hazeliscoding/sdl3-porter/issues). The current milestone is [v1.1](https://github.com/hazeliscoding/sdl3-porter/milestone/1): close Haiku 4.5's known gaps and make full eval reruns fast. The [sdl3-porter project](https://github.com/users/hazeliscoding/projects/10) shows all of it. Issues labeled `later` are ideas without a milestone, and the five trap candidates carry the `trap candidate` label.
+Close Haiku 4.5's known gaps and make full eval reruns fast.
+
+- [ ] Run the Evals workflow as a matrix, one job per eval case, so a full rerun takes minutes instead of hours and needs no local dispatch script. The last full rerun dispatched each case separately and polled GitHub's API often enough to hit its rate limit. One dispatch runs every case for a model, the results download the same way as today, and a one-case, one-run check passes.
+- [ ] Measure and merge `find-traps-full-sections`. The branch makes `find_traps.py` print each matched section in full. Haiku 4.5 reads reference files with a line limit, so cards low in a file sometimes go unread, the likely cause of its two weak cases in 1.0: `window-mode-null` (0.40) and `logical-scale-separate` (0.80). Rerun Haiku 4.5 on both cases with the branch, 5 runs each. Merge if both reach 0.9 and no other case gets worse; otherwise record why not here.
+- [ ] Release 1.1.0. First move the SDL3 pin to the latest SDL 3 release: copy the bundled files from the new tag, update `SOURCE`, CMake and CI, and record the decision. Then rerun every eval case on Sonnet 5 and Haiku 4.5, regenerate the README table from the rerun, bump `plugin.json`, tag and publish, with CI green.
+
+**Done when:** Haiku 4.5 scores 0.9 or better on every case, or each remaining gap has a decision here, and 1.1.0 is released.
+
+## M11: v1.2, SDL_image, SDL_ttf and SDL_mixer
+
+- [ ] SDL_image 3, SDL_ttf 3 and SDL_mixer 3. Today the skill ports these libraries' includes and leaves their calls to the user. Supporting them means a reference file each, traps proven with fixtures that fetch the library in CMake, and eval cases.
+
+**Done when:** each of the three libraries has a reference file, traps proven with fixtures, and eval cases.
+
+## Later
+
+Each idea says what has to be settled before it becomes a milestone. The five niche trap candidates are [`trap candidate`](https://github.com/hazeliscoding/sdl3-porter/labels/trap%20candidate) issues instead, where evidence from real ports can be added.
+
+- **Build the port inside evals.** Install SDL3 on the eval runner, so the agent builds its port and runs it headless, as the skill does on a real machine, and graders can check that the port runs, not just what it says. Settle first: what a build proves beyond step 5's syntax check against the bundled headers, since a trap compiles cleanly by definition and graders can't see whether a build succeeded; whether build cases get a higher turn limit or only the whole-program case builds, since Haiku 4.5 already reaches 60 turns in 3 of 5 whole-program runs and M10's turn count settles first; and getting SDL 3.4.18 prebuilt into the eval sandbox, so a run doesn't spend minutes and turns building it.
+- **Run `find_traps.py` from a hook on edited files.** It's already a deterministic trap checker that CI runs on every naive fixture. A plugin's `PostToolUse` hook on the edit tools could run it on each edited file and hand its hits back to the agent. Settle first: how a plugin declares the hook and how its output reaches the model, from the current hook docs; staying fast and silent in sessions that aren't ports, on files without SDL and on machines without Python 3; reporting only hits in the new text, not the `(HEAD)` hits from the committed SDL2 version, or the agent hears about every trap it already fixed; and an eval of the same cases with and without the hook.
+- **A visual high-DPI check.** High DPI is guidance because no headless test shows a port drawing at the wrong size on a scaled display. Settle first: whether SDL 3.4.18's dummy or offscreen driver can be given a display scale, through a hint or an environment variable, which would make High DPI a trap with a fixture pair; if not, a small sample that reports pixel size against window size, run by hand on a scaled display, to back the guidance; and whether either works for the other guidance-only changes.
+- **Evals for Codex and other harnesses.** Only Claude Code is evaluated, and directory listings for Cursor, Codex, Copilot and Gemini (#4) wait for evals there. Settle first: a runner per harness that runs the same cases headless with the skill installed where that harness reads skills, such as `codex exec`, while the regex graders stay as they are; which harness first, likely Codex; an API key per harness in the Evals workflow, with evals still run by hand; and the same bar as Claude Code, the skill beating the run without it on every case, before the README calls a harness supported.
+- **A catalog marketplace repo** that lists this plugin and future skills, so one `/plugin marketplace add` covers them. It waits for a second plugin: a catalog of one adds a repo without adding anything to install, and this repo's own `.claude-plugin/marketplace.json` keeps serving the quick start either way. Then decide its name, and whether it pins each plugin to a release tag, as the directory listing does, rather than following `main`.
+- **Writing new SDL3 code, the 2.x track:** main callbacks, properties and the GPU API. Settle first: evals that judge new code, which has no SDL2 original to compare with, by building and running it headless rather than with regex graders alone; reusing every trap card as a list of things not to do; whether writing is a second skill in this plugin or a mode of the porter, since a port starts from SDL2 code and new code from a description; and the order, with main callbacks and properties first and the GPU API as a milestone of its own.
 
 ## Not planned
 
