@@ -2,11 +2,11 @@
 # a trap card. A trap card is a "## <id>" section of a reference file with a
 # "**What compiles:**" part.
 #
-#   cmake -DREFERENCES=<dir> -DFIXTURES=<dir> -P check-trap-cards.cmake
+#   cmake -DREFERENCES=<dir> -DFIXTURES=<dir> -DSAMPLES=<dir> -DEVALS=<dir> -P check-trap-cards.cmake
 
 cmake_minimum_required(VERSION 3.25)
 
-foreach(var IN ITEMS REFERENCES FIXTURES)
+foreach(var IN ITEMS REFERENCES FIXTURES SAMPLES EVALS)
   if(NOT DEFINED ${var})
     message(FATAL_ERROR "${var} is not set")
   endif()
@@ -43,6 +43,16 @@ set(problems "")
 foreach(id IN LISTS cards)
   if(NOT id IN_LIST fixtures)
     list(APPEND problems "trap card without a fixture folder: ${id}")
+  endif()
+  
+  if(NOT EXISTS "${SAMPLES}/${id}/CMakeLists.txt")
+    list(APPEND problems "trap card ${id} missing samples/${id}/CMakeLists.txt")
+  endif()
+  if(NOT EXISTS "${SAMPLES}/${id}/src/main.c")
+    list(APPEND problems "trap card ${id} missing samples/${id}/src/main.c")
+  endif()
+  if(NOT EXISTS "${EVALS}/${id}/case.yaml")
+    list(APPEND problems "trap card ${id} missing ${EVALS}/${id}/case.yaml")
   endif()
 endforeach()
 foreach(id IN LISTS fixtures)
